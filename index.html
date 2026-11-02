@@ -67,6 +67,10 @@ main{flex:1;padding:14px 16px 8px;display:block}
 .row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer}
 .row:last-child{border-bottom:0}
 .dot{width:11px;height:11px;border-radius:50%;flex:none}
+.cico{flex:none;width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+.cico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cico.lg{width:34px;height:34px;border-radius:10px}
+.cico.lg svg{width:20px;height:20px}
 .row-main{flex:1;min-width:0}
 .row-title{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -111,6 +115,16 @@ main{flex:1;padding:14px 16px 8px;display:block}
 .cat-item .nm small{display:block;color:var(--muted);font-size:11.5px}
 .cat-item .pv{font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
 .cat-item .pct{color:var(--muted);font-size:12px;min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+.cat-item{cursor:pointer}
+.seg{cursor:pointer;transition:opacity .15s}
+.seg.dim{opacity:.18}
+.mcd{margin-top:14px;border:1px solid var(--border);border-radius:12px;padding:12px}
+.mcd-head{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:8px;flex-wrap:wrap}
+.mcd-row{display:flex;align-items:center;gap:8px;padding:8px 2px;border-top:1px solid var(--border);cursor:pointer}
+.mcd-row:first-of-type{border-top:0}
+.mcd-d{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;min-width:30px}
+.mcd-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.mcd-a{font-weight:700;font-variant-numeric:tabular-nums;font-size:13px}
 /* bars */
 .bars{width:100%;padding:4px 0 0}
 .bar-row{display:grid;grid-template-columns:38px 1fr 56px;align-items:end;gap:8px;margin-bottom:9px}
@@ -157,8 +171,32 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .cat-manage .set-item{border-bottom:1px solid var(--border)}
 .cat-manage .set-item:last-child{border-bottom:0}
 .cat-manage input[type=text]{flex:1;min-width:0;border:1px solid var(--border);border-radius:7px;
-  padding:6px 9px;font-size:14px;background:var(--surface)}
+  padding:6px 9px;font-size:16px;background:var(--surface)}
 .cat-manage .cbtn{border:0;background:transparent;padding:7px;cursor:pointer;color:var(--muted)}
+.cat-manage .cbtn.del{color:#C0392B}
+/* 新增类别表单 */
+.cat-add{padding:12px 14px;border-top:1px solid var(--border);background:#FBFCFC}
+.cat-add input[type=text]{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:16px;background:var(--surface)}
+.lbl{font-size:12px;color:var(--muted);margin:10px 0 6px;font-weight:600}
+.sws{display:flex;flex-wrap:wrap;gap:9px}
+.sw{width:28px;height:28px;border-radius:8px;cursor:pointer;border:2px solid transparent;display:inline-flex;align-items:center;justify-content:center}
+.sw.on{border-color:var(--accent);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--accent)}
+.sw.ic{background:#fff;border-color:var(--border);color:#374151}
+.sw.ic.on{border-color:var(--accent);color:var(--accent)}
+.sw.ic svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ca-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+/* 今日看板 */
+.dash-card{padding:14px}
+.dash-today{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.dash-amt{font-size:26px;font-weight:800;color:var(--accent-ink)}
+.dash-today small{color:var(--muted);font-size:12px}
+.dash-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:14px}
+.dc{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:var(--text);background:#F4F6F7;cursor:pointer;padding:2px}
+.dc b{font-weight:600;line-height:1.1}
+.dc i{font-size:9.5px;color:var(--accent-ink);font-style:normal;line-height:1.15;overflow:hidden;max-width:100%}
+.dc.has{background:var(--accent-soft)}
+.dc.today{outline:2px solid var(--accent);outline-offset:-1px;font-weight:800}
+.dc.blank{background:transparent;cursor:default}
 .cat-manage .cbtn.del{color:var(--danger)}
 .swatches{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0 0}
 .sw{width:28px;height:28px;border-radius:8px;border:2px solid transparent;cursor:pointer}
@@ -221,6 +259,12 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .stat-metric .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
 /* row chevron */
 .row .chev{color:var(--muted2);font-size:15px;flex:none}
+/* ledger 工具条 */
+.ledger-tool{display:flex;gap:8px;align-items:center;margin:10px 0 12px}
+.lt-search{flex:1;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 11px;min-width:0}
+.lt-search svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+.lt-search input{border:0;background:none;outline:none;flex:1;min-width:0;font-size:16px;color:var(--text)}
+.ledger-tool select{border:1px solid var(--border);border-radius:10px;padding:8px 6px;font-size:13px;background:var(--surface);color:var(--text);max-width:126px}
 /* toast */
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;z-index:80;
   background:rgba(27,32,36,.92);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;
@@ -263,6 +307,15 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
   <main id="main">
     <section id="view-ledger" class="view on">
       <div class="card summary" id="summaryCard"></div>
+      <div class="ledger-tool">
+        <div class="lt-search"><svg viewBox="0 0 24 24"><path d="M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM16 16l4 4"/></svg><input id="searchInput" type="search" placeholder="搜索备注 / 类别 / 商品名"></div>
+        <select id="sortSel" aria-label="排序">
+          <option value="date-desc">日期：新→旧</option>
+          <option value="date-asc">日期：旧→新</option>
+          <option value="amt-desc">花费：高→低</option>
+          <option value="amt-asc">花费：低→高</option>
+        </select>
+      </div>
       <div id="ledgerList"></div>
     </section>
 
@@ -274,10 +327,11 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     <!-- ===== 视图：导入 ===== -->
     <section id="view-import" class="view">
       <div class="import-tip">
-        <b>AI 识别小票 → 粘贴入库</b><br>
-        在 DeepSeek 里识别小票前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。金额以「实付总价」为准。
+        <b>AI 识别支出凭证 → 粘贴入库</b><br>
+        在 DeepSeek 里识别前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。支持小票、购物/订单截图、银行消费记录；一次可识别多张（用「批量识别提示词」，返回的数组会按各自的日期分别入库）。金额以「实付总价」为准。
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
           <button class="btn btn-primary sm" id="copyPromptBtn">复制识别提示词</button>
+          <button class="btn btn-ghost sm" id="batchCopyBtn">批量识别提示词</button>
           <button class="btn btn-ghost sm" id="viewPromptBtn">查看提示词</button>
         </div>
       </div>
@@ -288,7 +342,7 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       </div>
       <div class="card">
         <textarea class="in" id="importText" placeholder="粘贴 DeepSeek 返回的 JSON 或文本…"></textarea>
-        <div class="hint" id="importHint">支持：小票 JSON（含 expense 字段）、简单 JSON、以及「日期 金额 类别 备注」格式的行。</div>
+        <div class="hint" id="importHint">支持：小票 / 订单 / 银行消费 JSON（含 expense 字段或数组）、简单 JSON、以及「日期 金额 类别 备注」格式的行。批量识别返回的数组会自动按各自日期拆开入库。</div>
         <button class="btn btn-primary block mt" id="parseBtn">解析</button>
       </div>
       <div class="card" id="previewCard" style="display:none">
@@ -308,10 +362,33 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     <!-- ===== 视图：设置 ===== -->
     <section id="view-settings" class="view">
       <div class="set-group">
+        <div class="set-title">今日看板</div>
+        <div class="dash-card">
+          <div class="dash-today">
+            <div style="font-size:14px">今天 · <b id="dashDate"></b></div>
+            <div class="dash-amt num" id="dashTodayAmt">€ 0.00</div>
+            <small id="dashTodayCnt">0 笔支出</small>
+          </div>
+          <div class="dash-cal" id="dashCal"></div>
+        </div>
+      </div>
+
+      <div class="set-group">
         <div class="set-title">支出类别</div>
         <div class="cat-manage" id="catManage"></div>
         <div style="padding:10px 14px;border-top:1px solid var(--border)">
           <button class="btn btn-ghost sm" id="addCatBtn">+ 新增类别</button>
+        </div>
+        <div class="cat-add" id="catAddForm" style="display:none">
+          <input type="text" id="newCatName" placeholder="新类别名称（如：宠物）" maxlength="12">
+          <div class="lbl">颜色</div>
+          <div class="sws" id="newCatColors"></div>
+          <div class="lbl">图标</div>
+          <div class="sws" id="newCatIcons"></div>
+          <div class="ca-actions">
+            <button class="btn btn-ghost sm" id="newCatCancel">取消</button>
+            <button class="btn btn-primary sm" id="newCatSave">保存</button>
+          </div>
         </div>
       </div>
 
@@ -391,7 +468,7 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 <div class="modal-mask" id="detailModal">
   <div class="sheet">
     <div class="detail-head">
-      <span class="dot" id="dDot" style="width:14px;height:14px"></span>
+      <span id="dIcon"></span>
       <h3 id="dCat" style="margin:0;font-size:17px">—</h3>
       <span id="dSrc" style="margin-left:auto;font-size:11px;color:var(--muted2)"></span>
     </div>
@@ -411,22 +488,52 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 "use strict";
 /* ================= 常量与状态 ================= */
 const DEFAULT_CATS = [
-  {name:"餐饮",color:"#E5734A"},{name:"超市",color:"#1F7A63"},
-  {name:"交通",color:"#3B6FB6"},{name:"购物",color:"#8E5BC0"},
-  {name:"日用",color:"#6B7280"},{name:"娱乐",color:"#D9A441"},
-  {name:"医疗",color:"#C0392B"},{name:"教育",color:"#2C7FB8"},
-  {name:"房租",color:"#B08D57"},{name:"其他",color:"#94A3B8"}
+  {name:"餐饮",color:"#E5734A",icon:"food"},{name:"超市",color:"#1F7A63",icon:"shop"},
+  {name:"交通",color:"#3B6FB6",icon:"trans"},{name:"购物",color:"#8E5BC0",icon:"bag"},
+  {name:"日用",color:"#6B7280",icon:"daily"},{name:"娱乐",color:"#D9A441",icon:"fun"},
+  {name:"医疗",color:"#C0392B",icon:"med"},{name:"教育",color:"#2C7FB8",icon:"edu"},
+  {name:"房租",color:"#B08D57",icon:"rent"},{name:"衣服",color:"#7E57C2",icon:"shirt"},
+  {name:"电话费",color:"#4DB6AC",icon:"phone"},{name:"订阅",color:"#EC6F73",icon:"sub"},
+  {name:"水电",color:"#5B8DEF",icon:"elec"},{name:"网络",color:"#26A69A",icon:"net"},
+  {name:"其他",color:"#94A3B8",icon:"other"}
 ];
-const PALETTE = ["#E5734A","#1F7A63","#3B6FB6","#8E5BC0","#6B7280","#D9A441","#C0392B","#2C7FB8","#B08D57","#94A3B8","#4DB6AC","#EC6F73"];
+const PALETTE = ["#E5734A","#1F7A63","#3B6FB6","#8E5BC0","#6B7280","#D9A441","#C0392B","#2C7FB8","#B08D57","#94A3B8","#4DB6AC","#EC6F73","#7E57C2","#5B8DEF","#26A69A"];
+const ICONS = {
+  food:'<path d="M8 4v4m8-4v4M6 8h12v2a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5zM8 15h8v5H8z"/>',
+  shop:'<path d="M6 3L4 8m0 0h16L18 3M6 8l1.5 12h9L18 8M9 12v4m6-4v4"/>',
+  bag:'<path d="M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2m-14 0h14l-1 13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/>',
+  trans:'<path d="M5 15l1.5-8h11l1.5 8M7 15h10M5 15v4m14-4v4M9 11.5h6"/>',
+  rent:'<path d="M4 11l8-7 8 7M6 9v11h12V9M9 20v-6h6v6"/>',
+  home:'<path d="M4 11l8-7 8 7M6 9v11h12V9"/>',
+  shirt:'<path d="M9 3h6l3 4-3 2v12H9V9L6 7zM9 3l3 4 3-4"/>',
+  phone:'<path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm1 15h8"/>',
+  sub:'<path d="M4 5h16v6H4zM4 13h16v6H4zM8 9v.01M8 17v.01"/>',
+  fun:'<path d="M6 8h2V6h2v2h2V6h2v2h2v2h-8zM6 12h12v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM9 15h6"/>',
+  med:'<path d="M12 4a5 5 0 0 1 5 5c0 3-1.5 4-5 8-3.5-4-5-5-5-8a5 5 0 0 1 5-5z"/>',
+  edu:'<path d="M5 7h14v12H5zM5 7l2-3h10l2 3M9 11h6M9 15h6"/>',
+  daily:'<path d="M12 3l7 3.5v5.5c0 4-3 6.5-7 8.5-4-2-7-4.5-7-8.5V6.5zM9 11l2 2 4-4"/>',
+  elec:'<path d="M12 3v6m0 0h5l-3 4 3 4h-5v4"/>',
+  net:'<path d="M4 9a12 12 0 0 1 16 0M6 13a8 8 0 0 1 12 0M8.5 17a4 4 0 0 1 7 0M12 21h.01"/>',
+  other:'<path d="M12 12m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0-5 0"/>'
+};
+function catInfo(name){ return state.cats.find(c=>c.name===name)||{color:"#94A3B8",icon:"other"}; }
+function catColor(name){ return catInfo(name).color; }
+function catChip(name,cls){
+  const c=catInfo(name);
+  return '<span class="cico'+(cls?" "+cls:"")+'" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>';
+}
 
 const state = {
   cats: DEFAULT_CATS.slice(),
   // ledger period
   ly: 0, lm: 0,
   // stats
-  sy: 0, statMode: "month",
+  sy: 0, statMode: "month", monthCat: null,
   editingId: null,
-  tab: "ledger"
+  tab: "ledger",
+  q: "", sort: "date-desc",
+  newCatColor: null, newCatIcon: null,
+  dashYm: null
 };
 
 /* ================= 工具 ================= */
@@ -443,7 +550,6 @@ function fmtCn(dstr){ // "2026-11-02" -> "11月2日"
 }
 function fmtCnYm(y,m){ return y+"年"+m+"月"; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
-function catColor(name){ const c=state.cats.find(c=>c.name===name); return c?c.color:"#94A3B8"; }
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("on"),1800); }
 function download(name, text, mime){
   const blob=new Blob([text],{type:mime||"text/plain;charset=utf-8"});
@@ -545,32 +651,52 @@ function renderSummary(){
 }
 function renderLedgerList(){
   const wrap=$("#ledgerList");
-  const exps=allExpenses.filter(e=>e.date.slice(0,7)===monthKey(state.ly,state.lm))
-    .sort((a,b)=> b.date.localeCompare(a.date) || b.created-a.created);
+  const q=(state.q||"").trim().toLowerCase();
+  const s=state.sort||"date-desc";
+  let exps;
+  if(q){
+    exps=allExpenses.filter(e=>{
+      if((e.note||"").toLowerCase().includes(q)) return true;
+      if((e.category||"").toLowerCase().includes(q)) return true;
+      if(e.items&&e.items.some(it=>((it.nameZh||"")+" "+(it.name||"")).toLowerCase().includes(q))) return true;
+      return false;
+    });
+  }else{
+    exps=allExpenses.filter(e=>e.date.slice(0,7)===monthKey(state.ly,state.lm));
+  }
   if(!exps.length){
-    wrap.innerHTML='<div class="empty">本月还没有支出<br><button class="btn btn-primary sm e-btn" id="emptyAdd">记一笔</button></div>';
+    wrap.innerHTML=q
+      ?'<div class="empty">没有匹配「'+esc(q)+'」的记录</div>'
+      :'<div class="empty">本月还没有支出<br><button class="btn btn-primary sm e-btn" id="emptyAdd">记一笔</button></div>';
     const b=$("#emptyAdd"); if(b)b.addEventListener("click",()=>openModal(null));
     return;
   }
-  // 按日分组
-  const groups={};
-  exps.forEach(e=>{(groups[e.date]=groups[e.date]||[]).push(e);});
-  const dates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+  const byAmount=s==="amt-desc"||s==="amt-asc";
+  const sortFn=byAmount
+    ? (a,b)=> s==="amt-asc" ? a.amount-b.amount : b.amount-a.amount
+    : (a,b)=> s==="date-asc" ? (a.date.localeCompare(b.date)||a.created-b.created) : (b.date.localeCompare(a.date)||b.created-a.created);
+  exps.sort(sortFn);
+  const rowHtml=e=>'<div class="row" data-id="'+e.id+'">'+
+    catChip(e.category)+
+    '<div class="row-main"><div class="row-title">'+esc(e.category)+'</div>'+
+    '<div class="row-sub">'+esc(rowSub(e))+(byAmount||q?' · '+esc(e.date.slice(5)):"")+'</div></div>'+
+    (e.source==="ai"?'<span class="src">AI</span>':'')+
+    '<div class="row-amt num">€ '+money(e.amount)+'</div>'+
+    '<span class="chev">›</span></div>';
   let html="";
-  dates.forEach(d=>{
-    const dayTotal=groups[d].reduce((s,e)=>s+e.amount,0);
-    html+='<div class="day"><div class="day-head"><span>'+fmtCn(d)+'</span><span class="num">€ '+money(dayTotal)+'</span></div>';
-    groups[d].forEach(e=>{
-      html+='<div class="row" data-id="'+e.id+'">'+
-        '<span class="dot" style="background:'+catColor(e.category)+'"></span>'+
-        '<div class="row-main"><div class="row-title">'+esc(e.category)+'</div>'+
-        '<div class="row-sub">'+esc(rowSub(e))+'</div></div>'+
-        (e.source==="ai"?'<span class="src">AI</span>':'')+
-        '<div class="row-amt num">€ '+money(e.amount)+'</div>'+
-        '<span class="chev">›</span></div>';
+  if(byAmount||q){
+    exps.forEach(e=>{ html+=rowHtml(e); });
+  }else{
+    const groups={};
+    exps.forEach(e=>{(groups[e.date]=groups[e.date]||[]).push(e);});
+    const dates=Object.keys(groups).sort((a,b)=> s==="date-asc"?a.localeCompare(b):b.localeCompare(a));
+    dates.forEach(d=>{
+      const dayTotal=groups[d].reduce((sx,e)=>sx+e.amount,0);
+      html+='<div class="day"><div class="day-head"><span>'+fmtCn(d)+'</span><span class="num">€ '+money(dayTotal)+'</span></div>';
+      groups[d].forEach(e=>{ html+=rowHtml(e); });
+      html+='</div>';
     });
-    html+='</div>';
-  });
+  }
   wrap.innerHTML=html;
   $$(".row",wrap).forEach(r=>r.addEventListener("click",()=>openDetail(r.dataset.id)));
 }
@@ -589,7 +715,7 @@ let detailId=null;
 function openDetail(id){
   const e=allExpenses.find(x=>x.id===id); if(!e)return;
   detailId=id;
-  $("#dDot").style.background=catColor(e.category);
+  $("#dIcon").innerHTML=catChip(e.category,"lg");
   $("#dCat").textContent=e.category;
   $("#dSrc").textContent=e.source==="ai"?"AI 识别":"手动";
   $("#dAmt").textContent="€ "+money(e.amount);
@@ -661,7 +787,7 @@ function openModal(id){
   state.cats.forEach(c=>{
     const b=document.createElement("button");
     b.type="button"; b.className="chip"+(e&&e.category===c.name?" on":"");
-    b.innerHTML='<span class="c-dot" style="background:'+c.color+'"></span>'+esc(c.name);
+    b.innerHTML=catChip(c.name)+'<span>'+esc(c.name)+'</span>';
     b.addEventListener("click",()=>{$$(".chip",cw).forEach(x=>x.classList.remove("on")); b.classList.add("on");});
     cw.appendChild(b);
   });
@@ -716,42 +842,62 @@ function renderMonthStat(){
   const byCat={};
   exps.forEach(e=>{byCat[e.category]=(byCat[e.category]||0)+e.amount;});
   const segs=Object.keys(byCat).map(n=>({name:n,value:byCat[n],color:catColor(n)})).sort((a,b)=>b.value-a.value);
+  if(state.monthCat && !byCat[state.monthCat]) state.monthCat=null;
   const card=$("#statCard");
-  card.innerHTML=
+  let html=
     '<div class="stats-head"><div><h3 style="margin:0">'+fmtCnYm(state.ly,state.lm)+' 支出</h3>'+
     '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">€ '+money(total)+'</div>'+
-    '<div style="font-size:12px;color:var(--muted)">'+exps.length+' 笔</div></div></div>'+
-    '<div class="chart-box">'+donutSVG(segs,total)+'</div>'+
+    '<div style="font-size:12px;color:var(--muted)">'+exps.length+' 笔 · 点击圆环或分类查看明细</div></div></div>'+
+    '<div class="chart-box">'+donutSVG(segs,total,state.monthCat)+'</div>'+
     '<div class="cat-list">'+segs.map(s=>catLine(s,total)).join("")+
     (!segs.length?'<div class="empty">本月暂无支出</div>':"")+'</div>';
+  if(state.monthCat) html+=monthCatDetail(state.monthCat,key);
+  card.innerHTML=html;
+}
+function monthCatDetail(name,key){
+  const exps=allExpenses.filter(e=>e.date.slice(0,7)===key&&e.category===name).sort((a,b)=>a.date.localeCompare(b.date));
+  const sum=exps.reduce((s,e)=>s+e.amount,0);
+  const c=catInfo(name);
+  return '<div class="mcd"><div class="mcd-head"><span class="cico" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>'+
+    '<b>'+esc(name)+'</b><span style="color:var(--muted)">'+exps.length+' 笔 · € '+money(sum)+'</span>'+
+    '<button class="btn btn-ghost sm" id="mcdBack">返回全部</button></div>'+
+    exps.map(e=>'<div class="mcd-row" data-id="'+e.id+'"><span class="mcd-d">'+esc(e.date.slice(5))+'</span>'+
+      '<span class="mcd-n">'+esc(e.note||((e.items&&e.items.length)?(e.items[0].nameZh||e.items[0].name):"")||e.category)+'</span>'+
+      '<span class="mcd-a num">€ '+money(e.amount)+'</span></div>').join("")+'</div>';
 }
 function catLine(s,total){
   const pct=total>0?Math.round(s.value/total*100):0;
-  return '<div class="cat-item"><span class="dot" style="background:'+s.color+'"></span>'+
+  const c=catInfo(s.name);
+  return '<div class="cat-item" data-name="'+esc(s.name)+'"><span class="cico" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>'+
     '<div class="nm">'+esc(s.name)+'</div>'+
     '<div class="pv num">€ '+money(s.value)+'</div>'+
     '<div class="pct">'+pct+'%</div></div>';
 }
-function donutSVG(segs,total){
-  const S=230, C=S/2, R=82, r=56, cx=C, cy=C;
+function donutSVG(segs,total,sel){
+  const S=230,C=S/2,R=82,r=56,cx=C,cy=C;
   if(!segs.length) return '<svg viewBox="0 0 230 230" width="100%"><circle cx="115" cy="115" r="72" fill="none" stroke="#E3E7EB" stroke-width="18"/></svg>';
+  // 单一类别：占满整个圆环
+  if(segs.length===1 && segs[0].value/total>=0.999){
+    const s=segs[0];
+    return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+
+      '<circle cx="115" cy="115" r="69" fill="none" stroke="'+s.color+'" stroke-width="26" class="seg" data-name="'+esc(s.name)+'"/>'+
+      '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">总支出</text>'+
+      '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">€ '+money(total)+'</text></svg>';
+  }
   let acc=0;
   const paths=segs.map(s=>{
-    const a0=(acc/total)*2*Math.PI - Math.PI/2;
-    acc+=s.value;
-    const a1=(acc/total)*2*Math.PI - Math.PI/2;
+    const a0=(acc/total)*2*Math.PI-Math.PI/2; acc+=s.value;
+    const a1=(acc/total)*2*Math.PI-Math.PI/2;
     const large=(s.value/total)>0.5?1:0;
-    const x0=cx+R*Math.cos(a0), y0=cy+R*Math.sin(a0);
-    const x1=cx+R*Math.cos(a1), y1=cy+R*Math.sin(a1);
-    const xi0=cx+r*Math.cos(a1), yi0=cy+r*Math.sin(a1);
-    const xi1=cx+r*Math.cos(a0), yi1=cy+r*Math.sin(a0);
-    const d="M"+x0.toFixed(2)+" "+y0.toFixed(2)+" A"+R+" "+R+" 0 "+large+" 1 "+x1.toFixed(2)+" "+y1.toFixed(2)+
-      " L"+xi0.toFixed(2)+" "+yi0.toFixed(2)+" A"+r+" "+r+" 0 "+large+" 0 "+xi1.toFixed(2)+" "+yi1.toFixed(2)+" Z";
-    return '<path d="'+d+'" fill="'+s.color+'"/>';
+    const x0=cx+R*Math.cos(a0),y0=cy+R*Math.sin(a0);
+    const x1=cx+R*Math.cos(a1),y1=cy+R*Math.sin(a1);
+    const xi0=cx+r*Math.cos(a1),yi0=cy+r*Math.sin(a1);
+    const xi1=cx+r*Math.cos(a0),yi1=cy+r*Math.sin(a0);
+    const d="M"+x0.toFixed(2)+" "+y0.toFixed(2)+" A"+R+" "+R+" 0 "+large+" 1 "+x1.toFixed(2)+" "+y1.toFixed(2)+" L"+xi0.toFixed(2)+" "+yi0.toFixed(2)+" A"+r+" "+r+" 0 "+large+" 0 "+xi1.toFixed(2)+" "+yi1.toFixed(2)+" Z";
+    return '<path d="'+d+'" fill="'+s.color+'" class="seg'+(sel?(sel===s.name?" on":" dim"):"")+'" data-name="'+esc(s.name)+'"/>';
   }).join("");
-  return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+
-    paths+
-    '<text x="115" y="112" text-anchor="middle" font-size="12" fill="#6B747C">总支出</text>'+
+  return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+paths+
+    '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">总支出</text>'+
     '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">€ '+money(total)+'</text></svg>';
 }
 function renderYearStat(){
@@ -825,46 +971,51 @@ function lineSVG(months,max,avg){
 
 /* ================= AI 导入解析 ================= */
 const PROMPT_TEMPLATE = [
-"你是一个小票/收据识别与结构化助手。用户会发来一张购物小票的图片或文字。你的唯一任务是：把小票整理成一个严格符合下方 SCHEMA 的 JSON 对象。只输出这一个 JSON，不要输出任何其他内容。",
+"你是一个「支出凭证」识别与结构化助手。用户会发来一张支出凭证的图片或文字——可以是购物小票、电商/网购订单截图、银行消费或转账记录截图、支付账单等。你的唯一任务：把它整理成一个严格符合下方 SCHEMA 的 JSON 对象。只输出这一个 JSON，不要输出任何其他内容。",
+"",
+"【凭证类型判断】",
+"- 小票 / 订单截图：提取 items 商品明细（含中文名 nameZh）。",
+"- 银行支出 / 消费截图：一般没有分项商品，items 填空数组 []，amount 填实付金额，note 写清是「银行支出 / 某商户消费」等。",
 "",
 "【硬性规则】",
 "1. 只输出一个 JSON 对象。不要用 ``` 代码块包裹，不要输出任何解释、开头语、结尾语或 Markdown 标记。",
 "2. 金额一律写成 JSON 数字：不含货币符号、不含千分位逗号，小数用英文小数点，保留两位小数（如 21.52）。",
-"3. 日期统一转成 YYYY-MM-DD（如 28-10-2026 → 2026-10-28）。",
-"4. amount 必须是「最终实际支付的总价」：含税、含押金、已扣除所有优惠/折扣后的小票总计。",
-"5. category 只能从这组里选一个最贴切的：[\"餐饮\",\"超市\",\"交通\",\"购物\",\"日用\",\"娱乐\",\"医疗\",\"教育\",\"其他\"]。拿不准就选\"其他\"。",
-"6. payment 只能从：[\"银行卡\",\"现金\",\"信用卡\",\"手机支付\",\"其他\"]。小票写 Bankpas/银行卡 就填\"银行卡\"。",
-"7. items：每个商品一行，amount 填「最终应付金额」（已扣优惠后的实付价，无折扣就用原价）。按件卖的 qty 填件数、unit 填\"件\"；按重量卖的（如 xx kg）qty 填重量数值、unit 填\"kg\"、unitPrice 填单价。数量为 1 时 qty 填 1。",
-"8. 商品名：name 写小票原文（荷兰语/英语，如 Vissticks MSC）；nameZh 写它的中文名（如 Vissticks MSC → 鱼柳条）。看不清的 nameZh 填 null，绝不臆造。",
+"3. 日期统一转成 YYYY-MM-DD（如 28-10-2026 → 2026-10-28）。日期不确定时不编造，在 warnings 里说明。",
+"4. amount 必须是「最终实际支付的总价」：含税、含押金、已扣除所有优惠/折扣后的实际支出。",
+"5. category 只能从这组里选一个最贴切的：[\"餐饮\",\"超市\",\"交通\",\"购物\",\"日用\",\"娱乐\",\"医疗\",\"教育\",\"房租\",\"衣服\",\"电话费\",\"订阅\",\"水电\",\"网络\",\"其他\"]。拿不准就选\"其他\"。",
+"6. payment 只能从：[\"银行卡\",\"现金\",\"信用卡\",\"手机支付\",\"其他\"]。",
+"7. items：有商品明细就每个商品一行，amount 填「最终应付金额」（已扣优惠后的实付价）。按件卖的 qty 填件数、unit 填\"件\"；按重量卖的 qty 填重量数值、unit 填\"kg\"、unitPrice 填单价。没有分项商品就填空数组 []。",
+"8. 商品名：name 写凭证原文（荷兰语/英语等）；nameZh 写它的中文名（如 Vissticks MSC → 鱼柳条）。看不清的 nameZh 填 null，绝不臆造。",
 "9. currency 用 ISO 三位码：EUR / CNY / USD 等。",
 "10. confidence 填 0 到 1 的识别置信度。",
 "11. warnings：凡是看不清、缺失、有歧义的字段，都写进这个数组说明，绝不编造数据。",
-"12. 如果小票根本无法识别，只输出 {\"error\":\"无法识别\",\"reason\":\"<原因>\"}，不要编造。",
+"12. 如果凭证根本无法识别，只输出 {\"error\":\"无法识别\",\"reason\":\"<原因>\"}，不要编造。",
 "",
 "【输出 SCHEMA（严格照此结构，缺项用 null 或空数组）】",
-"{",
-"  \"expense\": {",
-"    \"date\": \"YYYY-MM-DD\",",
-"    \"amount\": 0.00,",
-"    \"category\": \"超市\",",
-"    \"store\": \"店铺名\",",
-"    \"payment\": \"银行卡\",",
-"    \"note\": \"可放店铺地址、总节省金额等说明，没有就留空字符串\",",
-"    \"items\": [",
-"      {\"name\": \"商品原文名\", \"nameZh\": \"中文名\", \"qty\": 1, \"unit\": \"件\", \"unitPrice\": 0.00, \"amount\": 0.00}",
-"    ]",
-"  },",
-"  \"currency\": \"EUR\",",
-"  \"confidence\": 0.9,",
-"  \"warnings\": []",
-"}",
+"{\"expense\":{\"date\":\"YYYY-MM-DD\",\"amount\":0.00,\"category\":\"超市\",\"store\":\"店铺/商户名\",\"payment\":\"银行卡\",\"note\":\"备注，没有就留空字符串\",\"items\":[{\"name\":\"原文名\",\"nameZh\":\"中文名\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":0.00,\"amount\":0.00}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]}",
 "",
 "【示例输入 → 示例输出】",
-"小票含：鱼柳条 1.75、薯片 2.50、香蕉 0.480kg × 1.15/kg = 0.55；应付总计 21.52；Bankpas；日期 28-10-2026。",
-"正确输出：",
-"{\"expense\":{\"date\":\"2026-10-28\",\"amount\":21.52,\"category\":\"超市\",\"store\":\"LIDL Hengelo\",\"payment\":\"银行卡\",\"note\":\"10件商品，共节省0.31\",\"items\":[{\"name\":\"Vissticks MSC\",\"nameZh\":\"鱼柳条\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":1.75,\"amount\":1.75},{\"name\":\"Lay's max paprika\",\"nameZh\":\"乐事红椒薯片\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":2.50,\"amount\":2.50},{\"name\":\"Bananen\",\"nameZh\":\"香蕉\",\"qty\":0.48,\"unit\":\"kg\",\"unitPrice\":1.15,\"amount\":0.55}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]}",
+"① 小票：鱼柳条 1.75、香蕉 0.480kg × 1.15/kg = 0.55；应付总计 21.52；Bankpas；日期 28-10-2026。",
+"→ {\"expense\":{\"date\":\"2026-10-28\",\"amount\":21.52,\"category\":\"超市\",\"store\":\"LIDL Hengelo\",\"payment\":\"银行卡\",\"note\":\"10件商品，共节省0.31\",\"items\":[{\"name\":\"Vissticks MSC\",\"nameZh\":\"鱼柳条\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":1.75,\"amount\":1.75},{\"name\":\"Bananen\",\"nameZh\":\"香蕉\",\"qty\":0.48,\"unit\":\"kg\",\"unitPrice\":1.15,\"amount\":0.55}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]}",
+"② 银行消费截图：NS 火车 35.00，日期 15-10-2026。",
+"→ {\"expense\":{\"date\":\"2026-10-15\",\"amount\":35.00,\"category\":\"交通\",\"store\":\"NS 火车\",\"payment\":\"银行卡\",\"note\":\"银行消费：火车票\",\"items\":[]},\"currency\":\"EUR\",\"confidence\":0.85,\"warnings\":[]}",
 "",
-"现在请处理用户发来的小票。"
+"现在请处理用户发来的凭证。"
+].join("\n");
+
+const BATCH_PROMPT_TEMPLATE = [
+"你是一个「多张支出凭证」识别与结构化助手。用户会一次发来多张支出凭证（小票 / 购物或订单截图 / 银行消费记录）。你的唯一任务：把每一张凭证分别整理成一个 expense 对象，最终输出一个 JSON 数组——有几张凭证就有几个元素。只输出这一个 JSON 数组，不要输出任何其他内容。",
+"",
+"【关键】",
+"- 每张凭证都可能有不同的日期，各自按凭证上的真实日期填写 date（YYYY-MM-DD），用于区分不同天的支出。",
+"- 数组顺序无所谓，接收端会按每张的 date 分别入库。",
+"- 其余规则与单张一致：amount 为实付总价；category 从 [\"餐饮\",\"超市\",\"交通\",\"购物\",\"日用\",\"娱乐\",\"医疗\",\"教育\",\"房租\",\"衣服\",\"电话费\",\"订阅\",\"水电\",\"网络\",\"其他\"] 选；有商品明细填 items（含 nameZh 中文名），没有填 []。",
+"- 某张凭证看不清就跳过，并在该张的 warnings 里说明，不要编造。全部无法识别则只输出 {\"error\":\"无法识别\",\"reason\":\"<原因>\"}。",
+"",
+"【输出格式】",
+"[{\"expense\":{\"date\":\"YYYY-MM-DD\",\"amount\":0.00,\"category\":\"超市\",\"store\":\"店铺名\",\"payment\":\"银行卡\",\"note\":\"\",\"items\":[{\"name\":\"原文名\",\"nameZh\":\"中文名\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":0.00,\"amount\":0.00}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]},{\"expense\":{…第二张凭证…}}]",
+"",
+"现在请处理用户发来的多张凭证。"
 ].join("\n");
 
 let previewRows=[];
@@ -875,7 +1026,7 @@ function parseImport(text){
   try{
     const obj=JSON.parse(cleaned);
     if(obj.error) return {error:obj.reason||"无法识别"};
-    if(Array.isArray(obj)) obj.forEach(o=>pushExpenseRow(rows,o,null));
+    if(Array.isArray(obj)) obj.forEach(o=>pushExpenseRow(rows,o.expense||o,o.expense?o:null));
     else if(obj.expense) pushExpenseRow(rows,obj.expense,obj);
     else if(Array.isArray(obj.expenses)) obj.expenses.forEach(o=>pushExpenseRow(rows,o,null));
     else if(typeof obj.amount==="number"||typeof obj.amount==="string") pushExpenseRow(rows,obj,null);
@@ -960,6 +1111,7 @@ function commitPreview(){
   good.forEach(r=>saveExpense({id:uid(),amount:r.amount,date:r.date,category:r.category,
     note:r.note||"",source:r.source||"manual",items:r.items||[],created:nowTs,updated:nowTs}));
   previewRows=[];
+  $("#importText").value="";
   renderPreview();
   refresh();
   toast("已入库 "+good.length+" 笔");
@@ -1016,10 +1168,11 @@ async function restoreFile(file){
 
 /* ================= 类别管理 ================= */
 function renderSettings(){
+  renderDash();
   const wrap=$("#catManage"); wrap.innerHTML="";
   state.cats.forEach((c,i)=>{
     const div=document.createElement("div"); div.className="set-item";
-    div.innerHTML='<span class="dot" style="background:'+c.color+';width:12px;height:12px"></span>'+
+    div.innerHTML='<span class="cico" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>'+
       '<input type="text" value="'+esc(c.name)+'" data-i="'+i+'" maxlength="12">'+
       '<button class="cbtn del" data-i="'+i+'" aria-label="删除">删除</button>';
     wrap.appendChild(div);
@@ -1034,7 +1187,6 @@ function renderSettings(){
     const i=+e.target.dataset.i;
     if(state.cats.length<=1){toast("至少保留一个类别");return;}
     const name=state.cats[i].name;
-    // 已有该类别支出的替换为“其他”
     state.cats.splice(i,1);
     persistCats().then(()=>{
       const other=state.cats.find(c=>c.name==="其他")||state.cats[0];
@@ -1042,6 +1194,43 @@ function renderSettings(){
       refresh();
     });
   }));
+  if(state.newCatColor===null) state.newCatColor=PALETTE[state.cats.length%PALETTE.length];
+  if(state.newCatIcon===null) state.newCatIcon="other";
+  $("#newCatColors").innerHTML=PALETTE.map(p=>{
+    const on=p===state.newCatColor?" on":"";
+    return '<span class="sw'+on+'" data-c="'+p+'" style="background:'+p+'"></span>';
+  }).join("");
+  $("#newCatIcons").innerHTML=Object.keys(ICONS).map(k=>{
+    const on=k===state.newCatIcon?" on":"";
+    return '<span class="sw ic'+on+'" data-i="'+k+'"><svg viewBox="0 0 24 24">'+ICONS[k]+'</svg></span>';
+  }).join("");
+}
+function renderDash(){
+  const t=new Date(); const y=state.dashYm?+state.dashYm.slice(0,4):t.getFullYear(); const m=state.dashYm?+state.dashYm.slice(5,7):t.getMonth()+1;
+  const today=fmtCn(todayStr()).slice(5);
+  $("#dashDate").textContent=fmtCnYm(y,m);
+  const todayExps=allExpenses.filter(e=>e.date===todayStr());
+  $("#dashTodayAmt").textContent="€ "+money(todayExps.reduce((s,e)=>s+e.amount,0));
+  $("#dashTodayCnt").textContent=todayExps.length+" 笔支出 · 点击日历某日查看";
+  // 日历网格
+  const first=new Date(y,m-1,1);
+  const offset=(first.getDay()+6)%7; // 周一开头
+  const dim=new Date(y,m,0).getDate();
+  const key=monthKey(y,m);
+  const byDay={};
+  allExpenses.forEach(e=>{ if(e.date.slice(0,7)===key){ byDay[e.date]= (byDay[e.date]||0)+e.amount; } });
+  let cells="";
+  for(let i=0;i<offset;i++) cells+='<span class="dc blank"></span>';
+  for(let d=1;d<=dim;d++){
+    const ds=y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    const amt=byDay[ds]||0;
+    const isToday=ds===todayStr();
+    const has=amt>0;
+    cells+='<span class="dc'+(isToday?" today":"")+(has?" has":"")+'" data-d="'+ds+'"><b>'+d+'</b>'+
+      (has?'<i class="num">'+money(amt)+'</i>':"")+'</span>';
+  }
+  $("#dashCal").innerHTML=cells;
+  $$(".dc[data-d]",$("#dashCal")).forEach(c=>c.addEventListener("click",()=>{ state.dashYm=c.dataset.d.slice(0,7); renderDash(); }));
 }
 
 /* ================= 刷新 ================= */
@@ -1059,7 +1248,7 @@ function bindEvents(){
   $$(".tab").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
   $("#prevBtn").addEventListener("click",()=>stepPeriod(-1));
   $("#nextBtn").addEventListener("click",()=>stepPeriod(1));
-  $("#statSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{state.statMode=b.dataset.k; renderStats();}));
+  $("#statSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{state.statMode=b.dataset.k; state.monthCat=null; renderStats();}));
   $("#fabBtn").addEventListener("click",()=>openModal(null));
   $("#fCancel").addEventListener("click",closeModal);
   $("#fSave").addEventListener("click",saveModal);
@@ -1077,7 +1266,17 @@ function bindEvents(){
   });
   // 详情
   $("#detailModal").addEventListener("click",e=>{ if(e.target.id==="detailModal") closeDetail(); });
-  $("#dEdit").addEventListener("click",()=>{ if(!detailId)return; closeDetail(); openModal(detailId); });
+  $("#statCard").addEventListener("click",e=>{
+    const seg=e.target.closest(".seg");
+    if(seg){ state.monthCat=seg.dataset.name; renderMonthStat(); return; }
+    const ci=e.target.closest(".cat-item");
+    if(ci){ state.monthCat=ci.dataset.name; renderMonthStat(); return; }
+    const mb=e.target.closest("#mcdBack");
+    if(mb){ state.monthCat=null; renderMonthStat(); return; }
+    const mr=e.target.closest(".mcd-row");
+    if(mr){ openDetail(mr.dataset.id); }
+  });
+  $("#dEdit").addEventListener("click",()=>{ if(!detailId)return; const id=detailId; closeDetail(); openModal(id); });
   $("#dDelete").addEventListener("click",()=>{ if(!detailId)return; const id=detailId; closeDetail(); removeExpense(id); refresh(); toast("已删除"); });
   // 导入
   function copyText(text){
@@ -1104,6 +1303,7 @@ function bindEvents(){
   }
   $("#copyPromptBtn").addEventListener("click",doCopyPrompt);
   $("#copyPrompt2Btn").addEventListener("click",doCopyPrompt);
+  $("#batchCopyBtn").addEventListener("click",()=>copyText(BATCH_PROMPT_TEMPLATE).then(ok=>toast(ok?"批量识别提示词已复制（多张凭证→返回数组，按各自日期入库）":"已弹出提示词，请手动全选复制")));
   $("#viewPromptBtn").addEventListener("click",()=>{
     const box=$("#promptBox"), shown=box.style.display!=="none";
     box.style.display=shown?"none":"block";
@@ -1120,15 +1320,27 @@ function bindEvents(){
   $("#commitBtn").addEventListener("click",commitPreview);
   $("#clearPreviewBtn").addEventListener("click",()=>{previewRows=[];renderPreview();});
   $("#restoreFile").addEventListener("change",e=>{if(e.target.files[0])restoreFile(e.target.files[0]); e.target.value="";});
+  // 明细搜索 / 排序
+  $("#searchInput").addEventListener("input",e=>{ state.q=e.target.value; renderLedgerList(); });
+  $("#sortSel").addEventListener("change",e=>{ state.sort=e.target.value; renderLedgerList(); });
   // 导出
   $("#exportJson").addEventListener("click",exportJSON);
   $("#exportCsv").addEventListener("click",exportCSV);
-  // 类别新增
+  // 类别新增（颜色 + 图标绑定）
   $("#addCatBtn").addEventListener("click",()=>{
-    const name=window.prompt("新类别名称：",""); if(!name||!name.trim())return;
-    if(state.cats.some(c=>c.name===name.trim())){toast("已有同名类别");return;}
-    state.cats.push({name:name.trim(),color:PALETTE[state.cats.length%PALETTE.length]});
-    persistCats().then(()=>{refresh();toast("已新增 "+name.trim());});
+    const f=$("#catAddForm"); const show=f.style.display!=="none";
+    f.style.display=show?"none":"block";
+    if(!show){ renderSettings(); $("#newCatName").focus(); }
+  });
+  $("#newCatCancel").addEventListener("click",()=>{ $("#catAddForm").style.display="none"; state.newCatColor=null; state.newCatIcon=null; });
+  $("#newCatColors").addEventListener("click",e=>{ const s=e.target.closest(".sw[data-c]"); if(!s)return; state.newCatColor=s.dataset.c; renderSettings(); });
+  $("#newCatIcons").addEventListener("click",e=>{ const s=e.target.closest(".sw[data-i]"); if(!s)return; state.newCatIcon=s.dataset.i; renderSettings(); });
+  $("#newCatSave").addEventListener("click",()=>{
+    const name=$("#newCatName").value.trim();
+    if(!name){toast("请输入类别名称");return;}
+    if(state.cats.some(c=>c.name===name)){toast("已有同名类别");return;}
+    state.cats.push({name,color:state.newCatColor||PALETTE[0],icon:state.newCatIcon||"other"});
+    persistCats().then(()=>{ state.newCatColor=null; state.newCatIcon=null; $("#catAddForm").style.display="none"; $("#newCatName").value=""; refresh(); toast("已新增 "+name); });
   });
 }
 async function init(){
