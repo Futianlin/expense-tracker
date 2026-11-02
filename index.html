@@ -460,7 +460,7 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
         <button class="btn btn-primary block mt" id="parseBtn" data-i18n="parse">解析</button>
       </div>
       <div class="card" id="previewCard" style="display:none">
-        <h3 data-i18n="previewTitle">待入库 <span id="previewCount"></span> 笔</h3>
+        <h3><span data-i18n="previewTitle">待入库</span> <span id="previewCount"></span> 笔</h3>
         <div id="previewList"></div>
         <button class="btn btn-primary block mt" id="commitBtn" data-i18n="commit">确认入库</button>
         <button class="btn btn-plain block mt" id="clearPreviewBtn" data-i18n="clear">清空</button>
@@ -604,7 +604,7 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     <div class="field">
       <label data-i18n="fAmount">金额</label>
       <div style="display:flex;gap:8px;align-items:center">
-        <input type="number" id="fAmount" step="0.01" min="0" inputmode="decimal" placeholder="0.00" style="flex:1;min-width:0">
+        <input type="text" id="fAmount" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0.00" style="flex:1;min-width:0">
         <select id="fCur" aria-label="货币" style="width:104px;border:1px solid var(--border);border-radius:10px;padding:11px 8px;font-size:16px;background:var(--surface);color:var(--text)">
           <option value="EUR">€ EUR</option>
           <option value="USD">$ USD</option>
@@ -649,12 +649,21 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       <div style="display:flex;gap:8px;align-items:center">
         <input type="number" id="recDayInput" value="1" min="1" max="31" step="1" inputmode="numeric" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)">
         <span data-i18n="recDayU">日</span>
+        <input type="time" id="recTime" value="08:00" aria-label="时间" style="border:1px solid var(--border);border-radius:10px;padding:9px 8px;font-size:16px;background:var(--surface);color:var(--text)">
       </div>
+    </div>
+    <div class="field">
+      <label data-i18n="recStart">开始于</label>
+      <div style="display:flex;gap:8px" id="recStartWrap">
+        <button type="button" class="btn btn-plain on" data-start="this" style="flex:1" data-i18n="recThisMonth">本月开始</button>
+        <button type="button" class="btn btn-plain" data-start="next" style="flex:1" data-i18n="recNextStart">下月开始</button>
+      </div>
+      <small style="color:var(--muted)" data-i18n="recStartHint">本月开始：已过的日期（如今天 2 日、选 1 日）会补记本月</small>
     </div>
     <div class="field">
       <label data-i18n="fAmount">金额</label>
       <div style="display:flex;gap:8px;align-items:center">
-        <input type="number" id="recAmt" step="0.01" min="0" inputmode="decimal" placeholder="0.00" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)">
+        <input type="text" id="recAmt" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0.00" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)">
         <select id="recCur" aria-label="货币" style="width:104px;border:1px solid var(--border);border-radius:10px;padding:11px 8px;font-size:16px;background:var(--surface);color:var(--text)"></select>
       </div>
     </div>
@@ -843,6 +852,7 @@ zh:{
   ledger:"账本",
   recTitle:"每月定时记账", recAdd:"新增定时", recHint:"到设定日期会自动记一笔；若当天没打开 App，下次打开会补记",
   recDay:"每月第", recDayU:"日", recNotePh:"如：房租、订阅费", recNone:"还没有定时记录", recNext:"下次", recEdit:"编辑定时", recAdded:"已自动记账", recTag:"定时",
+  recStart:"开始于", recThisMonth:"本月开始", recNextStart:"下月开始", recStartHint:"本月开始：已过的日期（如今天 2 日、选 1 日）会补记本月",
   hasItems:"含", tCommitted:"已入库", tNoValidCommit:"没有可入库的有效记录",
   tNoValid:"没解析出有效记录，试试 JSON 格式",
   tRmOn:"记账提醒已开启", tRmOff:"记账提醒已关闭",
@@ -911,6 +921,7 @@ en:{
   ledger:"Ledger",
   recTitle:"Monthly schedule", recAdd:"Add schedule", recHint:"Auto-records on the set day; if the app wasn't open that day, it catches up next time",
   recDay:"Day of month", recDayU:"th", recNotePh:"e.g. rent, subscription", recNone:"No schedules yet", recNext:"next", recEdit:"Edit schedule", recAdded:"Auto-recorded", recTag:"scheduled",
+  recStart:"Start from", recThisMonth:"This month", recNextStart:"Next month", recStartHint:"This month: an already-passed day (e.g. today is the 2nd, day=1) backfills this month",
   hasItems:"with", tCommitted:"Imported", tNoValidCommit:"No valid records to import",
   tNoValid:"No valid records — try JSON format",
   tRmOn:"Reminder on", tRmOff:"Reminder off",
@@ -1075,11 +1086,13 @@ function ledgerBar(){
 function restrictNumeric(el){
   el.addEventListener("beforeinput",e=>{
     if(e.data==null) return; // 删除/退格/粘贴等不在此判断
-    if(!/^[\d.]$/.test(e.data)) e.preventDefault();
-    else if(e.data==="." && el.value.includes(".")) e.preventDefault();
+    if(!/^[\d.,]$/.test(e.data)){ e.preventDefault(); return; }
+    // 已有小数点（. 或 ,）则不再允许第二个
+    if(/[.,]/.test(e.data) && /[.,]/.test(el.value)) e.preventDefault();
   });
   el.addEventListener("input",()=>{
-    let v=el.value.replace(/[^\d.]/g,"");
+    let v=el.value.replace(/[^\d.,]/g,"");
+    v=v.replace(",","."); // 欧式键盘用逗号当小数点，统一转成点
     const i=v.indexOf(".");
     if(i!==-1) v=v.slice(0,i+1)+v.slice(i+1).replace(/\./g,"");
     if(v!==el.value) el.value=v;
@@ -1165,6 +1178,7 @@ async function persistAppSettings(){
 /* 读取某账本的预算（自动建默认） */
 function curBudget(c){ return state.budgets[c]||(state.budgets[c]={m:0,y:0}); }
 /* ===== 每月定时记账 ===== */
+function nowHHMM(){ const t=new Date(); return String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"); }
 /* 给定基准日期，返回下一个月第 day 天的日期（day 超出当月天数则取月末） */
 function recNextMonth(day,base){
   let y=+base.slice(0,4), m=+base.slice(5,7);
@@ -1172,23 +1186,32 @@ function recNextMonth(day,base){
   const dd=Math.min(day,new Date(y,m,0).getDate());
   return y+"-"+String(m).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
 }
-/* 新建定时时：首次触发日 = 今天所在月内该 day（若已过则下个月），不小于今天 */
-function recFirst(day){
+/* 新建定时时的首次触发日：startMode="this" 从本月该 day 开始（已过则补记）；"next" 从下月开始 */
+function recFirst(day,startMode){
   const t=new Date(); const y=t.getFullYear(), m=t.getMonth()+1;
+  if(startMode==="next"){
+    let yy=y, mm=m+1; if(mm===13){mm=1;yy++;}
+    const dd=Math.min(day,new Date(yy,mm,0).getDate());
+    return yy+"-"+String(mm).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
+  }
   const dd=Math.min(day,new Date(y,m,0).getDate());
-  let cand=y+"-"+String(m).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
-  if(cand<todayStr()) cand=recNextMonth(day,cand);
-  return cand;
+  return y+"-"+String(m).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
+}
+/* 是否已到触发时刻：日期已过 → 是；今天 → 到点(几点几分)才触发 */
+function recDue(r){
+  const today=todayStr();
+  if(r.next<today) return true;
+  if(r.next===today) return (r.time||"00:00")<=nowHHMM();
+  return false;
 }
 /* 补录 + 到点自动记一笔：遍历所有启用中的定时，把已到期的都写入 */
 async function checkRecurring(){
   if(!state.recurring||!state.recurring.length) return;
-  const today=todayStr();
   let added=0, touched=false;
   for(const r of state.recurring){
     if(!r.enabled) continue;
-    if(!r.next) r.next=recFirst(r.day);
-    while(r.next && r.next<=today){
+    if(!r.next) r.next=recFirst(r.day,(r.start||"this"));
+    while(recDue(r)){
       await saveExpense({id:uid(),amount:r.amount,date:r.next,category:r.category||"其他",
         note:r.note||"",type:r.type||"expense",cur:r.cur||"EUR",source:"rec",
         created:Date.now(),updated:Date.now()});
@@ -1364,8 +1387,8 @@ function renderItemsEdit(){
     h+='<div class="ie-row" data-i="'+i+'">'+
       '<div class="ie-name">'+esc(it.nameZh||it.name)+'</div>'+
       '<div class="ie-fields">'+
-        '<label>'+t("ieQty")+'<input type="number" class="ie-q" value="'+(it.qty||1)+'" step="0.01" min="0" inputmode="decimal"></label>'+
-        '<label>'+t("iePrice")+'<input type="number" class="ie-u" value="'+(it.unitPrice||0)+'" step="0.01" min="0" inputmode="decimal"></label>'+
+        '<label>'+t("ieQty")+'<input type="text" class="ie-q" value="'+(it.qty||1)+'" inputmode="decimal" autocomplete="off"></label>'+
+        '<label>'+t("iePrice")+'<input type="text" class="ie-u" value="'+(it.unitPrice||0)+'" inputmode="decimal" autocomplete="off"></label>'+
         '<span class="ie-amt num">'+moneyC(amt,editCur)+'</span>'+
       '</div></div>';
   });
@@ -1990,7 +2013,7 @@ function renderRecList(){
   box.innerHTML=state.recurring.map((r,i)=>{
     const inc=r.type==="income";
     return '<div class="rec-row" data-i="'+i+'"><div class="rec-main">'+
-      '<div class="rec-title">'+esc((r.day||1)+t("recDayU"))+' · '+catChip(r.category)+esc(r.category)+
+      '<div class="rec-title">'+esc((r.day||1)+t("recDayU")+(r.time?" "+r.time:""))+' · '+catChip(r.category)+esc(r.category)+
       (inc?' <span class="tag-inc">'+t("income")+'</span>':'')+'</div>'+
       '<div class="rec-sub">'+moneyC(r.amount,r.cur||'EUR')+(r.note?' · '+esc(r.note):"")+' · '+t("recNext")+': '+esc(r.next||"—")+'</div>'+
       '</div>'+
@@ -2002,6 +2025,7 @@ function openRecModal(i){
   $("#recTitle2").textContent=i==null?t("recAdd"):t("recEdit");
   const r=i!=null?state.recurring[i]:null;
   $("#recDayInput").value=r?r.day:1;
+  $("#recTime").value=r?(r.time||"08:00"):"08:00";
   $("#recAmt").value=r?r.amount:"";
   const fc=$("#recCur"); fc.innerHTML="";
   sortedCurrencies().forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=curSym(c)+" "+c; fc.appendChild(o); });
@@ -2010,6 +2034,8 @@ function openRecModal(i){
   state.cats.forEach(c=>{ const o=document.createElement("option"); o.value=c.name; o.textContent=c.name; cc.appendChild(o); });
   cc.value=r?r.category:state.cats[0].name;
   $("#recNote").value=r?(r.note||""):"";
+  const st=(r&&r.start)||"this";
+  $$("#recStartWrap button").forEach(b=>b.classList.toggle("on",b.dataset.start===st));
   $$("#recType button").forEach(b=>b.classList.toggle("on",b.dataset.type===((r&&r.type==="income")?"income":"expense")));
   $("#recModal").classList.add("on");
 }
@@ -2021,11 +2047,14 @@ function saveRec(){
   const cur=$("#recCur").value||"EUR";
   const category=$("#recCat").value||state.cats[0].name;
   const note=$("#recNote").value.trim();
+  const time=$("#recTime").value||"08:00";
+  const start=$("#recStartWrap button.on")?.dataset.start||"this";
   if(recEditI!=null && state.recurring[recEditI]){
     const r=state.recurring[recEditI];
-    r.day=day; r.amount=amt; r.cur=cur; r.type=type; r.category=category; r.note=note;
+    r.day=day; r.amount=amt; r.cur=cur; r.type=type; r.category=category; r.note=note; r.time=time; r.start=start;
+    r.next=recFirst(day,start); // 改日/时间后重置下次触发
   }else{
-    state.recurring.push({id:uid(),day,amount:amt,cur:cur,type:type,category:category,note:note,enabled:true,next:recFirst(day)});
+    state.recurring.push({id:uid(),day,amount:amt,cur:cur,type:type,category:category,note:note,enabled:true,time:time,start:start,next:recFirst(day,start)});
   }
   recEditI=null;
   persistAppSettings().then(()=>{ $("#recModal").classList.remove("on"); renderSettings(); toast(t("tSaved")); });
@@ -2094,7 +2123,10 @@ function renderDash(){
     const dayRecs=byDay[ds]||{};
     const dcs=Object.keys(dayRecs);
     const cls="dc"+(ds===todayStr()?" today":"")+(ds===sel?" sel":"")+(dcs.length?" has":"");
-    const tag=dcs.slice(0,2).map(c=>curSym(c)+dayRecs[c].n).join(" · ")+(dcs.length>2?" · +"+(dcs.length-2):"");
+    // 单币种显示金额（随数据变化），多币种显示笔数
+    const tag=dcs.length===1
+      ? curSym(dcs[0])+Math.round(dayRecs[dcs[0]].amt)
+      : dcs.slice(0,2).map(c=>curSym(c)+dayRecs[c].n).join("·")+(dcs.length>2?"·+"+(dcs.length-2):"");
     html+='<span class="'+cls+'" data-d="'+ds+'"><b>'+d+'</b>'+(tag?'<i class="tags">'+esc(tag)+'</i>':"")+'</span>';
   }
   html+='</div><div class="dash-foot"><button class="btn btn-ghost sm" id="dashTodayBtn">回到今天</button></div>';
@@ -2279,6 +2311,7 @@ function bindEvents(){
     const row=e.target.closest(".rec-row"); if(row) openRecModal(+row.dataset.i);
   });
   if($("#recType")) $("#recType").addEventListener("click",e=>{ const b=e.target.closest("button[data-type]"); if(!b)return; $$("#recType button").forEach(x=>x.classList.toggle("on",x===b)); });
+  if($("#recStartWrap")) $("#recStartWrap").addEventListener("click",e=>{ const b=e.target.closest("button[data-start]"); if(!b)return; $$("#recStartWrap button").forEach(x=>x.classList.toggle("on",x===b)); });
   if($("#recAmt")) restrictNumeric($("#recAmt"));
   if($("#recDayInput")) restrictNumeric($("#recDayInput"));
   if($("#recCancel")) $("#recCancel").addEventListener("click",()=>$("#recModal").classList.remove("on"));
