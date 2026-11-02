@@ -1,5 +1,5 @@
 /* 支出记账 离线 Service Worker：首次访问后缓存全部资源，之后完全离线可用 */
-const CACHE = "expense-v1";
+const CACHE = "expense-v2";
 const ASSETS = [
   "./",
   "./index.html",
