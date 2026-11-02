@@ -260,6 +260,9 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
   font-size:13.5px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .chip .c-dot{width:8px;height:8px;border-radius:50%}
 .chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.ledger-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.ledger-bar .lb-label{font-size:12.5px;color:var(--muted);margin-right:2px}
+.ledger-bar .chip{padding:5px 10px;font-size:12.5px}
 #catPickerLabel{display:flex;align-items:center;gap:8px}
 .cat-drop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;border:1px solid var(--border);
   border-radius:12px;padding:10px;background:var(--surface)}
@@ -695,7 +698,7 @@ const state = {
   tab: "ledger",
   q: "", sort: "date-desc",
   newCatColor: null, newCatIcon: null,
-  dashYm: null, dashSel: null, catEditI: null, catsOpen: false,
+  dashYm: null, dashSel: null, catEditI: null, catsOpen: false, statCur: "EUR",
   lang: "zh", budget: 0
 };
 /* ================= 国际化 ================= */
@@ -757,6 +760,7 @@ zh:{
   today:"今天", dashCount:"笔支出", dashHint:"点日历某天可切换",
   tExpJson:"已导出 JSON 备份", tExpCsv:"已导出 CSV",
   csvDate:"日期", csvCat:"类别", csvType:"类型", csvAmt:"金额", csvCur:"货币", csvQty:"件数", csvNote:"备注", csvSrc:"来源",
+  ledger:"账本",
   hasItems:"含", tCommitted:"已入库", tNoValidCommit:"没有可入库的有效记录",
   tNoValid:"没解析出有效记录，试试 JSON 格式",
   tRmOn:"记账提醒已开启", tRmOff:"记账提醒已关闭",
@@ -821,6 +825,7 @@ en:{
   today:"Today", dashCount:"entries", dashHint:"tap a day to switch",
   tExpJson:"JSON backup exported", tExpCsv:"CSV exported",
   csvDate:"Date", csvCat:"Category", csvType:"Type", csvAmt:"Amount", csvCur:"Currency", csvQty:"Qty", csvNote:"Note", csvSrc:"Source",
+  ledger:"Ledger",
   hasItems:"with", tCommitted:"Imported", tNoValidCommit:"No valid records to import",
   tNoValid:"No valid records — try JSON format",
   tRmOn:"Reminder on", tRmOff:"Reminder off",
@@ -935,11 +940,52 @@ function renderManual(){
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
 const pad = n => String(n).padStart(2,"0");
-const CURRENCIES = {EUR:{sym:"€"},USD:{sym:"$"},GBP:{sym:"£"},CNY:{sym:"¥"},JPY:{sym:"¥"}};
+const CURRENCIES = {
+  CNY:{sym:"¥"}, USD:{sym:"$"}, EUR:{sym:"€"}, GBP:{sym:"£"}, JPY:{sym:"¥"},
+  HKD:{sym:"HK$"}, SGD:{sym:"S$"}, AUD:{sym:"A$"}, CAD:{sym:"C$"}, CHF:{sym:"Fr"},
+  KRW:{sym:"₩"}, SEK:{sym:"kr"}, DKK:{sym:"kr"}, NOK:{sym:"kr"}, NZD:{sym:"NZ$"}, INR:{sym:"₹"}
+};
 function curSym(c){ return (CURRENCIES[c]||CURRENCIES.EUR).sym; }
 /* 聚合/合计默认用 EUR 符号；单笔记录用 moneyC(n, c) 按其自带货币显示 */
 const money = n => CURRENCIES.EUR.sym+" "+(Math.round(n*100)/100).toFixed(2);
 const moneyC = (n,c) => curSym(c)+" "+(Math.round(n*100)/100).toFixed(2);
+/* ===== 不同货币 = 不同账本：按账本筛选与排序 ===== */
+function isExp(e){ return !e.type||e.type!=="income"; }
+function inLedger(e){ return (e.cur||"EUR")===state.statCur; }
+/* 每种货币的记录条数（含 AI 导入），用于把常用货币排到前面 */
+function currencyCounts(){
+  const c={};
+  allExpenses.forEach(e=>{const k=e.cur||"EUR"; c[k]=(c[k]||0)+1;});
+  return c;
+}
+const CUR_TIE=["CNY","USD","EUR","GBP","JPY","HKD","SGD","AUD","CAD","CHF","KRW","SEK","DKK","NOK","NZD","INR"];
+/* 全部货币按使用频次降序；频次相同时按 CUR_TIE */
+function sortedCurrencies(){
+  const cnt=currencyCounts();
+  return Object.keys(CURRENCIES).sort((a,b)=>{
+    const ca=cnt[a]||0, cb=cnt[b]||0;
+    if(cb!==ca) return cb-ca;
+    const ia=CUR_TIE.indexOf(a), ib=CUR_TIE.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+}
+/* 统计页账本选择器：只列已有记录的货币，按使用频次排序，且始终含当前账本 */
+function statCurList(){
+  const cnt=currencyCounts();
+  const present=Object.keys(cnt).filter(k=>cnt[k]>0);
+  if(!present.length) present.push("EUR");
+  if(present.indexOf(state.statCur)<0) present.push(state.statCur);
+  return present.sort((a,b)=>{
+    const ca=cnt[a]||0, cb=cnt[b]||0;
+    if(cb!==ca) return cb-ca;
+    const ia=CUR_TIE.indexOf(a), ib=CUR_TIE.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+}
+function ledgerBar(){
+  return '<div class="ledger-bar"><span class="lb-label">'+t("ledger")+'</span>'+
+    statCurList().map(c=>'<button class="chip'+(c===state.statCur?' on':'')+'" data-cur="'+c+'" type="button">'+curSym(c)+' '+esc(c)+'</button>').join('')+'</div>';
+}
 /* 数值输入限制：只允许数字与一个小数点，阻断非法按键并清理粘贴 */
 function restrictNumeric(el){
   el.addEventListener("beforeinput",e=>{
@@ -1051,27 +1097,26 @@ function renderLedger(){
 }
 function renderSummary(){
   const exps=allExpenses;
-  const isExp=e=>!e.type||e.type!=="income";
-  const inMonth=exps.filter(e=>isExp(e)&&e.date.slice(0,7)===monthKey(state.ly,state.lm));
+  const inMonth=exps.filter(e=>isExp(e)&&inLedger(e)&&e.date.slice(0,7)===monthKey(state.ly,state.lm));
   const total=inMonth.reduce((s,e)=>s+e.amount,0);
   const days=new Set(inMonth.map(e=>e.date)).size||1;
   const avg=total/days;
   // 上月
   let lm=state.lm-1, ly=state.ly;
   if(lm===0){lm=12;ly--;}
-  const lastTotal=exps.filter(e=>isExp(e)&&e.date.slice(0,7)===monthKey(ly,lm)).reduce((s,e)=>s+e.amount,0);
+  const lastTotal=exps.filter(e=>isExp(e)&&inLedger(e)&&e.date.slice(0,7)===monthKey(ly,lm)).reduce((s,e)=>s+e.amount,0);
   const card=$("#summaryCard");
   let diff="";
   if(lastTotal>0){
     const pct=Math.round((total-lastTotal)/lastTotal*100);
     diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% "+t("vsMonth");
   }
-  card.innerHTML=
+  card.innerHTML=ledgerBar()+
     '<div class="lab">'+fmtCnYm(state.ly,state.lm)+' '+t("total")+'</div>'+
-    '<div class="big num">'+money(total)+'</div>'+
+    '<div class="big num">'+moneyC(total,state.statCur)+'</div>'+
     '<div class="grid">'+
       '<span class="chip">'+t("count")+' <b>'+inMonth.length+'</b></span>'+
-      '<span class="chip">'+t("dailyAvg")+' <b>'+money(avg)+'</b></span>'+
+      '<span class="chip">'+t("dailyAvg")+' <b>'+moneyC(avg,state.statCur)+'</b></span>'+
       (diff?'<span class="chip">'+diff+'</span>':'')+
     '</div>';
 }
@@ -1082,13 +1127,14 @@ function renderLedgerList(){
   let exps;
   if(q){
     exps=allExpenses.filter(e=>{
+      if(!inLedger(e)) return false;
       if((e.note||"").toLowerCase().includes(q)) return true;
       if((e.category||"").toLowerCase().includes(q)) return true;
       if(e.items&&e.items.some(it=>((it.nameZh||"")+" "+(it.name||"")).toLowerCase().includes(q))) return true;
       return false;
     });
   }else{
-    exps=allExpenses.filter(e=>e.date.slice(0,7)===monthKey(state.ly,state.lm));
+    exps=allExpenses.filter(e=>inLedger(e)&&e.date.slice(0,7)===monthKey(state.ly,state.lm));
   }
   if(!exps.length){
     wrap.innerHTML=q
@@ -1121,7 +1167,7 @@ function renderLedgerList(){
     const dates=Object.keys(groups).sort((a,b)=> s==="date-asc"?a.localeCompare(b):b.localeCompare(a));
     dates.forEach(d=>{
       const dayTotal=groups[d].reduce((sx,e)=>sx+e.amount,0);
-      html+='<div class="day"><div class="day-head"><span>'+fmtCn(d)+'</span><span class="num">'+money(dayTotal)+'</span></div>';
+      html+='<div class="day"><div class="day-head"><span>'+fmtCn(d)+'</span><span class="num">'+moneyC(dayTotal,state.statCur)+'</span></div>';
       groups[d].forEach(e=>{ html+=rowHtml(e); });
       html+='</div>';
     });
@@ -1277,7 +1323,14 @@ function openModal(id){
   $("#modalSub").textContent=e?t("modalSubSrc")+(e.source==="ai"?t("srcAi"):t("srcManual")):t("modalSubAdd");
   setTypeToggle(inc);
   $("#fAmount").value=e?e.amount:"";
-  $("#fCur").value=(e&&e.cur)?e.cur:"EUR";
+  // 货币下拉：按使用频次排序（常用货币靠前）
+  const fcur=$("#fCur"); if(fcur){
+    fcur.innerHTML="";
+    sortedCurrencies().forEach(c=>{
+      const o=document.createElement("option"); o.value=c; o.textContent=curSym(c)+" "+c; fcur.appendChild(o);
+    });
+    fcur.value=(e&&e.cur)?e.cur:"EUR";
+  }
   const d=(e?e.date:todayStr()).split("-").map(Number);
   calState={y:d[0],m:d[1],sel:(e?e.date:todayStr())};
   $("#fDateLabel").textContent=fmtCn(calState.sel);
@@ -1364,16 +1417,16 @@ function renderStats(){
 }
 function renderMonthStat(){
   const key=monthKey(state.ly,state.lm);
-  const exps=allExpenses.filter(e=>(!e.type||e.type!=="income")&&e.date.slice(0,7)===key);
+  const exps=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&e.date.slice(0,7)===key);
   const total=exps.reduce((s,e)=>s+e.amount,0);
   const byCat={};
   exps.forEach(e=>{byCat[e.category]=(byCat[e.category]||0)+e.amount;});
   const segs=Object.keys(byCat).map(n=>({name:n,value:byCat[n],color:catColor(n)})).sort((a,b)=>b.value-a.value);
   if(state.monthCat && !byCat[state.monthCat]) state.monthCat=null;
   const card=$("#statCard");
-  let html=
+  let html=ledgerBar()+
     '<div class="stats-head"><div><h3 style="margin:0">'+fmtCnYm(state.ly,state.lm)+' '+t("monthExp")+'</h3>'+
-    '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">'+money(total)+'</div>'+
+    '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">'+moneyC(total,state.statCur)+'</div>'+
     '<div style="font-size:12px;color:var(--muted)">'+exps.length+' '+t("count")+' · '+t("donutHint")+'</div></div></div>'+
     '<div class="chart-box">'+donutSVG(segs,total,state.monthCat)+'</div>'+
     '<div class="cat-list">'+segs.map(s=>catLine(s,total)).join("")+
@@ -1382,11 +1435,11 @@ function renderMonthStat(){
   card.innerHTML=html;
 }
 function monthCatDetail(name,key){
-  const exps=allExpenses.filter(e=>(!e.type||e.type!=="income")&&e.date.slice(0,7)===key&&e.category===name).sort((a,b)=>a.date.localeCompare(b.date));
+  const exps=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&e.date.slice(0,7)===key&&e.category===name).sort((a,b)=>a.date.localeCompare(b.date));
   const sum=exps.reduce((s,e)=>s+e.amount,0);
   const c=catInfo(name);
   return '<div class="mcd"><div class="mcd-head"><span class="cico" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>'+
-    '<b>'+esc(name)+'</b><span style="color:var(--muted)">'+exps.length+' '+t("count")+' · '+money(sum)+'</span>'+
+    '<b>'+esc(name)+'</b><span style="color:var(--muted)">'+exps.length+' '+t("count")+' · '+moneyC(sum,state.statCur)+'</span>'+
     '<button class="btn btn-ghost sm" id="mcdBack">'+t("backAll")+'</button></div>'+
     exps.map(e=>'<div class="mcd-row" data-id="'+e.id+'"><span class="mcd-d">'+esc(e.date.slice(5))+'</span>'+
       '<span class="mcd-n">'+esc(e.note||((e.items&&e.items.length)?(e.items[0].nameZh||e.items[0].name):"")||e.category)+'</span>'+
@@ -1397,7 +1450,7 @@ function catLine(s,total){
   const c=catInfo(s.name);
   return '<div class="cat-item" data-name="'+esc(s.name)+'"><span class="cico" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>'+
     '<div class="nm">'+esc(s.name)+'</div>'+
-    '<div class="pv num">'+money(s.value)+'</div>'+
+    '<div class="pv num">'+moneyC(s.value,state.statCur)+'</div>'+
     '<div class="pct">'+pct+'%</div></div>';
 }
 function donutSVG(segs,total,sel){
@@ -1409,7 +1462,7 @@ function donutSVG(segs,total,sel){
     return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+
       '<circle cx="115" cy="115" r="69" fill="none" stroke="'+s.color+'" stroke-width="26" class="seg" data-name="'+esc(s.name)+'"/>'+
       '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">'+t("donutCenter")+'</text>'+
-      '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">'+money(total)+'</text></svg>';
+      '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">'+moneyC(total,state.statCur)+'</text></svg>';
   }
   let acc=0;
   const paths=segs.map(s=>{
@@ -1425,61 +1478,60 @@ function donutSVG(segs,total,sel){
   }).join("");
   return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+paths+
     '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">'+t("donutCenter")+'</text>'+
-    '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">'+money(total)+'</text></svg>';
+    '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">'+moneyC(total,state.statCur)+'</text></svg>';
 }
 function renderYearStat(){
   const y=state.sy;
-  const isExp=e=>!e.type||e.type!=="income";
-  const exps=allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y);
+  const exps=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&+e.date.slice(0,4)===y);
   const yearTotal=exps.reduce((s,e)=>s+e.amount,0);
   const months=Array.from({length:12},(_,i)=>exps.filter(e=>+e.date.slice(5,7)===i+1).reduce((s,e)=>s+e.amount,0));
-  const lastTotal=allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
+  const lastTotal=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
   const max=Math.max(...months,1);
   let diff="";
   if(lastTotal>0){const pct=Math.round((yearTotal-lastTotal)/lastTotal*100); diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% "+t("vsYear");}
   const card=$("#statCard");
-  card.innerHTML=
+  card.innerHTML=ledgerBar()+
     '<div class="stats-head"><div><h3 style="margin:0">'+y+' '+t("yearBill")+'</h3>'+
-    '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">'+money(yearTotal)+'</div>'+
+    '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">'+moneyC(yearTotal,state.statCur)+'</div>'+
     '<div style="font-size:12px;color:var(--muted)">'+exps.length+' '+t("count")+(diff?' · '+diff:"")+'</div></div></div>'+
     '<div class="bars">'+months.map((v,i)=>{
       const w=Math.round(v/max*100);
       return '<div class="bar-row"><div class="m">'+(i+1)+t("monthUnit")+'</div>'+
         '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(w,2)+'%"></div></div>'+
-        '<div class="v num">'+(v>0?""+money(v):"—")+'</div></div>';
+        '<div class="v num">'+(v>0?""+moneyC(v,state.statCur):"—")+'</div></div>';
     }).join("")+'</div>'+
     (!exps.length?'<div class="empty">'+t("yearNoData")+'</div>':"");
 }
 
 function renderTrendStat(){
   const y=state.sy;
-  const isExp=e=>!e.type||e.type!=="income";
-  const months=Array.from({length:12},(_,i)=>allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y && +e.date.slice(5,7)===i+1).reduce((s,e)=>s+e.amount,0));
+  const months=Array.from({length:12},(_,i)=>allExpenses.filter(e=>isExp(e)&&inLedger(e)&&+e.date.slice(0,4)===y && +e.date.slice(5,7)===i+1).reduce((s,e)=>s+e.amount,0));
   const yearTotal=months.reduce((a,b)=>a+b,0);
   const nonZero=months.filter(v=>v>0);
   const max=Math.max(...months,1);
   const min=nonZero.length?Math.min(...nonZero):0;
   const avg=yearTotal/(nonZero.length||1);
-  const lastTotal=allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
-  const budget=state.budget>0?state.budget:0;
+  const lastTotal=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
+  // 预算为全局（EUR）数值，仅在该账本为 EUR 时显示红线，避免与其它货币混算
+  const budget=(state.statCur==="EUR"&&state.budget>0)?state.budget:0;
   let diff="";
   if(lastTotal>0){const pct=Math.round((yearTotal-lastTotal)/lastTotal*100); diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% "+t("vsYear");}
   const card=$("#statCard");
-  card.innerHTML=
+  card.innerHTML=ledgerBar()+
     '<div class="stats-head"><div><h3 style="margin:0">'+y+' '+t("trendTitle")+'</h3>'+
-    '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">'+money(yearTotal)+'</div>'+
+    '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">'+moneyC(yearTotal,state.statCur)+'</div>'+
     '<div style="font-size:12px;color:var(--muted)">'+expsCount(y)+' '+t("count")+(diff?' · '+diff:"")+'</div></div></div>'+
     '<div class="line-wrap">'+lineSVG(months,max,avg,budget)+'</div>'+
     '<div class="stat-metrics">'+
-      '<div class="stat-metric"><div class="l">'+t("monthlyAvg")+'</div><div class="v num">'+money(avg)+'</div></div>'+
-      '<div class="stat-metric"><div class="l">'+t("maxMonth")+'</div><div class="v num">'+money(max)+'</div></div>'+
-      '<div class="stat-metric"><div class="l">'+t("minMonth")+'</div><div class="v num">'+money(min)+'</div></div>'+
+      '<div class="stat-metric"><div class="l">'+t("monthlyAvg")+'</div><div class="v num">'+moneyC(avg,state.statCur)+'</div></div>'+
+      '<div class="stat-metric"><div class="l">'+t("maxMonth")+'</div><div class="v num">'+moneyC(max,state.statCur)+'</div></div>'+
+      '<div class="stat-metric"><div class="l">'+t("minMonth")+'</div><div class="v num">'+moneyC(min,state.statCur)+'</div></div>'+
     '</div>'+
     '<div class="legend-mini"><span><i style="background:var(--accent)"></i>'+t("monthExp")+'</span><span><i style="background:#B08968;height:2px;border-radius:1px;vertical-align:1px"></i>'+t("monthlyAvg")+'</span>'+
     (budget?'<span><i style="background:var(--danger);height:2px;border-radius:1px;vertical-align:1px"></i>'+t("budget")+'</span>':"")+'</div>'+
     (!yearTotal?'<div class="empty">'+t("yearNoData")+'</div>':"");
 }
-function expsCount(y){ return allExpenses.filter(e=>(!e.type||e.type!=="income")&&+e.date.slice(0,4)===y).length; }
+function expsCount(y){ return allExpenses.filter(e=>isExp(e)&&inLedger(e)&&+e.date.slice(0,4)===y).length; }
 function lineSVG(months,max,avg,budget){
   const W=320,H=150,padL=6,padR=8,padT=12,padB=22;
   const iw=W-padL-padR, ih=H-padT-padB;
@@ -1898,6 +1950,8 @@ function bindEvents(){
   // 详情
   $("#detailModal").addEventListener("click",e=>{ if(e.target.id==="detailModal") closeDetail(); });
   $("#statCard").addEventListener("click",e=>{
+    const lc=e.target.closest("button[data-cur]");
+    if(lc){ state.statCur=lc.dataset.cur; state.monthCat=null; renderStats(); return; }
     const seg=e.target.closest(".seg");
     if(seg){ state.monthCat=seg.dataset.name; renderMonthStat(); return; }
     const ci=e.target.closest(".cat-item");
@@ -1906,6 +1960,10 @@ function bindEvents(){
     if(mb){ state.monthCat=null; renderMonthStat(); return; }
     const mr=e.target.closest(".mcd-row");
     if(mr){ openDetail(mr.dataset.id); }
+  });
+  $("#summaryCard").addEventListener("click",e=>{
+    const lc=e.target.closest("button[data-cur]");
+    if(lc){ state.statCur=lc.dataset.cur; renderLedger(); }
   });
   $("#dEdit").addEventListener("click",()=>{ if(!detailId)return; const id=detailId; closeDetail(); openModal(id); });
   $("#dEditItems").addEventListener("click",()=>{ if($("#dEditItems").textContent===t("detailCancel")) exitItemsEdit(); else startEditItems(); });
@@ -2030,6 +2088,10 @@ async function init(){
   await loadCats();
   await loadAppSettings();
   allExpenses=await getExpenses();
+  // 默认账本：用记录最多的货币，否则 EUR
+  const cnt=currencyCounts(); let best="EUR",bn=0;
+  Object.keys(cnt).forEach(k=>{ if(cnt[k]>bn){bn=cnt[k];best=k;} });
+  state.statCur=best;
   bindEvents();
   applyLang();
   $("#dashTodayAmt").textContent=money(0);
