@@ -17,7 +17,7 @@
 5. category 只能从这组里选一个最贴切的：["餐饮","超市","交通","购物","日用","娱乐","医疗","教育","其他"]。拿不准就选"其他"。
 6. payment 只能从：["银行卡","现金","信用卡","手机支付","其他"]。小票写 Bankpas/银行卡 就填"银行卡"。
 7. items：每个商品一行，amount 填「最终应付金额」（已扣优惠后的实付价，无折扣就用原价）。按件卖的 qty 填件数、unit 填"件"；按重量卖的（如 xx kg）qty 填重量数值、unit 填"kg"、unitPrice 填单价（每公斤价格）。数量为 1 时 qty 填 1。
-8. 商品名：name 写小票上的原文（如荷兰语 Vissticks MSC），不要翻译替换原名。
+8. 商品名：name 写小票原文（荷兰语/英语，如 Vissticks MSC）；nameZh 写它的中文名（如 Vissticks MSC → 鱼柳条）。看不清的 nameZh 填 null，绝不臆造。
 9. currency 用 ISO 三位码：EUR / CNY / USD 等。
 10. confidence 填 0 到 1 的识别置信度。
 11. warnings：凡是看不清、缺失、有歧义的字段，都写进这个数组说明，绝不编造数据。
@@ -33,7 +33,7 @@
     "payment": "银行卡",
     "note": "可放店铺地址、总节省金额等说明，没有就留空字符串",
     "items": [
-      {"name": "商品原文名", "qty": 1, "unit": "件", "unitPrice": 0.00, "amount": 0.00}
+      {"name": "商品原文名", "nameZh": "中文名", "qty": 1, "unit": "件", "unitPrice": 0.00, "amount": 0.00}
     ]
   },
   "currency": "EUR",
@@ -44,7 +44,7 @@
 【示例输入 → 示例输出】
 小票含：鱼柳条 1.75、薯片 2.50、香蕉 0.480kg × 1.15/kg = 0.55；应付总计 21.52；Bankpas；日期 28-10-2026。
 正确输出：
-{"expense":{"date":"2026-10-28","amount":21.52,"category":"超市","store":"LIDL Hengelo","payment":"银行卡","note":"10件商品，共节省0.31","items":[{"name":"Vissticks MSC","qty":1,"unit":"件","unitPrice":1.75,"amount":1.75},{"name":"Lay's max paprika","qty":1,"unit":"件","unitPrice":2.50,"amount":2.50},{"name":"Bananen","qty":0.48,"unit":"kg","unitPrice":1.15,"amount":0.55}]},"currency":"EUR","confidence":0.9,"warnings":[]}
+{"expense":{"date":"2026-10-28","amount":21.52,"category":"超市","store":"LIDL Hengelo","payment":"银行卡","note":"10件商品，共节省0.31","items":[{"name":"Vissticks MSC","nameZh":"鱼柳条","qty":1,"unit":"件","unitPrice":1.75,"amount":1.75},{"name":"Lay's max paprika","nameZh":"乐事红椒薯片","qty":1,"unit":"件","unitPrice":2.50,"amount":2.50},{"name":"Bananen","nameZh":"香蕉","qty":0.48,"unit":"kg","unitPrice":1.15,"amount":0.55}]},"currency":"EUR","confidence":0.9,"warnings":[]}
 
 现在请处理用户发来的小票。
 ```
@@ -56,7 +56,7 @@
 - **只输出一个 JSON、不加代码块**：DeepSeek 有时会包 ```json``` 或在前后加说明，我们 app 的解析器会先剥掉这些再解析，但严格模式更稳。
 - **amount 用最终实付总价**：超市小票有优惠、押金、税，只有「实付总价」才和你的账本金额一致。
 - **category 限定死列表**：app 里类别就是这组，避免 DeepSeek 返回一个 app 里没有的类别导致落库失败。
-- **items 只是明细**：入库时按一张小票=一笔支出（金额=总价）记，明细会作为备注保存，不污染流水。
+- **items 是明细**：入库时按一张小票=一笔支出（金额=总价）记，但每件商品的**中文名、数量、单价、金额**都会保留，点开记录即可看到买了什么。
 
 ## 额外建议
 
