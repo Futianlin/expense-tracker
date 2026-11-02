@@ -487,22 +487,6 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       </div>
 
       <div class="set-group">
-        <div class="set-title" data-i18n="setCur">货币</div>
-        <div class="set-item plain">
-          <div class="tx" style="flex:1;display:flex;align-items:center;justify-content:space-between">
-            <b data-i18n="setCur">货币</b>
-            <select id="curSel" style="border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:16px;background:var(--surface);color:var(--text)">
-              <option value="EUR" data-i18n="curEUR">欧元 EUR</option>
-              <option value="USD" data-i18n="curUSD">美元 USD</option>
-              <option value="GBP" data-i18n="curGBP">英镑 GBP</option>
-              <option value="CNY" data-i18n="curCNY">人民币 CNY</option>
-              <option value="JPY" data-i18n="curJPY">日元 JPY</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="set-group">
         <div class="set-title clickable" id="catsToggle" data-i18n="setCats">支出类别 <span class="cat-caret" id="catsCaret">▸</span></div>
         <div id="catCollapse" style="display:none">
           <div class="cat-manage" id="catManage"></div>
@@ -573,8 +557,17 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       <button data-type="income" data-i18n="typeIncome">入账</button>
     </div>
     <div class="field">
-      <label data-i18n="fAmount">金额（EUR）</label>
-      <input type="number" id="fAmount" step="0.01" min="0" inputmode="decimal" placeholder="0.00">
+      <label data-i18n="fAmount">金额</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="fAmount" step="0.01" min="0" inputmode="decimal" placeholder="0.00" style="flex:1;min-width:0">
+        <select id="fCur" aria-label="货币" style="width:104px;border:1px solid var(--border);border-radius:10px;padding:11px 8px;font-size:16px;background:var(--surface);color:var(--text)">
+          <option value="EUR">€ EUR</option>
+          <option value="USD">$ USD</option>
+          <option value="GBP">£ GBP</option>
+          <option value="CNY">¥ CNY</option>
+          <option value="JPY">¥ JPY</option>
+        </select>
+      </div>
     </div>
     <div class="field">
       <label data-i18n="fDate">日期</label>
@@ -703,7 +696,7 @@ const state = {
   q: "", sort: "date-desc",
   newCatColor: null, newCatIcon: null,
   dashYm: null, dashSel: null, catEditI: null, catsOpen: false,
-  lang: "zh", budget: 0, currency: "EUR"
+  lang: "zh", budget: 0
 };
 /* ================= 国际化 ================= */
 const I18N = {
@@ -763,7 +756,7 @@ zh:{
   monthlyAvg:"月均", maxMonth:"最高月", minMonth:"最低月", budget:"预算", monthUnit:"月",
   today:"今天", dashCount:"笔支出", dashHint:"点日历某天可切换",
   tExpJson:"已导出 JSON 备份", tExpCsv:"已导出 CSV",
-  csvDate:"日期", csvCat:"类别", csvType:"类型", csvAmt:"金额", csvQty:"件数", csvNote:"备注", csvSrc:"来源",
+  csvDate:"日期", csvCat:"类别", csvType:"类型", csvAmt:"金额", csvCur:"货币", csvQty:"件数", csvNote:"备注", csvSrc:"来源",
   hasItems:"含", tCommitted:"已入库", tNoValidCommit:"没有可入库的有效记录",
   tNoValid:"没解析出有效记录，试试 JSON 格式",
   tRmOn:"记账提醒已开启", tRmOff:"记账提醒已关闭",
@@ -827,7 +820,7 @@ en:{
   monthlyAvg:"monthly avg", maxMonth:"highest month", minMonth:"lowest month", budget:"budget", monthUnit:"M",
   today:"Today", dashCount:"entries", dashHint:"tap a day to switch",
   tExpJson:"JSON backup exported", tExpCsv:"CSV exported",
-  csvDate:"Date", csvCat:"Category", csvType:"Type", csvAmt:"Amount", csvQty:"Qty", csvNote:"Note", csvSrc:"Source",
+  csvDate:"Date", csvCat:"Category", csvType:"Type", csvAmt:"Amount", csvCur:"Currency", csvQty:"Qty", csvNote:"Note", csvSrc:"Source",
   hasItems:"with", tCommitted:"Imported", tNoValidCommit:"No valid records to import",
   tNoValid:"No valid records — try JSON format",
   tRmOn:"Reminder on", tRmOff:"Reminder off",
@@ -943,8 +936,10 @@ const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
 const pad = n => String(n).padStart(2,"0");
 const CURRENCIES = {EUR:{sym:"€"},USD:{sym:"$"},GBP:{sym:"£"},CNY:{sym:"¥"},JPY:{sym:"¥"}};
-function cur(){ return (CURRENCIES[state.currency]||CURRENCIES.EUR).sym; }
-const money = n => cur()+" "+(Math.round(n*100)/100).toFixed(2);
+function curSym(c){ return (CURRENCIES[c]||CURRENCIES.EUR).sym; }
+/* 聚合/合计默认用 EUR 符号；单笔记录用 moneyC(n, c) 按其自带货币显示 */
+const money = n => CURRENCIES.EUR.sym+" "+(Math.round(n*100)/100).toFixed(2);
+const moneyC = (n,c) => curSym(c)+" "+(Math.round(n*100)/100).toFixed(2);
 /* 数值输入限制：只允许数字与一个小数点，阻断非法按键并清理粘贴 */
 function restrictNumeric(el){
   el.addEventListener("beforeinput",e=>{
@@ -1028,11 +1023,10 @@ async function loadAppSettings(){
     const s=a.val;
     if(s.lang==="zh"||s.lang==="en") state.lang=s.lang;
     if(typeof s.budget==="number") state.budget=s.budget;
-    if(s.currency && CURRENCIES[s.currency]) state.currency=s.currency;
   }
 }
 async function persistAppSettings(){
-  await dbPut("settings",{key:"app",val:{lang:state.lang,budget:state.budget,currency:state.currency}});
+  await dbPut("settings",{key:"app",val:{lang:state.lang,budget:state.budget}});
 }
 
 /* ================= 路由 / 标签 ================= */
@@ -1115,7 +1109,7 @@ function renderLedgerList(){
       '<div class="row-main"><div class="row-title">'+esc(e.category)+(inc?' <span class="tag-inc">'+t("income")+'</span>':"")+'</div>'+
       '<div class="row-sub">'+esc(rowSub(e))+(byAmount||q?' · '+esc(e.date.slice(5)):"")+'</div></div>'+
       (e.source==="ai"?'<span class="src">AI</span>':'')+
-      '<div class="row-amt num'+(inc?' inc':'')+'">'+(inc?'+':'')+money(e.amount)+'</div>'+
+      '<div class="row-amt num'+(inc?' inc':'')+'">'+(inc?'+':'')+moneyC(e.amount,e.cur||'EUR')+'</div>'+
       '<span class="chev">›</span></div>';
   };
   let html="";
@@ -1155,7 +1149,7 @@ function openDetail(id){
   const inc=e.type==="income";
   $("#dSrc").textContent=(e.source==="ai"?t("srcAi"):t("srcManual"))+(inc?" · "+t("income"):"");
   const amtEl=$("#dAmt");
-  amtEl.textContent=(inc?"+":"")+money(e.amount);
+  amtEl.textContent=(inc?"+":"")+moneyC(e.amount,e.cur||'EUR');
   amtEl.classList.toggle("inc",inc);
   $("#dDate").textContent=fmtCn(e.date)+" · "+fmtCnYm(+e.date.slice(0,4),+e.date.slice(5,7));
   $("#dNote").textContent=e.note||"";
@@ -1172,8 +1166,8 @@ function openDetail(id){
       const zh=it.nameZh||it.name;
       h+='<tr><td>'+esc(zh)+(it.nameZh&&it.name&&it.nameZh!==it.name?'<small>'+esc(it.name)+'</small>':"")+'</td>'+
         '<td class="num">'+(it.qty||1)+(it.unit?" "+esc(it.unit):"")+'</td>'+
-        '<td class="num">'+money(it.unitPrice!=null?it.unitPrice:it.amount)+'</td>'+
-        '<td class="num">'+money(it.amount!=null&&it.amount>0?it.amount:(it.unitPrice||0)*(it.qty||1))+'</td></tr>';
+        '<td class="num">'+moneyC(it.unitPrice!=null?it.unitPrice:it.amount,e.cur||'EUR')+'</td>'+
+        '<td class="num">'+moneyC(it.amount!=null&&it.amount>0?it.amount:(it.unitPrice||0)*(it.qty||1),e.cur||'EUR')+'</td></tr>';
     });
     h+='</table></div>';
     itemsBox.innerHTML=h;
@@ -1182,10 +1176,11 @@ function openDetail(id){
 }
 function closeDetail(){ $("#detailModal").classList.remove("on"); detailId=null; }
 /* 明细编辑（改数量/单价自动重算金额） */
-let editItemsData=null;
+let editItemsData=null, editCur="EUR";
 function startEditItems(){
   const e=allExpenses.find(x=>x.id===detailId); if(!e||!e.items||!e.items.length)return;
   editItemsData=e.items.map(it=>({...it}));
+  editCur=e.cur||"EUR";
   $("#dItems").style.display="none";
   $("#dItemsEdit").style.display="block";
   $("#dEditItems").textContent=t("detailCancel");
@@ -1201,11 +1196,11 @@ function renderItemsEdit(){
       '<div class="ie-fields">'+
         '<label>'+t("ieQty")+'<input type="number" class="ie-q" value="'+(it.qty||1)+'" step="0.01" min="0" inputmode="decimal"></label>'+
         '<label>'+t("iePrice")+'<input type="number" class="ie-u" value="'+(it.unitPrice||0)+'" step="0.01" min="0" inputmode="decimal"></label>'+
-        '<span class="ie-amt num">'+money(amt)+'</span>'+
+        '<span class="ie-amt num">'+moneyC(amt,editCur)+'</span>'+
       '</div></div>';
   });
   const total=editItemsData.reduce((s,it)=>s+Math.round(((it.qty||1)*(it.unitPrice||0))*100)/100,0);
-  h+='</div><div class="ie-total">'+t("ieTotal")+' <b class="num" id="ieTotalVal">'+money(total)+'</b></div>'+
+  h+='</div><div class="ie-total">'+t("ieTotal")+' <b class="num" id="ieTotalVal">'+moneyC(total,editCur)+'</b></div>'+
     '<div class="ca-actions" style="margin-top:8px">'+
     '<button class="btn btn-plain sm" id="ieCancel">'+t("mCancel")+'</button>'+
     '<button class="btn btn-primary sm" id="ieSave">'+t("ieSave")+'</button></div></div>';
@@ -1220,9 +1215,9 @@ function recalcItem(inp,kind){
   const v=parseFloat(inp.value)||0;
   if(kind==="q") editItemsData[i].qty=v; else editItemsData[i].unitPrice=v;
   const amt=Math.round(((editItemsData[i].qty||1)*(editItemsData[i].unitPrice||0))*100)/100;
-  row.querySelector(".ie-amt").textContent=""+money(amt);
+  row.querySelector(".ie-amt").textContent=""+moneyC(amt,editCur);
   const total=editItemsData.reduce((s,it)=>s+Math.round(((it.qty||1)*(it.unitPrice||0))*100)/100,0);
-  const tv=$("#ieTotalVal"); if(tv) tv.textContent=""+money(total);
+  const tv=$("#ieTotalVal"); if(tv) tv.textContent=""+moneyC(total,editCur);
 }
 function exitItemsEdit(){
   editItemsData=null;
@@ -1282,6 +1277,7 @@ function openModal(id){
   $("#modalSub").textContent=e?t("modalSubSrc")+(e.source==="ai"?t("srcAi"):t("srcManual")):t("modalSubAdd");
   setTypeToggle(inc);
   $("#fAmount").value=e?e.amount:"";
+  $("#fCur").value=(e&&e.cur)?e.cur:"EUR";
   const d=(e?e.date:todayStr()).split("-").map(Number);
   calState={y:d[0],m:d[1],sel:(e?e.date:todayStr())};
   $("#fDateLabel").textContent=fmtCn(calState.sel);
@@ -1315,12 +1311,13 @@ function saveModal(){
   if(!date){ toast(t("tDateErr")); return; }
   const cat=selectedChip();
   const inc=$("#typeToggle button.on")?.dataset.type==="income";
+  const cur=$("#fCur")?$("#fCur").value:"EUR";
   if(state.editingId){
     const e=allExpenses.find(x=>x.id===state.editingId);
-    e.amount=amt; e.date=date; e.category=cat; e.note=$("#fNote").value.trim(); e.type=inc?"income":"expense"; e.updated=Date.now();
+    e.amount=amt; e.date=date; e.category=cat; e.note=$("#fNote").value.trim(); e.type=inc?"income":"expense"; e.cur=cur; e.updated=Date.now();
     saveExpense(e);
   }else{
-    const e={id:uid(),amount:amt,date:date,category:cat,note:$("#fNote").value.trim(),type:inc?"income":"expense",
+    const e={id:uid(),amount:amt,date:date,category:cat,note:$("#fNote").value.trim(),type:inc?"income":"expense",cur:cur,
       source:"manual",created:Date.now(),updated:Date.now()};
     saveExpense(e);
   }
@@ -1393,7 +1390,7 @@ function monthCatDetail(name,key){
     '<button class="btn btn-ghost sm" id="mcdBack">'+t("backAll")+'</button></div>'+
     exps.map(e=>'<div class="mcd-row" data-id="'+e.id+'"><span class="mcd-d">'+esc(e.date.slice(5))+'</span>'+
       '<span class="mcd-n">'+esc(e.note||((e.items&&e.items.length)?(e.items[0].nameZh||e.items[0].name):"")||e.category)+'</span>'+
-      '<span class="mcd-a num">'+money(e.amount)+'</span></div>').join("")+'</div>';
+      '<span class="mcd-a num">'+moneyC(e.amount,e.cur||'EUR')+'</span></div>').join("")+'</div>';
 }
 function catLine(s,total){
   const pct=total>0?Math.round(s.value/total*100):0;
@@ -1661,7 +1658,7 @@ function pushExpenseRow(rows,o,wrap){
     }));
     note=(note?note+" · ":"")+"共"+items.length+"件";
   }
-  rows.push({amount,date,category,note:note.slice(0,60),source:"ai",items});
+  rows.push({amount,date,category,note:note.slice(0,60),source:"ai",cur:((wrap&&wrap.currency)||o.currency||"EUR"),items});
 }
 /* ================= 导入预览 / 确认 ================= */
 function renderPreview(){
@@ -1694,7 +1691,7 @@ function commitPreview(){
   if(!good.length){ toast(t("tNoValidCommit")); return; }
   const nowTs=Date.now();
   good.forEach(r=>saveExpense({id:uid(),amount:r.amount,date:r.date,category:r.category,
-    note:r.note||"",source:r.source||"manual",items:r.items||[],created:nowTs,updated:nowTs}));
+    note:r.note||"",source:r.source||"manual",cur:r.cur||"EUR",items:r.items||[],created:nowTs,updated:nowTs}));
   previewRows=[];
   $("#importText").value="";
   renderPreview();
@@ -1710,9 +1707,9 @@ function exportJSON(){
   toast(t("tExpJson"));
 }
 function exportCSV(){
-  const head=[t("csvDate"),t("csvCat"),t("csvType"),t("csvAmt"),t("csvQty"),t("csvNote"),t("csvSrc")];
+  const head=[t("csvDate"),t("csvCat"),t("csvType"),t("csvAmt"),t("csvCur"),t("csvQty"),t("csvNote"),t("csvSrc")];
   const rows=allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>
-    [e.date,e.category,e.type==="income"?"入账":"支出",e.amount,e.items&&e.items.length?e.items.length:"",'"'+(e.note||"").replace(/"/g,'""')+'"',e.source==="ai"?"AI":t("srcManual")]);
+    [e.date,e.category,e.type==="income"?"入账":"支出",e.amount,e.cur||"EUR",e.items&&e.items.length?e.items.length:"",'"'+(e.note||"").replace(/"/g,'""')+'"',e.source==="ai"?"AI":t("srcManual")]);
   const csv=[head.join(",")].concat(rows.map(r=>r.join(","))).join("\r\n");
   download("天天记账明细-"+todayStr()+".csv",csv,"text/csv");
   toast(t("tExpCsv"));
@@ -1728,7 +1725,7 @@ async function restoreFile(file){
       const cats=Array.isArray(data.cats)&&data.cats.length?data.cats:null;
       if(!exps) throw new Error("no expenses");
       await dbClear("expenses");
-      for(const e of exps) if(e&&e.amount>0) await saveExpense({id:e.id||uid(),amount:+e.amount,date:e.date||todayStr(),category:e.category||"其他",note:e.note||"",type:e.type||"expense",source:e.source||"manual",items:Array.isArray(e.items)?e.items:[],created:e.created||Date.now(),updated:e.updated||Date.now()});
+      for(const e of exps) if(e&&e.amount>0) await saveExpense({id:e.id||uid(),amount:+e.amount,date:e.date||todayStr(),category:e.category||"其他",note:e.note||"",type:e.type||"expense",cur:e.cur||(e.currency||"EUR"),source:e.source||"manual",items:Array.isArray(e.items)?e.items:[],created:e.created||Date.now(),updated:e.updated||Date.now()});
       if(cats){state.cats=cats.map(c=>({name:String(c.name),color:c.color||"#94A3B8"})); await persistCats();}
       await refresh(); toast(t("tRestored")+" "+exps.length);
     }catch(err){ toast(t("tRestoreFail")); }
@@ -1784,10 +1781,9 @@ function renderSettings(){
       refresh();
     });
   }));
-  // 预算 / 语言 / 货币
+  // 预算 / 语言
   const bi=$("#budgetInput"); if(bi && bi.value==="") bi.value=state.budget>0?state.budget:"";
   const ls=$("#langSel"); if(ls) ls.value=state.lang;
-  const cs=$("#curSel"); if(cs) cs.value=state.currency;
 }
 function catSwatchHTML(color,icon){
   return {colors:PALETTE.map(p=>'<span class="sw'+(p===color?" on":"")+'" data-c="'+p+'" style="background:'+p+'"></span>').join(""),
@@ -2012,6 +2008,11 @@ function bindEvents(){
   });
   // 金额输入：只允许数字与一个小数点
   restrictNumeric($("#fAmount"));
+  // 类型切换：支出 / 入账（点击生效）
+  $("#typeToggle").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-type]"); if(!b)return;
+    $$("#typeToggle button").forEach(x=>x.classList.toggle("on",x===b));
+  });
   // 支出类别：默认收起，点标题展开/收起
   $("#catsToggle").addEventListener("click",()=>{
     state.catsOpen=!state.catsOpen;
@@ -2023,11 +2024,6 @@ function bindEvents(){
     state.lang=e.target.value==="en"?"en":"zh";
     persistAppSettings(); applyLang(); renderSettings(); refresh();
   });
-  // 货币
-  $("#curSel").addEventListener("change",e=>{
-    if(CURRENCIES[e.target.value]) state.currency=e.target.value;
-    persistAppSettings(); refresh(); toast(t("tCurSaved")+" "+cur());
-  });
 }
 async function init(){
   const t=new Date(); state.ly=t.getFullYear(); state.lm=t.getMonth()+1; state.sy=t.getFullYear();
@@ -2036,8 +2032,8 @@ async function init(){
   allExpenses=await getExpenses();
   bindEvents();
   applyLang();
-  $("#dashTodayAmt").textContent=cur()+"0.00";
-  $("#dAmt").textContent=cur()+"0.00";
+  $("#dashTodayAmt").textContent=money(0);
+  $("#dAmt").textContent=money(0);
   showTab("ledger");
   if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 }
