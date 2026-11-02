@@ -169,8 +169,8 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .set-title{padding:13px 14px;font-size:14px;font-weight:700;background:#FBFCFC;border-bottom:1px solid var(--border)}
 .set-title.clickable{cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;user-select:none;-webkit-user-select:none}
 .set-title.clickable:active{background:var(--accent-soft)}
-.cat-caret{color:var(--muted);font-size:12px;transition:transform .15s}
-.set-title.open .cat-caret{transform:rotate(90deg)}
+.cat-caret{color:var(--muted);font-size:12px;transition:transform .15s;display:inline-block}
+.set-title.open .cat-caret{transform:rotate(180deg)}
 .set-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer}
 .set-item:last-child{border-bottom:0}
 .set-item .ico{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);
@@ -487,7 +487,7 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       </div>
 
       <div class="set-group">
-        <div class="set-title clickable" id="catsToggle" data-i18n="setCats">支出类别 <span class="cat-caret" id="catsCaret">▸</span></div>
+        <div class="set-title clickable" id="catsToggle" data-i18n="setCats">支出类别 <span class="cat-caret" id="catsCaret">▾</span></div>
         <div id="catCollapse" style="display:none">
           <div class="cat-manage" id="catManage"></div>
           <div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border)">
