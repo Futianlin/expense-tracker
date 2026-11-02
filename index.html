@@ -279,6 +279,11 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .bud-line .bar-fill.over{background:var(--danger)}
 .bud-line .num{font-weight:700;color:var(--text)}
 .bud-over{font-size:12.5px;font-weight:600;margin:-6px 0 12px}
+.rec-row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer}
+.rec-row .rec-main{flex:1;min-width:0}
+.rec-title{font-size:13.5px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.rec-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.rec-del{border:none;background:transparent;color:var(--muted);font-size:14px;padding:6px 8px;cursor:pointer;flex:none}
 #catPickerLabel{display:flex;align-items:center;gap:8px}
 .cat-drop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;border:1px solid var(--border);
   border-radius:12px;padding:10px;background:var(--surface)}
@@ -505,6 +510,15 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       </div>
 
       <div class="set-group">
+        <div class="set-title" data-i18n="recTitle">每月定时记账</div>
+        <div class="set-item plain" style="flex-direction:column;align-items:stretch">
+          <div id="recList" style="display:flex;flex-direction:column;gap:8px"></div>
+          <button class="btn btn-plain sm" id="recAdd" type="button" style="margin-top:8px" data-i18n="recAdd">+ 新增定时</button>
+          <small style="color:var(--muted)" data-i18n="recHint">到设定日期会自动记一笔；若当天没打开 App，下次打开会补记</small>
+        </div>
+      </div>
+
+      <div class="set-group">
         <div class="set-title" data-i18n="setLang">语言</div>
         <div class="set-item plain">
           <div class="tx" style="flex:1;display:flex;align-items:center;justify-content:space-between">
@@ -622,6 +636,43 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
   </div>
 </div>
 
+<!-- ===== 每月定时弹窗 ===== -->
+<div class="modal-mask" id="recModal">
+  <div class="sheet">
+    <h3 id="recTitle2">新增每月定时</h3>
+    <div class="type-toggle" id="recType">
+      <button class="on" data-type="expense" data-i18n="typeExpense">支出</button>
+      <button data-type="income" data-i18n="typeIncome">入账</button>
+    </div>
+    <div class="field">
+      <label data-i18n="recDay">每月第</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="recDayInput" value="1" min="1" max="31" step="1" inputmode="numeric" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)">
+        <span data-i18n="recDayU">日</span>
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="fAmount">金额</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="recAmt" step="0.01" min="0" inputmode="decimal" placeholder="0.00" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)">
+        <select id="recCur" aria-label="货币" style="width:104px;border:1px solid var(--border);border-radius:10px;padding:11px 8px;font-size:16px;background:var(--surface);color:var(--text)"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="fCat">类别</label>
+      <select id="recCat" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)"></select>
+    </div>
+    <div class="field">
+      <label data-i18n="fNote">备注</label>
+      <input type="text" id="recNote" data-i18n-ph="recNotePh" placeholder="如：房租、订阅费">
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-plain" id="recCancel" data-i18n="mCancel">取消</button>
+      <button class="btn btn-primary" id="recSave" data-i18n="mSave">保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== 记录详情 ===== -->
 <div class="modal-mask" id="detailModal">
   <div class="sheet">
@@ -727,7 +778,7 @@ const state = {
   q: "", sort: "date-desc",
   newCatColor: null, newCatIcon: null,
   dashYm: null, dashSel: null, catEditI: null, catsOpen: false, statCur: "EUR",
-  lang: "zh", budgets: {},
+  lang: "zh", budgets: {}, recurring: [],
 };
 /* ================= 国际化 ================= */
 const I18N = {
@@ -790,6 +841,8 @@ zh:{
   tExpJson:"已导出 JSON 备份", tExpCsv:"已导出 CSV",
   csvDate:"日期", csvCat:"类别", csvType:"类型", csvAmt:"金额", csvCur:"货币", csvQty:"件数", csvNote:"备注", csvSrc:"来源",
   ledger:"账本",
+  recTitle:"每月定时记账", recAdd:"新增定时", recHint:"到设定日期会自动记一笔；若当天没打开 App，下次打开会补记",
+  recDay:"每月第", recDayU:"日", recNotePh:"如：房租、订阅费", recNone:"还没有定时记录", recNext:"下次", recEdit:"编辑定时", recAdded:"已自动记账", recTag:"定时",
   hasItems:"含", tCommitted:"已入库", tNoValidCommit:"没有可入库的有效记录",
   tNoValid:"没解析出有效记录，试试 JSON 格式",
   tRmOn:"记账提醒已开启", tRmOff:"记账提醒已关闭",
@@ -856,6 +909,8 @@ en:{
   tExpJson:"JSON backup exported", tExpCsv:"CSV exported",
   csvDate:"Date", csvCat:"Category", csvType:"Type", csvAmt:"Amount", csvCur:"Currency", csvQty:"Qty", csvNote:"Note", csvSrc:"Source",
   ledger:"Ledger",
+  recTitle:"Monthly schedule", recAdd:"Add schedule", recHint:"Auto-records on the set day; if the app wasn't open that day, it catches up next time",
+  recDay:"Day of month", recDayU:"th", recNotePh:"e.g. rent, subscription", recNone:"No schedules yet", recNext:"next", recEdit:"Edit schedule", recAdded:"Auto-recorded", recTag:"scheduled",
   hasItems:"with", tCommitted:"Imported", tNoValidCommit:"No valid records to import",
   tNoValid:"No valid records — try JSON format",
   tRmOn:"Reminder on", tRmOff:"Reminder off",
@@ -1101,13 +1156,48 @@ async function loadAppSettings(){
     // 新结构：每账本 {m:月度, y:年度}；兼容旧的单一 budget → 归入 EUR
     if(s.budgets && typeof s.budgets==="object") state.budgets=s.budgets;
     else if(typeof s.budget==="number") state.budgets={EUR:{m:s.budget,y:0}};
+    if(Array.isArray(s.rec)) state.recurring=s.rec;
   }
 }
 async function persistAppSettings(){
-  await dbPut("settings",{key:"app",val:{lang:state.lang,budgets:state.budgets}});
+  await dbPut("settings",{key:"app",val:{lang:state.lang,budgets:state.budgets,rec:state.recurring}});
 }
 /* 读取某账本的预算（自动建默认） */
 function curBudget(c){ return state.budgets[c]||(state.budgets[c]={m:0,y:0}); }
+/* ===== 每月定时记账 ===== */
+/* 给定基准日期，返回下一个月第 day 天的日期（day 超出当月天数则取月末） */
+function recNextMonth(day,base){
+  let y=+base.slice(0,4), m=+base.slice(5,7);
+  if(m===12){m=1;y++;}else m++;
+  const dd=Math.min(day,new Date(y,m,0).getDate());
+  return y+"-"+String(m).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
+}
+/* 新建定时时：首次触发日 = 今天所在月内该 day（若已过则下个月），不小于今天 */
+function recFirst(day){
+  const t=new Date(); const y=t.getFullYear(), m=t.getMonth()+1;
+  const dd=Math.min(day,new Date(y,m,0).getDate());
+  let cand=y+"-"+String(m).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
+  if(cand<todayStr()) cand=recNextMonth(day,cand);
+  return cand;
+}
+/* 补录 + 到点自动记一笔：遍历所有启用中的定时，把已到期的都写入 */
+async function checkRecurring(){
+  if(!state.recurring||!state.recurring.length) return;
+  const today=todayStr();
+  let added=0, touched=false;
+  for(const r of state.recurring){
+    if(!r.enabled) continue;
+    if(!r.next) r.next=recFirst(r.day);
+    while(r.next && r.next<=today){
+      await saveExpense({id:uid(),amount:r.amount,date:r.next,category:r.category||"其他",
+        note:r.note||"",type:r.type||"expense",cur:r.cur||"EUR",source:"rec",
+        created:Date.now(),updated:Date.now()});
+      added++; touched=true;
+      r.next=recNextMonth(r.day,r.next);
+    }
+  }
+  if(touched){ await persistAppSettings(); await refresh(); toast(t("recAdded")+" "+added); }
+}
 
 /* ================= 路由 / 标签 ================= */
 function showTab(tab){
@@ -1188,7 +1278,7 @@ function renderLedgerList(){
       catChip(e.category)+
       '<div class="row-main"><div class="row-title">'+esc(e.category)+(inc?' <span class="tag-inc">'+t("income")+'</span>':"")+'</div>'+
       '<div class="row-sub">'+esc(rowSub(e))+(byAmount||q?' · '+esc(e.date.slice(5)):"")+'</div></div>'+
-      (e.source==="ai"?'<span class="src">AI</span>':'')+
+      (e.source==="rec"?'<span class="src">'+t("recTag")+'</span>':(e.source==="ai"?'<span class="src">AI</span>':''))+
       '<div class="row-amt num'+(inc?' inc':'')+'">'+(inc?'+':'')+moneyC(e.amount,e.cur||'EUR')+'</div>'+
       '<span class="chev">›</span></div>';
   };
@@ -1884,12 +1974,61 @@ function renderSettings(){
     fillBudgetInputs();
   }
   const ls=$("#langSel"); if(ls) ls.value=state.lang;
+  renderRecList();
 }
 function fillBudgetInputs(){
   const bc=$("#budCur"); if(!bc) return;
   const b=curBudget(bc.value);
   const bm=$("#budMonth"); if(bm) bm.value=b.m>0?b.m:"";
   const by=$("#budYear"); if(by) by.value=b.y>0?b.y:"";
+}
+/* ===== 每月定时记账：列表 / 弹窗 ===== */
+let recEditI=null;
+function renderRecList(){
+  const box=$("#recList"); if(!box) return;
+  if(!state.recurring.length){ box.innerHTML='<div class="empty" style="font-size:12.5px">'+t("recNone")+'</div>'; return; }
+  box.innerHTML=state.recurring.map((r,i)=>{
+    const inc=r.type==="income";
+    return '<div class="rec-row" data-i="'+i+'"><div class="rec-main">'+
+      '<div class="rec-title">'+esc((r.day||1)+t("recDayU"))+' · '+catChip(r.category)+esc(r.category)+
+      (inc?' <span class="tag-inc">'+t("income")+'</span>':'')+'</div>'+
+      '<div class="rec-sub">'+moneyC(r.amount,r.cur||'EUR')+(r.note?' · '+esc(r.note):"")+' · '+t("recNext")+': '+esc(r.next||"—")+'</div>'+
+      '</div>'+
+      '<button class="rec-del" data-i="'+i+'" aria-label="删除">✕</button></div>';
+  }).join("");
+}
+function openRecModal(i){
+  recEditI=(i==null?null:i);
+  $("#recTitle2").textContent=i==null?t("recAdd"):t("recEdit");
+  const r=i!=null?state.recurring[i]:null;
+  $("#recDayInput").value=r?r.day:1;
+  $("#recAmt").value=r?r.amount:"";
+  const fc=$("#recCur"); fc.innerHTML="";
+  sortedCurrencies().forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=curSym(c)+" "+c; fc.appendChild(o); });
+  fc.value=r?(r.cur||"EUR"):state.statCur;
+  const cc=$("#recCat"); cc.innerHTML="";
+  state.cats.forEach(c=>{ const o=document.createElement("option"); o.value=c.name; o.textContent=c.name; cc.appendChild(o); });
+  cc.value=r?r.category:state.cats[0].name;
+  $("#recNote").value=r?(r.note||""):"";
+  $$("#recType button").forEach(b=>b.classList.toggle("on",b.dataset.type===((r&&r.type==="income")?"income":"expense")));
+  $("#recModal").classList.add("on");
+}
+function saveRec(){
+  const day=Math.max(1,Math.min(31,parseInt($("#recDayInput").value,10)||1));
+  const amt=parseFloat($("#recAmt").value);
+  if(!(amt>0)){ toast(t("tAmtErr")); return; }
+  const type=$("#recType button.on")?.dataset.type||"expense";
+  const cur=$("#recCur").value||"EUR";
+  const category=$("#recCat").value||state.cats[0].name;
+  const note=$("#recNote").value.trim();
+  if(recEditI!=null && state.recurring[recEditI]){
+    const r=state.recurring[recEditI];
+    r.day=day; r.amount=amt; r.cur=cur; r.type=type; r.category=category; r.note=note;
+  }else{
+    state.recurring.push({id:uid(),day,amount:amt,cur:cur,type:type,category:category,note:note,enabled:true,next:recFirst(day)});
+  }
+  recEditI=null;
+  persistAppSettings().then(()=>{ $("#recModal").classList.remove("on"); renderSettings(); toast(t("tSaved")); });
 }
 function catSwatchHTML(color,icon){
   return {colors:PALETTE.map(p=>'<span class="sw'+(p===color?" on":"")+'" data-c="'+p+'" style="background:'+p+'"></span>').join(""),
@@ -2132,6 +2271,18 @@ function bindEvents(){
   if($("#dashDateBtn")) $("#dashDateBtn").addEventListener("click",e=>{ e.stopPropagation(); const j=$("#dashJump"); j.value=state.dashSel||todayStr(); j.style.display="block"; j.focus(); });
   if($("#dashJump")) $("#dashJump").addEventListener("change",e=>{ if(e.target.value){ state.dashSel=e.target.value; e.target.style.display="none"; renderDash(); } });
   if($("#dashJump")) $("#dashJump").addEventListener("blur",e=>{ e.target.style.display="none"; });
+  // 每月定时记账
+  if($("#recAdd")) $("#recAdd").addEventListener("click",()=>openRecModal(null));
+  if($("#recList")) $("#recList").addEventListener("click",e=>{
+    const d=e.target.closest(".rec-del");
+    if(d){ const i=+d.dataset.i; state.recurring.splice(i,1); persistAppSettings().then(()=>{ renderSettings(); toast(t("tDeleted")); }); return; }
+    const row=e.target.closest(".rec-row"); if(row) openRecModal(+row.dataset.i);
+  });
+  if($("#recType")) $("#recType").addEventListener("click",e=>{ const b=e.target.closest("button[data-type]"); if(!b)return; $$("#recType button").forEach(x=>x.classList.toggle("on",x===b)); });
+  if($("#recAmt")) restrictNumeric($("#recAmt"));
+  if($("#recDayInput")) restrictNumeric($("#recDayInput"));
+  if($("#recCancel")) $("#recCancel").addEventListener("click",()=>$("#recModal").classList.remove("on"));
+  if($("#recSave")) $("#recSave").addEventListener("click",saveRec);
   // 金额输入：只允许数字与一个小数点
   restrictNumeric($("#fAmount"));
   // 类型切换：支出 / 入账（点击生效）
@@ -2165,6 +2316,9 @@ async function init(){
   if($("#dashBreak")) $("#dashBreak").innerHTML='<div class="dash-break dash-empty"><span class="num">'+moneyC(0,state.statCur)+'</span><small>0</small></div>';
   $("#dAmt").textContent=money(0);
   showTab("ledger");
+  // 每月定时：打开时补录已到期项；运行中每分钟再查一次
+  checkRecurring();
+  setInterval(()=>{ checkRecurring(); },60000);
   if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 }
 init();
