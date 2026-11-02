@@ -1,5 +1,5 @@
-/* 支出记账 离线 Service Worker：首次访问后缓存全部资源，之后完全离线可用 */
-const CACHE = "expense-v4";
+/* 天天记账 DayTally 离线 Service Worker：首次访问后缓存全部资源，之后完全离线可用 */
+const CACHE = "expense-v5";
 const ASSETS = [
   "./",
   "./index.html",

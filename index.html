@@ -6,11 +6,12 @@
 <meta name="theme-color" content="#1F7A63">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="支出记账">
+<meta name="apple-mobile-web-app-title" content="天天记账">
+<meta name="description" content="天天记账 DayTally — 完全离线个人记账 PWA">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%231F7A63'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23F5F8F6' stroke-width='9'/%3E%3Cpath d='M32 15 a17 17 0 0 1 14 27' fill='none' stroke='%23FFFFFF' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
-<title>支出记账</title>
+<title>天天记账 DayTally</title>
 <style>
 :root{
   --bg:#F6F7F9; --surface:#FFFFFF; --border:#E3E7EB;
@@ -296,6 +297,23 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .ie-amt{font-weight:700;font-variant-numeric:tabular-nums;font-size:14px;min-width:56px;text-align:right}
 .ie-total{margin-top:10px;text-align:right;font-size:14px;color:var(--muted)}
 .ie-total b{color:var(--text);font-size:17px}
+/* 类型切换（支出/入账） */
+.type-toggle{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;background:var(--surface)}
+.type-toggle button{flex:1;border:0;background:transparent;padding:10px;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.type-toggle button.on{background:var(--accent-soft);color:var(--accent-ink)}
+.type-toggle button[data-type="income"].on{background:#E7F5EA;color:#2E7D32}
+.set-item.plain{padding:14px;cursor:default}
+.set-item.plain input,.set-item.plain select{min-height:44px}
+/* 开关 */
+.switch{position:relative;display:inline-block;width:50px;height:28px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#CFD5DB;border-radius:999px;transition:.2s}
+.switch .slider:before{content:"";position:absolute;height:22px;width:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.switch input:checked+.slider{background:var(--accent)}
+.switch input:checked+.slider:before{transform:translateX(22px)}
+.wd-row{display:flex;gap:6px;flex-wrap:wrap}
+.wd-row span{border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text);cursor:pointer;background:var(--surface);min-width:34px;text-align:center}
+.wd-row span.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
 /* line chart */
 .line-wrap{position:relative;width:100%;padding:6px 2px 0}
 .legend-mini{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
@@ -306,6 +324,9 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .stat-metric .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
 /* row chevron */
 .row .chev{color:var(--muted2);font-size:15px;flex:none}
+.row.inc .row-amt{color:#2E7D32}
+.tag-inc{display:inline-block;font-size:10px;color:#2E7D32;background:#E7F5EA;border-radius:999px;padding:1px 7px;margin-left:5px;vertical-align:1px;font-weight:600}
+.detail-amt.inc{color:#2E7D32}
 /* ledger 工具条 */
 .ledger-tool{display:flex;gap:8px;align-items:center;margin:10px 0 12px}
 .lt-search{flex:1;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 11px;min-width:0}
@@ -332,7 +353,7 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
   <!-- ===== 顶部 ===== -->
   <header class="header">
     <div class="header-row">
-      <div class="brand">支出记账<small>本地 · 离线</small></div>
+      <div class="brand"><span data-i18n="app">天天记账</span><small data-i18n="appTag">本地 · 离线</small></div>
       <div class="period" id="periodWrap">
         <div class="period-label" id="periodLabel" title="点我选月份">2026年10月</div>
         <div class="nav">
@@ -343,9 +364,9 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
     <div class="period" id="statSegWrap" style="display:none;margin-top:12px">
       <div class="seg" id="statSeg">
-        <button data-k="month" class="on">本月</button>
-        <button data-k="year">年账单</button>
-        <button data-k="trend">趋势</button>
+        <button data-k="month" data-i18n="segMonth" class="on">本月</button>
+        <button data-k="year" data-i18n="segYear">年账单</button>
+        <button data-k="trend" data-i18n="segTrend">趋势</button>
       </div>
     </div>
     <div class="period-cal" id="periodCal" style="display:none"></div>
@@ -355,12 +376,12 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     <section id="view-ledger" class="view on">
       <div class="card summary" id="summaryCard"></div>
       <div class="ledger-tool">
-        <div class="lt-search"><svg viewBox="0 0 24 24"><path d="M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM16 16l4 4"/></svg><input id="searchInput" type="search" placeholder="搜索备注 / 类别 / 商品名"></div>
+        <div class="lt-search"><svg viewBox="0 0 24 24"><path d="M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM16 16l4 4"/></svg><input id="searchInput" type="search" data-i18n-ph="searchPh" placeholder="搜索备注 / 类别 / 商品名"></div>
         <select id="sortSel" aria-label="排序">
-          <option value="date-desc">日期：新→旧</option>
-          <option value="date-asc">日期：旧→新</option>
-          <option value="amt-desc">花费：高→低</option>
-          <option value="amt-asc">花费：低→高</option>
+          <option value="date-desc" data-i18n="sortDd">日期：新→旧</option>
+          <option value="date-asc" data-i18n="sortDa">日期：旧→新</option>
+          <option value="amt-desc" data-i18n="sortAd">花费：高→低</option>
+          <option value="amt-asc" data-i18n="sortAa">花费：低→高</option>
         </select>
       </div>
       <div id="ledgerList"></div>
@@ -374,42 +395,42 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     <!-- ===== 视图：导入 ===== -->
     <section id="view-import" class="view">
       <div class="import-tip">
-        <b>AI 识别支出凭证 → 粘贴入库</b><br>
-        在 DeepSeek 里识别前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。支持小票、购物/订单截图、银行消费记录；一次可识别多张（用「批量识别提示词」，返回的数组会按各自的日期分别入库）。金额以「实付总价」为准。
+        <b data-i18n="importTitle">AI 识别支出凭证 → 粘贴入库</b><br>
+        <span data-i18n="importTip">在 DeepSeek 里识别前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。支持小票、购物/订单截图、银行消费记录；一次可识别多张（用「批量识别提示词」，返回的数组会按各自的日期分别入库）。金额以「实付总价」为准。</span>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-          <button class="btn btn-primary sm" id="copyPromptBtn">复制识别提示词</button>
-          <button class="btn btn-ghost sm" id="batchCopyBtn">批量识别提示词</button>
-          <button class="btn btn-ghost sm" id="viewPromptBtn">查看提示词</button>
+          <button class="btn btn-primary sm" id="copyPromptBtn" data-i18n="copyPrompt">复制识别提示词</button>
+          <button class="btn btn-ghost sm" id="batchCopyBtn" data-i18n="batchPrompt">批量识别提示词</button>
+          <button class="btn btn-ghost sm" id="viewPromptBtn" data-i18n="viewPrompt">查看提示词</button>
         </div>
       </div>
       <div class="card" id="promptBox" style="display:none">
-        <h3>识别提示词（整段发给 DeepSeek）</h3>
+        <h3 data-i18n="promptBoxTitle">识别提示词（整段发给 DeepSeek）</h3>
         <div class="prompt-scroll" id="promptText"></div>
-        <button class="btn btn-primary block" id="copyPrompt2Btn">复制识别提示词</button>
+        <button class="btn btn-primary block" id="copyPrompt2Btn" data-i18n="copyPrompt">复制识别提示词</button>
       </div>
       <div class="card">
-        <textarea class="in" id="importText" placeholder="粘贴 DeepSeek 返回的 JSON 或文本…"></textarea>
-        <div class="hint" id="importHint">支持：小票 / 订单 / 银行消费 JSON（含 expense 字段或数组）、简单 JSON、以及「日期 金额 类别 备注」格式的行。批量识别返回的数组会自动按各自日期拆开入库。</div>
-        <button class="btn btn-primary block mt" id="parseBtn">解析</button>
+        <textarea class="in" id="importText" data-i18n-ph="importPh" placeholder="粘贴 DeepSeek 返回的 JSON 或文本…"></textarea>
+        <div class="hint" id="importHint" data-i18n="importHint">支持：小票 / 订单 / 银行消费 JSON（含 expense 字段或数组）、简单 JSON、以及「日期 金额 类别 备注」格式的行。批量识别返回的数组会自动按各自日期拆开入库。</div>
+        <button class="btn btn-primary block mt" id="parseBtn" data-i18n="parse">解析</button>
       </div>
       <div class="card" id="previewCard" style="display:none">
-        <h3>待入库 <span id="previewCount"></span> 笔</h3>
+        <h3 data-i18n="previewTitle">待入库 <span id="previewCount"></span> 笔</h3>
         <div id="previewList"></div>
-        <button class="btn btn-primary block mt" id="commitBtn">确认入库</button>
-        <button class="btn btn-plain block mt" id="clearPreviewBtn">清空</button>
+        <button class="btn btn-primary block mt" id="commitBtn" data-i18n="commit">确认入库</button>
+        <button class="btn btn-plain block mt" id="clearPreviewBtn" data-i18n="clear">清空</button>
       </div>
       <div class="card">
-        <h3>从文件恢复</h3>
-        <label class="btn btn-plain block" for="restoreFile" style="margin-bottom:8px">选择 JSON / CSV 文件</label>
+        <h3 data-i18n="restoreTitle">从文件恢复</h3>
+        <label class="btn btn-plain block" for="restoreFile" style="margin-bottom:8px" data-i18n="restoreBtn">选择 JSON / CSV 文件</label>
         <input type="file" id="restoreFile" accept=".json,.csv,.txt" style="display:none">
-        <div class="hint">用于恢复之前导出的备份（JSON 完整备份 / CSV 明细）。</div>
+        <div class="hint" data-i18n="restoreHint">用于恢复之前导出的备份（JSON 完整备份 / CSV 明细）。</div>
       </div>
     </section>
 
     <!-- ===== 视图：设置 ===== -->
     <section id="view-settings" class="view">
       <div class="set-group">
-        <div class="set-title">今日看板</div>
+        <div class="set-title" data-i18n="setDash">今日看板</div>
         <div class="dash-card">
           <div class="dash-today">
             <div style="font-size:14px" id="dashDate">今天</div>
@@ -421,44 +442,97 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       </div>
 
       <div class="set-group">
-        <div class="set-title">支出类别</div>
-        <div class="cat-manage" id="catManage"></div>
-        <div id="editCatPicker" style="display:none;padding:12px 14px;border-top:1px solid var(--border);background:#FBFCFC"></div>
-        <div style="padding:10px 14px;border-top:1px solid var(--border)">
-          <button class="btn btn-ghost sm" id="addCatBtn">+ 新增类别</button>
-        </div>
-        <div class="cat-add" id="catAddForm" style="display:none">
-          <input type="text" id="newCatName" placeholder="新类别名称（如：宠物）" maxlength="12">
-          <div class="lbl">颜色</div>
-          <div class="sws" id="newCatColors"></div>
-          <div class="lbl">图标</div>
-          <div class="sws" id="newCatIcons"></div>
-          <div class="ca-actions">
-            <button class="btn btn-ghost sm" id="newCatCancel">取消</button>
-            <button class="btn btn-primary sm" id="newCatSave">保存</button>
+        <div class="set-title" data-i18n="setBudget">月度预算</div>
+        <div class="set-item plain">
+          <div class="tx" style="flex:1">
+            <input type="number" id="budgetInput" data-i18n-ph="budgetPh" placeholder="每月预算（EUR），0 或留空则不显示" step="1" min="0" inputmode="decimal" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;background:var(--surface);color:var(--text)">
+            <small style="color:var(--muted)" data-i18n="budgetHint">预算会作为趋势图的红色虚线上界，超出的月份标红</small>
           </div>
         </div>
       </div>
 
       <div class="set-group">
-        <div class="set-title">数据</div>
+        <div class="set-title" data-i18n="setLang">语言</div>
+        <div class="set-item plain">
+          <div class="tx" style="flex:1;display:flex;align-items:center;justify-content:space-between">
+            <b data-i18n="setLang">语言</b>
+            <select id="langSel" style="border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:16px;background:var(--surface);color:var(--text)">
+              <option value="zh" data-i18n="langZh">中文</option>
+              <option value="en" data-i18n="langEn">English</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-title" data-i18n="setReminder">记账提醒</div>
+        <div class="set-item plain">
+          <div class="tx" style="flex:1;display:flex;align-items:center;justify-content:space-between">
+            <b data-i18n="rmEnabled">开启记账提醒</b>
+            <label class="switch"><input type="checkbox" id="rmEnabled"><span class="slider"></span></label>
+          </div>
+        </div>
+        <div class="set-item plain" id="rmCfg" style="display:none">
+          <div class="tx" style="flex:1">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+              <select id="rmFreq" style="flex:1;min-width:110px;border:1px solid var(--border);border-radius:10px;padding:9px;font-size:16px;background:var(--surface);color:var(--text)">
+                <option value="daily" data-i18n="rmDaily">每天</option>
+                <option value="weekly" data-i18n="rmWeekly">每周</option>
+                <option value="everyN" data-i18n="rmEveryN">每 N 天</option>
+              </select>
+              <input type="time" id="rmTime" value="20:00" style="border:1px solid var(--border);border-radius:10px;padding:9px 10px;font-size:16px;background:var(--surface);color:var(--text)">
+            </div>
+            <div id="rmWeekday" style="display:none;margin-bottom:8px">
+              <div class="wd-row" id="wdRow"></div>
+            </div>
+            <div id="rmEvery" style="display:none;margin-bottom:8px;align-items:center;gap:8px">
+              <span style="font-size:14px;color:var(--muted)" data-i18n="rmInterval">间隔天数</span>
+              <input type="number" id="rmInterval" min="1" max="60" value="3" style="width:76px;border:1px solid var(--border);border-radius:10px;padding:9px;font-size:16px;background:var(--surface);color:var(--text)">
+            </div>
+            <small style="color:var(--muted);line-height:1.6;display:block" data-i18n="rmHint">打开 App 时会检查：若已到设定时间、且这段时间还没记过账，就提醒你记账。（注意：iOS 添加到主屏幕的网页无法后台推送通知，只能在打开时提醒）</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-title" data-i18n="setCats">支出类别</div>
+        <div class="cat-manage" id="catManage"></div>
+        <div id="editCatPicker" style="display:none;padding:12px 14px;border-top:1px solid var(--border);background:#FBFCFC"></div>
+        <div style="padding:10px 14px;border-top:1px solid var(--border)">
+          <button class="btn btn-ghost sm" id="addCatBtn" data-i18n="catAdd">+ 新增类别</button>
+        </div>
+        <div class="cat-add" id="catAddForm" style="display:none">
+          <input type="text" id="newCatName" data-i18n-ph="catAddPh" placeholder="新类别名称（如：宠物）" maxlength="12">
+          <div class="lbl" data-i18n="color">颜色</div>
+          <div class="sws" id="newCatColors"></div>
+          <div class="lbl" data-i18n="icon">图标</div>
+          <div class="sws" id="newCatIcons"></div>
+          <div class="ca-actions">
+            <button class="btn btn-ghost sm" id="newCatCancel" data-i18n="catCancel">取消</button>
+            <button class="btn btn-primary sm" id="newCatSave" data-i18n="catSave">保存</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-title" data-i18n="setData">数据</div>
         <div class="set-item" id="exportJson">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14"/></svg></div>
-          <div class="tx"><b>导出备份（JSON）</b><small>完整数据，含所有记录与类别，可用于恢复</small></div>
+          <div class="tx"><b data-i18n="exportJson">导出备份（JSON）</b><small data-i18n="exportJsonSub">完整数据，含所有记录与类别，可用于恢复</small></div>
           <div class="arr">›</div>
         </div>
         <div class="set-item" id="exportCsv">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
-          <div class="tx"><b>导出明细（CSV）</b><small>表格格式，可用 Excel / Numbers 打开</small></div>
+          <div class="tx"><b data-i18n="exportCsv">导出明细（CSV）</b><small data-i18n="exportCsvSub">表格格式，可用 Excel / Numbers 打开</small></div>
           <div class="arr">›</div>
         </div>
       </div>
 
       <div class="set-group">
-        <div class="set-title">帮助</div>
+        <div class="set-title" data-i18n="setManual">用户手册</div>
         <div class="set-item" id="openManual">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 8v4m0 4h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></div>
-          <div class="tx"><b>用户手册</b><small>功能说明 + 各品牌手机安装到主屏幕教程</small></div>
+          <div class="tx"><b data-i18n="setManual">用户手册</b><small data-i18n="setManualSub">功能说明 + 各品牌手机安装到主屏幕教程</small></div>
           <div class="arr">›</div>
         </div>
       </div>
@@ -466,27 +540,27 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       <div class="card" style="font-size:13px;color:var(--muted)">
         <h3 style="font-size:14px;color:var(--text)">说明</h3>
         数据只保存在本机浏览器（IndexedDB），不联网、不调用任何接口、不上传。<br><br>
-        <b>安装到主屏幕：</b>先在电脑/手机把本项目部署到免费静态托管（如 GitHub Pages、Cloudflare Pages），再用 iPhone 的 Safari 打开该网址 → 分享 → 「添加到主屏幕」，即可像 App 一样全屏使用，之后完全离线可用。<br><br>
+        <b>安装到主屏幕：</b>先用电脑/手机打开本项目的免费静态托管网址（GitHub Pages），再用 iPhone 的 Safari 打开该网址 → 分享 → 「添加到主屏幕」，即可像 App 一样全屏使用，之后完全离线可用。<br><br>
         <b>备份：</b>定期导出 JSON 备份，换手机或清浏览器前先导出保存。
       </div>
     </section>
   </main>
 
-  <button class="fab" id="fabBtn" aria-label="新增支出">＋</button>
+  <button class="fab" id="fabBtn" aria-label="记一笔">＋</button>
 
   <!-- ===== 底部 tab ===== -->
   <nav class="tabbar">
     <button class="tab on" data-tab="ledger">
-      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>明细
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="tabLedger">明细</span>
     </button>
     <button class="tab" data-tab="stats">
-      <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>统计
+      <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg><span data-i18n="tabStats">统计</span>
     </button>
     <button class="tab" data-tab="import">
-      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg>导入
+      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg><span data-i18n="tabImport">导入</span>
     </button>
     <button class="tab" data-tab="settings">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5l-.3 2.5a7 7 0 0 0-1.7 1L5 5.5l-2 3.5L5 10.5a7 7 0 0 0 0 2L3 14l2 3.5 2.4-1a7 7 0 0 0 1.7 1l.3 2.5h5l.3-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5L19 13a7 7 0 0 0 .1-1z"/></svg>设置
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5l-.3 2.5a7 7 0 0 0-1.7 1L5 5.5l-2 3.5L5 10.5a7 7 0 0 0 0 2L3 14l2 3.5 2.4-1a7 7 0 0 0 1.7 1l.3 2.5h5l.3-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5L19 13a7 7 0 0 0 .1-1z"/></svg><span data-i18n="tabSettings">设置</span>
     </button>
   </nav>
 </div>
@@ -496,28 +570,32 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
   <div class="sheet">
     <h3 id="modalTitle">新增支出</h3>
     <p class="sub" id="modalSub"></p>
+    <div class="type-toggle" id="typeToggle">
+      <button class="on" data-type="expense" data-i18n="typeExpense">支出</button>
+      <button data-type="income" data-i18n="typeIncome">入账</button>
+    </div>
     <div class="field">
-      <label>金额（EUR）</label>
+      <label data-i18n="fAmount">金额（EUR）</label>
       <input type="number" id="fAmount" step="0.01" min="0" inputmode="decimal" placeholder="0.00">
     </div>
     <div class="field">
-      <label>日期</label>
+      <label data-i18n="fDate">日期</label>
       <button type="button" class="date-btn" id="fDateBtn"><span id="fDateLabel">—</span><span class="date-caret">⌄</span></button>
       <div class="calendar" id="fCal" style="display:none"></div>
     </div>
     <div class="field">
-      <label>类别</label>
+      <label data-i18n="fCat">类别</label>
       <button type="button" class="date-btn" id="catPickerBtn"><span id="catPickerLabel">—</span><span class="date-caret">⌄</span></button>
       <div class="cat-drop" id="catDropdown" style="display:none"></div>
     </div>
     <div class="field">
-      <label>备注</label>
-      <input type="text" id="fNote" placeholder="可选，如：超市 10件商品">
+      <label data-i18n="fNote">备注</label>
+      <input type="text" id="fNote" data-i18n-ph="fNotePh" placeholder="可选，如：超市 10件商品">
     </div>
     <div class="sheet-actions">
-      <button class="btn btn-danger" id="fDelete" style="display:none">删除</button>
-      <button class="btn btn-plain" id="fCancel">取消</button>
-      <button class="btn btn-primary" id="fSave">保存</button>
+      <button class="btn btn-danger" id="fDelete" style="display:none" data-i18n="mDelete">删除</button>
+      <button class="btn btn-plain" id="fCancel" data-i18n="mCancel">取消</button>
+      <button class="btn btn-primary" id="fSave" data-i18n="mSave">保存</button>
     </div>
   </div>
 </div>
@@ -536,9 +614,9 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     <div id="dItems"></div>
     <div id="dItemsEdit" style="display:none"></div>
     <div class="sheet-actions" style="margin-top:14px">
-      <button class="btn btn-danger" id="dDelete">删除</button>
+      <button class="btn btn-danger" id="dDelete" data-i18n="detailDelete">删除</button>
       <button class="btn btn-ghost" id="dEditItems" style="display:none">编辑明细</button>
-      <button class="btn btn-primary" id="dEdit">编辑</button>
+      <button class="btn btn-primary" id="dEdit" data-i18n="detailEdit">编辑</button>
     </div>
   </div>
 </div>
@@ -548,73 +626,13 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 <div class="modal-mask" id="manualModal">
   <div class="sheet manual-sheet">
     <div class="manual-head">
-      <h3 style="margin:0;font-size:17px">用户手册</h3>
+      <h3 style="margin:0;font-size:17px" data-i18n="setManual">用户手册</h3>
       <div class="manual-actions">
         <button class="btn btn-ghost sm" id="manualPdf">导出 PDF</button>
         <button class="btn btn-plain sm" id="manualClose">关闭</button>
       </div>
     </div>
-    <div class="manual-body" id="manualPrint">
-      <div class="msec">
-        <h4>1. 这是什么</h4>
-        <p>一款完全离线的个人记账工具：所有数据只存在你的手机本机（IndexedDB），不联网、不上传、不调 AI 接口。支持 AI 识别小票/账单、月/年账单、类别、可视化、增删改查与导出备份。</p>
-      </div>
-      <div class="msec">
-        <h4>2. 快速开始</h4>
-        <p>底部四个页签：<b>明细</b>（流水列表）、<b>统计</b>（本月/年账单/趋势）、<b>导入</b>（AI 识别入库）、<b>设置</b>（类别、数据、看板）。点底部中间「＋」即可手动记一笔。</p>
-      </div>
-      <div class="msec">
-        <h4>3. 记一笔支出</h4>
-        <p>点「＋」→ 填金额、选日期（点日期直接弹日历）、选类别（点开下拉）、填备注 → 保存。金额与日期必填，日期默认今天。</p>
-      </div>
-      <div class="msec">
-        <h4>4. AI 识别入库（最常用）</h4>
-        <p><b>流程：</b>打开「导入」→ 点「复制识别提示词」（或批量版）→ 把提示词连同你的小票/购物截图/银行记录图片一起发给 DeepSeek → DeepSeek 只返回一段 JSON → 回到本 app「导入」页粘贴 → 点「解析」→ 在预览里确认 →「确认入库」。</p>
-        <p>支持：超市小票、购物截图、银行支出记录等。识别结果会带商品明细（荷兰语原名 + 中文名 + 数量 + 单价），入库后可查看每一项。</p>
-        <p><b>批量：</b>用「批量识别提示词」可一次贴多张凭证，返回后按各自日期自动拆开逐条入库。</p>
-      </div>
-      <div class="msec">
-        <h4>5. 编辑记录 & 编辑购买明细</h4>
-        <p>在明细里点任意一笔 → 弹出详情 → 「编辑」改金额/日期/类别/备注；点「编辑明细」可改每一项的数量和单价，金额会自动用计算器重算，保存后总金额同步更新。</p>
-      </div>
-      <div class="msec">
-        <h4>6. 类别管理</h4>
-        <p>「设置 → 类别」可改名、删除、点「改」换图标和颜色（颜色会同步到统计图的颜色）；可点「新增类别」用色板和图标新建。</p>
-      </div>
-      <div class="msec">
-        <h4>7. 统计与可视化</h4>
-        <p>「统计」页：本月看<b>环形占比图</b>（点某个扇区看该类别明细，只有一个类别时占满整圈）；<b>年账单</b>看 12 个月柱状；<b>趋势</b>看 12 个月折线与月均线。顶部期标签可点开日历直接选月份。</p>
-      </div>
-      <div class="msec">
-        <h4>8. 搜索与排序</h4>
-        <p>「明细」页顶部可搜索备注/类别/商品名（跨所有月份）；右侧下拉可按日期或金额升/降序排列。</p>
-      </div>
-      <div class="msec">
-        <h4>9. 数据与备份（重要）</h4>
-        <p>数据存在本机 IndexedDB（库名 expense-db），iOS 可在「设置 → Safari → 高级 → 网站数据」查看/清除。建议定期在「设置 → 导出」导出 JSON 备份；换手机或清缓存后用「恢复」导入回来。</p>
-      </div>
-      <div class="msec">
-        <h4>10. 安装到主屏幕（各品牌）</h4>
-        <p class="lead">先在你的手机浏览器打开本站网址，然后按下列步骤“添加到主屏幕”，以后从主屏幕图标进入，可完全离线使用（首次在线加载后）。</p>
-
-        <h5>苹果 iPhone / iPad（Safari）</h5>
-        <p>用 <b>Safari</b> 打开网址 → 点底部中间<b>「分享」按钮（方框+箭头）</b>→ 在弹出菜单点 <b>「添加到主屏幕」</b> → 命名（如“支出记账”）→ 点右上角<b>「添加」</b>。桌面出现图标即完成。</p>
-
-        <h5>安卓（三星 / 华为 / 小米 / vivo 等，Chrome 或自带浏览器）</h5>
-        <p class="lead">主流安卓浏览器步骤基本一致，相似机型可合并看：</p>
-        <p>用 <b>Chrome</b>（或系统自带浏览器）打开网址 → 点右上角<b>菜单「⋮」</b>→ 找 <b>「添加到主屏幕」/「安装应用」/「添加到桌面」</b> → 确认。如弹出“安装应用/添加到主屏幕”的横幅，直接点它更快。</p>
-        <p><b>三星（One UI）</b>：浏览器菜单里点<b>「添加到主屏幕」</b>；也可在桌面长按空白处 → 添加小组件/快捷方式 → 选浏览器书签。</p>
-        <p><b>华为（EMUI/HarmonyOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>；HarmonyOS 桌面长按也可直接添加。</p>
-        <p><b>小米（MIUI/HyperOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>；若浏览器是小米自带，菜单里叫<b>「添加到主屏幕」</b>。</p>
-        <p><b>vivo（OriginOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>，确认后桌面生成图标。</p>
-      </div>
-      <div class="msec">
-        <h4>11. 常见问题</h4>
-        <p><b>装了没网络能用吗？</b>能。首次打开并加载完成后即可离线记账，数据始终在本机。</p>
-        <p><b>想换手机/备份？</b>定期导出 JSON，需要时在新设备“恢复”。</p>
-        <p><b>数据会丢吗？</b>只要不清除浏览器网站数据就不丢；建议保留 JSON 备份以防万一。</p>
-      </div>
-    </div>
+    <div class="manual-body" id="manualPrint"></div>
   </div>
 </div>
 <script id="app-js">
@@ -666,8 +684,240 @@ const state = {
   tab: "ledger",
   q: "", sort: "date-desc",
   newCatColor: null, newCatIcon: null,
-  dashYm: null, dashSel: null, catEditI: null
+  dashYm: null, dashSel: null, catEditI: null,
+  lang: "zh", budget: 0,
+  reminder: { enabled:false, freq:"daily", time:"20:00", intervalDays:3, weekdays:[1], last:null }
 };
+/* ================= 国际化 ================= */
+const I18N = {
+zh:{
+  app:"天天记账", appTag:"本地 · 离线",
+  pickMonth:"点我选月份", pcalHint:"← → 切换年份，点某月跳转到该月",
+  tabLedger:"明细", tabStats:"统计", tabImport:"导入", tabSettings:"设置",
+  segMonth:"本月", segYear:"年账单", segTrend:"趋势",
+  total:"总支出", count:"笔数", dailyAvg:"日均", vsMonth:"较上月", vsYear:"较去年",
+  searchPh:"搜索备注 / 类别 / 商品名",
+  sortDd:"日期：新→旧", sortDa:"日期：旧→新", sortAd:"花费：高→低", sortAa:"花费：低→高",
+  noMatch:"没有匹配", monthEmpty:"本月还没有支出", emptyAdd:"记一笔",
+  income:"入账",
+  detailEdit:"编辑", detailDelete:"删除", detailEditItems:"编辑明细", detailCancel:"取消",
+  srcAi:"AI 识别", srcManual:"手动", itemsTitle:"购买明细",
+  ieTitle:"编辑明细 · 改数量/单价自动重算金额", ieQty:"数量", iePrice:"单价€", ieTotal:"明细合计", ieSave:"保存并更新总额",
+  itName:"商品", itAmount:"金额",
+  modalAdd:"新增支出", modalEdit:"编辑支出", modalSubAdd:"填一笔支出", modalSubSrc:"来源：",
+  typeExpense:"支出", typeIncome:"入账", fAmount:"金额（EUR）", fDate:"日期", fCat:"类别",
+  fNote:"备注", fNotePh:"可选，如：超市 10件商品",
+  mDelete:"删除", mCancel:"取消", mSave:"保存",
+  calToday:"今天", calYest:"昨天",
+  statMonthTitle:"支出", statMonthHint:"笔 · 点击圆环或分类查看明细", statMonthEmpty:"本月暂无支出",
+  statYearTitle:"年账单", statYearEmpty:"该年度暂无支出",
+  statTrendTitle:"支出趋势", trendAvg:"月均", trendHigh:"最高月", trendLow:"最低月",
+  trendEmpty:"该年度暂无支出", legendSpend:"月支出", legendAvg:"月均", legendBudget:"预算",
+  donutTotal:"总支出", mcdBack:"返回全部",
+  importTitle:"AI 识别支出凭证 → 粘贴入库",
+  importTip:"在 DeepSeek 里识别前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。支持小票、购物/订单截图、银行消费记录；一次可识别多张（用「批量识别提示词」，返回的数组会按各自的日期分别入库）。金额以「实付总价」为准。",
+  copyPrompt:"复制识别提示词", batchPrompt:"批量识别提示词", viewPrompt:"查看提示词",
+  promptBoxTitle:"识别提示词（整段发给 DeepSeek）", collapsePrompt:"收起提示词",
+  importPh:"粘贴 DeepSeek 返回的 JSON 或文本…",
+  importHint:"支持：小票 / 订单 / 银行消费 JSON（含 expense 字段或数组）、简单 JSON、以及「日期 金额 类别 备注」格式的行。批量识别返回的数组会自动按各自日期拆开入库。",
+  parse:"解析", previewTitle:"待入库", commit:"确认入库", clear:"清空",
+  restoreTitle:"从文件恢复", restoreBtn:"选择 JSON / CSV 文件", restoreHint:"用于恢复之前导出的备份（JSON 完整备份 / CSV 明细）。",
+  setDash:"今日看板", setDashCnt:"笔支出 · 点日历某天可切换", dashTodayBtn:"回到今天",
+  setCats:"支出类别", catEdit:"改", catDel:"删除", catAdd:"+ 新增类别", catAddPh:"新类别名称（如：宠物）",
+  color:"颜色", icon:"图标", catSave:"保存", catCancel:"取消",
+  setBudget:"月度预算", budgetPh:"每月预算（EUR），0 或留空则不显示", budgetHint:"预算会作为趋势图的红色虚线上界，超出的月份标红",
+  setLang:"语言", langZh:"中文", langEn:"English",
+  setReminder:"记账提醒", rmEnabled:"开启记账提醒", rmFreq:"频率", rmDaily:"每天", rmWeekly:"每周", rmEveryN:"每 N 天",
+  rmTime:"提醒时间", rmWeekday:"每周几", rmInterval:"间隔天数", rmHint:"打开 App 时会检查：若已到设定时间、且这段时间还没记过账，就提醒你记账。（注意：iOS 添加到主屏幕的网页无法后台推送通知，只能在打开时提醒）",
+  setData:"数据", exportJson:"导出备份（JSON）", exportJsonSub:"完整数据，含所有记录与类别，可用于恢复",
+  exportCsv:"导出明细（CSV）", exportCsvSub:"表格格式，可用 Excel / Numbers 打开",
+  setManual:"用户手册", setManualSub:"功能说明 + 各品牌手机安装到主屏幕教程",
+  tSaved:"已保存", tDeleted:"已删除", tUpdated:"已更新", tRemoved:"已删除", tAmtErr:"金额需大于 0", tDateErr:"请选择日期",
+  tCatEmpty:"名称不能为空", tCatDup:"已有同名类别", tCatKeep:"至少保留一个类别",
+  tItemsUpdated:"明细已更新，总额已重算", tPromptCopied:"识别提示词已复制",
+  tPromptManual:"已弹出提示词，请手动全选复制", tBatchCopied:"批量识别提示词已复制（多张凭证→返回数组，按各自日期入库）",
+  tPasteFirst:"先粘贴内容", tParseFail:"解析失败：", tParseEmpty:"没解析出有效记录，试试 JSON 格式",
+  tImported:"已入库", tNoGood:"没有可入库的有效记录", tRestored:"已恢复", tRestoreFail:"恢复失败：JSON 格式不正确",
+  tImportedCsv:"已导入", tBadType:"不支持的文件类型", tExportedJson:"已导出 JSON 备份", tExportedCsv:"已导出 CSV",
+  tNoCat:"至少保留一个类别", tNoFile:"先粘贴内容",
+  monthExp:"支出", donutHint:"点击圆环或分类查看明细", donutCenter:"总支出", monthNoData:"本月暂无支出",
+  backAll:"返回全部", yearBill:"年账单", yearNoData:"该年度暂无支出", trendTitle:"支出趋势",
+  monthlyAvg:"月均", maxMonth:"最高月", minMonth:"最低月", budget:"预算", monthUnit:"月",
+  today:"今天", dashCount:"笔支出", dashHint:"点日历某天可切换",
+  tExpJson:"已导出 JSON 备份", tExpCsv:"已导出 CSV",
+  csvDate:"日期", csvCat:"类别", csvType:"类型", csvAmt:"金额(EUR)", csvQty:"件数", csvNote:"备注", csvSrc:"来源",
+  hasItems:"含", tCommitted:"已入库", tNoValidCommit:"没有可入库的有效记录",
+  tNoValid:"没解析出有效记录，试试 JSON 格式",
+  tRmOn:"记账提醒已开启", tRmOff:"记账提醒已关闭",
+  tRmDue:"该记账啦！打开后记得把今天的账记上",
+  tBudgetSet:"月度预算已设为", tBudgetClear:"已清除预算",
+  tHidePrompt:"收起提示词", tViewPrompt:"查看提示词"
+},
+en:{
+  app:"DayTally", appTag:"Local · Offline",
+  pickMonth:"Tap to pick a month", pcalHint:"Use ‹ › to change year; tap a month to jump",
+  tabLedger:"Records", tabStats:"Stats", tabImport:"Import", tabSettings:"Settings",
+  segMonth:"Month", segYear:"Year", segTrend:"Trend",
+  total:"Total spending", count:"entries", dailyAvg:"daily avg", vsMonth:"vs last month", vsYear:"vs last year",
+  searchPh:"Search note, category or item",
+  sortDd:"Date: new→old", sortDa:"Date: old→new", sortAd:"Amount: high→low", sortAa:"Amount: low→high",
+  noMatch:"No records matching", monthEmpty:"No spending this month", emptyAdd:"Add",
+  income:"Income",
+  detailEdit:"Edit", detailDelete:"Delete", detailEditItems:"Edit items", detailCancel:"Cancel",
+  srcAi:"AI", srcManual:"Manual", itemsTitle:"Purchased items",
+  ieTitle:"Edit items · change qty / unit price, amount auto-recaluclated", ieQty:"Qty", iePrice:"€/unit", ieTotal:"Items total", ieSave:"Save & update total",
+  itName:"Item", itAmount:"Amount",
+  modalAdd:"Add expense", modalEdit:"Edit expense", modalSubAdd:"Enter an expense", modalSubSrc:"Source: ",
+  typeExpense:"Expense", typeIncome:"Income", fAmount:"Amount (EUR)", fDate:"Date", fCat:"Category",
+  fNote:"Note", fNotePh:"optional, e.g. supermarket, 10 items",
+  mDelete:"Delete", mCancel:"Cancel", mSave:"Save",
+  calToday:"Today", calYest:"Yesterday",
+  statMonthTitle:"spending", statMonthHint:"entries · tap ring or a category for details", statMonthEmpty:"No spending this month",
+  statYearTitle:"Year bill", statYearEmpty:"No spending this year",
+  statTrendTitle:"Spending trend", trendAvg:"monthly avg", trendHigh:"highest", trendLow:"lowest",
+  trendEmpty:"No spending this year", legendSpend:"monthly spend", legendAvg:"avg", legendBudget:"budget",
+  donutTotal:"Total", mcdBack:"Back to all",
+  importTitle:"AI-recognize receipt → paste to import",
+  importTip:"Before recognizing in DeepSeek, tap “Copy recognition prompt” to grab the prompt. Then paste the JSON DeepSeek returns into the box and tap “Parse” to review before importing. Supports receipts, order/shopping screenshots and bank spending; multiple at once (use the batch prompt — the returned array is imported by each item's own date). Amount = final paid total.",
+  copyPrompt:"Copy recognition prompt", batchPrompt:"Batch recognition prompt", viewPrompt:"View prompt",
+  promptBoxTitle:"Recognition prompt (send whole to DeepSeek)", collapsePrompt:"Collapse prompt",
+  importPh:"Paste the JSON or text DeepSeek returned…",
+  importHint:"Accepts receipt/order/bank JSON (with an expense field or array), plain JSON, or lines of “date amount category note”. Batch arrays are split and imported by each item's date.",
+  parse:"Parse", previewTitle:"To import", commit:"Import", clear:"Clear",
+  restoreTitle:"Restore from file", restoreBtn:"Choose JSON / CSV file", restoreHint:"Restores a previously exported backup (JSON full backup / CSV detail).",
+  setDash:"Today dashboard", setDashCnt:"entries · tap a day to switch", dashTodayBtn:"Back to today",
+  setCats:"Categories", catEdit:"Edit", catDel:"Delete", catAdd:"+ Add category", catAddPh:"New category name (e.g. Pets)",
+  color:"Color", icon:"Icon", catSave:"Save", catCancel:"Cancel",
+  setBudget:"Monthly budget", budgetPh:"Monthly budget (EUR); 0 or empty hides it", budgetHint:"Budget shows as a red dashed ceiling in the trend chart; months over budget are marked red",
+  setLang:"Language", langZh:"中文", langEn:"English",
+  setReminder:"Reminder", rmEnabled:"Enable reminder", rmFreq:"Frequency", rmDaily:"Daily", rmWeekly:"Weekly", rmEveryN:"Every N days",
+  rmTime:"Time", rmWeekday:"Weekdays", rmInterval:"Interval days", rmHint:"When you open the app it checks: if the set time has passed and you haven't logged in a while, it reminds you to record. (Note: home-screen web apps on iOS can't push background notifications — the reminder fires when you open it.)",
+  setData:"Data", exportJson:"Export backup (JSON)", exportJsonSub:"Full data, incl. all records & categories, for restore",
+  exportCsv:"Export detail (CSV)", exportCsvSub:"Table format, openable in Excel / Numbers",
+  setManual:"User guide", setManualSub:"How to use + add to home screen on each phone brand",
+  tSaved:"Saved", tDeleted:"Deleted", tUpdated:"Updated", tRemoved:"Deleted", tAmtErr:"Amount must be > 0", tDateErr:"Please pick a date",
+  tCatEmpty:"Name can't be empty", tCatDup:"Category already exists", tCatKeep:"Keep at least one category",
+  tItemsUpdated:"Items updated, total recalculated", tPromptCopied:"Recognition prompt copied",
+  tPromptManual:"Prompt shown — select-all and copy manually", tBatchCopied:"Batch prompt copied (multiple receipts → array, imported by each date)",
+  tPasteFirst:"Paste something first", tParseFail:"Parse failed: ", tParseEmpty:"No valid records — try JSON format",
+  tImported:"Imported", tNoGood:"No valid records to import", tRestored:"Restored", tRestoreFail:"Restore failed: bad JSON format",
+  tImportedCsv:"Imported", tBadType:"Unsupported file type", tExportedJson:"JSON backup exported", tExportedCsv:"CSV exported",
+  tNoCat:"Keep at least one category", tNoFile:"Paste something first",
+  monthExp:"spending", donutHint:"tap the ring or a category for details", donutCenter:"Total", monthNoData:"No spending this month",
+  backAll:"Back to all", yearBill:"Year bill", yearNoData:"No spending this year", trendTitle:"Spending trend",
+  monthlyAvg:"monthly avg", maxMonth:"highest month", minMonth:"lowest month", budget:"budget", monthUnit:"M",
+  today:"Today", dashCount:"entries", dashHint:"tap a day to switch",
+  tExpJson:"JSON backup exported", tExpCsv:"CSV exported",
+  csvDate:"Date", csvCat:"Category", csvType:"Type", csvAmt:"Amount(EUR)", csvQty:"Qty", csvNote:"Note", csvSrc:"Source",
+  hasItems:"with", tCommitted:"Imported", tNoValidCommit:"No valid records to import",
+  tNoValid:"No valid records — try JSON format",
+  tRmOn:"Reminder on", tRmOff:"Reminder off",
+  tRmDue:"Time to record! Remember to log today's entries",
+  tBudgetSet:"Monthly budget set to", tBudgetClear:"Budget cleared",
+  tHidePrompt:"Collapse prompt", tViewPrompt:"View prompt"
+}
+};
+function t(k){ return (I18N[state.lang]||I18N.zh)[k] ?? I18N.zh[k]; }
+function applyLang(){
+  $$("[data-i18n]").forEach(el=>{ const k=el.getAttribute("data-i18n"); if(k) el.textContent=t(k); });
+  $$("[data-i18n-ph]").forEach(el=>{ const k=el.getAttribute("data-i18n-ph"); if(k) el.placeholder=t(k); });
+}
+/* 用户手册内容（中 / 英） */
+const MANUAL = {
+zh:[
+ {h:"1. 这是什么", b:[
+   {t:"p",v:"一款完全离线的个人记账工具：所有数据只存在你的手机本机（IndexedDB），不联网、不上传、不调 AI 接口。支持 AI 识别小票/账单、月/年账单、类别、可视化、入账、预算与导出备份。"}]},
+ {h:"2. 快速开始", b:[
+   {t:"p",v:"底部四个页签：<b>明细</b>（流水列表）、<b>统计</b>（本月/年账单/趋势）、<b>导入</b>（AI 识别入库）、<b>设置</b>（类别、数据、看板、预算、语言、提醒）。点底部中间「＋」即可手动记一笔，可记<b>支出</b>或<b>入账</b>。"}]},
+ {h:"3. 记一笔支出 / 入账", b:[
+   {t:"p",v:"点「＋」→ 先选<b>支出 / 入账</b> → 填金额、选日期（点日期直接弹日历）、选类别（点开下拉）、填备注 → 保存。金额与日期必填，日期默认今天。"}]},
+ {h:"4. AI 识别入库（最常用）", b:[
+   {t:"p",v:"<b>流程：</b>打开「导入」→ 点「复制识别提示词」（或批量版）→ 把提示词连同你的小票/购物截图/银行记录图片一起发给 DeepSeek → DeepSeek 只返回一段 JSON → 回到本 app「导入」页粘贴 → 点「解析」→ 在预览里确认 →「确认入库」。英文界面下提示词也是英文。"},
+   {t:"p",v:"支持：超市小票、购物截图、银行支出记录等。识别结果会带商品明细（原名 + 中文名 + 数量 + 单价），入库后可查看每一项。"},
+   {t:"p",v:"<b>批量：</b>用「批量识别提示词」可一次贴多张凭证，返回后按各自日期自动拆开逐条入库。"}]},
+ {h:"5. 编辑记录 & 编辑购买明细", b:[
+   {t:"p",v:"在明细里点任意一笔 → 弹出详情 → 「编辑」改金额/日期/类别/备注；点「编辑明细」可改每一项的数量和单价，金额会自动用计算器重算，保存后总金额同步更新。"}]},
+ {h:"6. 类别管理", b:[
+   {t:"p",v:"「设置 → 类别」可改名、删除、点「改」换图标和颜色（颜色会同步到统计图的颜色）；可点「新增类别」用色板和图标新建。"}]},
+ {h:"7. 统计与预算", b:[
+   {t:"p",v:"「统计」页：本月看<b>环形占比图</b>（点某个扇区看该类别明细，只有一个类别时占满整圈）；<b>年账单</b>看 12 个月柱状；<b>趋势</b>看 12 个月折线、月均线与<b>预算红线</b>。"},
+   {t:"p",v:"在「设置 → 月度预算」填金额后，趋势图会出现一条红色虚线作为预算上限，超出预算的月份会标红。顶部期标签可点开日历直接选月份。"}]},
+ {h:"8. 搜索与排序", b:[
+   {t:"p",v:"「明细」页顶部可搜索备注/类别/商品名（跨所有月份）；右侧下拉可按日期或金额升/降序排列。"}]},
+ {h:"9. 记账提醒", b:[
+   {t:"p",v:"「设置 → 记账提醒」可开启：每天 / 每周（选星期几）/ 每 N 天，并设提醒时间。打开 App 时会检查，若到点且这段时间还没记过账就提醒你。"},
+   {t:"p",v:"注意：iOS「添加到主屏幕」的网页无法在后台推送通知，所以提醒是在你打开 App 时触发的。"}]},
+ {h:"10. 数据与备份（重要）", b:[
+   {t:"p",v:"数据存在本机 IndexedDB（库名 expense-db），iOS 可在「设置 → Safari → 高级 → 网站数据」查看/清除。建议定期在「设置 → 导出」导出 JSON 备份；换手机或清缓存后用「恢复」导入回来。"}]},
+ {h:"11. 安装到主屏幕（各品牌）", b:[
+   {t:"lead",v:"先在你的手机浏览器打开本站网址，然后按下列步骤“添加到主屏幕”，以后从主屏幕图标进入，可完全离线使用（首次在线加载后）。"},
+   {t:"h5",v:"苹果 iPhone / iPad（Safari）"},
+   {t:"p",v:"用 <b>Safari</b> 打开网址 → 点底部中间<b>「分享」按钮（方框+箭头）</b>→ 在弹出菜单点 <b>「添加到主屏幕」</b> → 命名（如“天天记账”）→ 点右上角<b>「添加」</b>。桌面出现图标即完成。"},
+   {t:"h5",v:"安卓（三星 / 华为 / 小米 / vivo 等，Chrome 或自带浏览器）"},
+   {t:"lead",v:"主流安卓浏览器步骤基本一致，相似机型可合并看："},
+   {t:"p",v:"用 <b>Chrome</b>（或系统自带浏览器）打开网址 → 点右上角<b>菜单「⋮」</b>→ 找 <b>「添加到主屏幕」/「安装应用」/「添加到桌面」</b> → 确认。如弹出“安装应用/添加到主屏幕”的横幅，直接点它更快。"},
+   {t:"p",v:"<b>三星（One UI）</b>：浏览器菜单里点<b>「添加到主屏幕」</b>；也可在桌面长按空白处 → 添加小组件/快捷方式 → 选浏览器书签。"},
+   {t:"p",v:"<b>华为（EMUI/HarmonyOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>；HarmonyOS 桌面长按也可直接添加。"},
+   {t:"p",v:"<b>小米（MIUI/HyperOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>；若浏览器是小米自带，菜单里叫<b>「添加到主屏幕」</b>。"},
+   {t:"p",v:"<b>vivo（OriginOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>，确认后桌面生成图标。"}]},
+ {h:"12. 常见问题", b:[
+   {t:"p",v:"<b>装了没网络能用吗？</b>能。首次打开并加载完成后即可离线记账，数据始终在本机。"},
+   {t:"p",v:"<b>想换手机/备份？</b>定期导出 JSON，需要时在新设备“恢复”。"},
+   {t:"p",v:"<b>数据会丢吗？</b>只要不清除浏览器网站数据就不丢；建议保留 JSON 备份以防万一。"}]}
+],
+en:[
+ {h:"1. What is this", b:[
+   {t:"p",v:"A fully offline personal bookkeeping app: all data lives only on your device (IndexedDB) — no network, no upload, no AI API. Supports AI receipt recognition, monthly/yearly bills, categories, charts, income, budget and export backup."}]},
+ {h:"2. Quick start", b:[
+   {t:"p",v:"Four tabs at the bottom: <b>Records</b> (ledger), <b>Stats</b> (month / year / trend), <b>Import</b> (AI recognition), <b>Settings</b> (categories, data, dashboard, budget, language, reminder). Tap the “＋” button to add an <b>expense</b> or <b>income</b>."}]},
+ {h:"3. Add an expense / income", b:[
+   {t:"p",v:"Tap “＋” → pick <b>Expense / Income</b> → enter amount, date (tap to open calendar), category (tap to open dropdown), note → save. Amount and date are required; date defaults to today."}]},
+ {h:"4. AI recognition (most used)", b:[
+   {t:"p",v:"<b>Flow:</b> open “Import” → tap “Copy recognition prompt” (or batch) → send the prompt together with your receipt / shopping screenshot / bank record to DeepSeek → DeepSeek returns only one JSON → paste it back into the app's “Import” page → tap “Parse” → review → “Import”. The prompt is in English when the app is in English."},
+   {t:"p",v:"Supports: supermarket receipts, shopping/order screenshots, bank spending records, etc. Results include item details (original name + Chinese name + qty + unit price) that you can view per entry."},
+   {t:"p",v:"<b>Batch:</b> use the batch prompt to recognize several receipts at once; each item is imported by its own date."}]},
+ {h:"5. Edit records & items", b:[
+   {t:"p",v:"Tap any record → detail → “Edit” to change amount/date/category/note; tap “Edit items” to change each item's qty and unit price — the amount recalculates automatically and the total updates on save."}]},
+ {h:"6. Categories", b:[
+   {t:"p",v:"“Settings → Categories” lets you rename, delete, and tap “Edit” to change icon & color (colors sync to the stats chart); tap “Add category” to create with the palette and icons."}]},
+ {h:"7. Stats & budget", b:[
+   {t:"p",v:"“Stats”: this month shows a <b>donut chart</b> (tap a segment for that category's details; a single category fills the ring); <b>Year</b> shows 12-month bars; <b>Trend</b> shows the 12-month line, monthly-average line and the <b>budget line</b>."},
+   {t:"p",v:"After setting a “Monthly budget” in Settings, the trend chart shows a red dashed ceiling; months over budget are marked red. Tap the period label to open a calendar and pick a month."}]},
+ {h:"8. Search & sort", b:[
+   {t:"p",v:"Search note/category/item across all months from the top of “Records”; the dropdown sorts by date or amount, ascending or descending."}]},
+ {h:"9. Reminder", b:[
+   {t:"p",v:"“Settings → Reminder” can enable: Daily / Weekly (pick weekdays) / Every N days, plus a reminder time. When you open the app it checks and reminds you if the time has passed and you haven't logged recently."},
+   {t:"p",v:"Note: home-screen web apps on iOS can't push background notifications, so the reminder triggers when you open the app."}]},
+ {h:"10. Data & backup (important)", b:[
+   {t:"p",v:"Data is stored in local IndexedDB (db “expense-db”); on iOS check/clear via Settings → Safari → Advanced → Website Data. Export a JSON backup regularly under “Settings → Export”; restore it on a new device or after clearing cache."}]},
+ {h:"11. Add to home screen (per brand)", b:[
+   {t:"lead",v:"Open the site in your phone's browser, then follow the steps below to “Add to Home Screen”. Launch from the icon afterwards — fully offline (after the first online load)."},
+   {t:"h5",v:"Apple iPhone / iPad (Safari)"},
+   {t:"p",v:"Open the URL in <b>Safari</b> → tap the <b>Share</b> button (box with arrow) in the bottom center → tap <b>“Add to Home Screen”</b> → name it (e.g. “DayTally”) → tap <b>“Add”</b>. Done."},
+   {t:"h5",v:"Android (Samsung / Huawei / Xiaomi / vivo — Chrome or stock browser)"},
+   {t:"lead",v:"Mainstream Android browsers share nearly the same steps; similar models can be grouped:"},
+   {t:"p",v:"Open the URL in <b>Chrome</b> (or the stock browser) → tap the top-right <b>menu “⋮”</b> → find <b>“Add to Home Screen” / “Install app” / “Add to Home”</b> → confirm. If an “Install app / Add to Home Screen” banner appears, just tap it."},
+   {t:"p",v:"<b>Samsung (One UI):</b> browser menu → <b>“Add to Home Screen”</b>; or long-press a blank spot on the home screen → add widget/shortcut → pick the browser bookmark."},
+   {t:"p",v:"<b>Huawei (EMUI/HarmonyOS):</b> browser menu → <b>“Add to Home”</b>; long-press on the HarmonyOS home screen also works."},
+   {t:"p",v:"<b>Xiaomi (MIUI/HyperOS):</b> browser menu → <b>“Add to Home”</b>; on the stock browser it's called <b>“Add to Home Screen”</b>."},
+   {t:"p",v:"<b>vivo (OriginOS):</b> browser menu → <b>“Add to Home”</b>, confirm and the icon appears."}]},
+ {h:"12. FAQ", b:[
+   {t:"p",v:"<b>Does it work offline after install?</b> Yes. Once the first load completes, record fully offline — data stays on-device."},
+   {t:"p",v:"<b>Moving to a new phone / backup?</b> Export JSON regularly, then “Restore” on the new device."},
+   {t:"p",v:"<b>Can data be lost?</b> Not unless browser site data is cleared; keep a JSON backup to be safe."}]}
+]
+};
+function renderManual(){
+  const M=MANUAL[state.lang]||MANUAL.zh;
+  $("#manualPrint").innerHTML=M.map(sec=>{
+    const inner=sec.b.map(bl=>{
+      if(bl.t==="h5") return '<h5>'+bl.v+'</h5>';
+      if(bl.t==="lead") return '<p class="lead">'+bl.v+'</p>';
+      return '<p>'+bl.v+'</p>';
+    }).join("");
+    return '<div class="msec"><h4>'+sec.h+'</h4>'+inner+'</div>';
+  }).join("");
+}
 
 /* ================= 工具 ================= */
 const $ = (s, el=document) => el.querySelector(s);
@@ -736,6 +986,42 @@ async function loadCats(){
   else await persistCats();
 }
 async function persistCats(){ await dbPut("settings",{key:"cats",val:state.cats}); }
+async function loadAppSettings(){
+  const rows=await dbGetAll("settings");
+  const a=rows.find(r=>r.key==="app");
+  if(a&&a.val){
+    const s=a.val;
+    if(s.lang==="zh"||s.lang==="en") state.lang=s.lang;
+    if(typeof s.budget==="number") state.budget=s.budget;
+    if(s.reminder) state.reminder=Object.assign({enabled:false,freq:"daily",time:"20:00",intervalDays:3,weekdays:[1],last:null},s.reminder);
+  }
+}
+async function persistAppSettings(){
+  await dbPut("settings",{key:"app",val:{lang:state.lang,budget:state.budget,reminder:state.reminder}});
+}
+
+/* ================= 记账提醒 ================= */
+function checkReminder(){
+  const rm=state.reminder;
+  if(!rm.enabled) return;
+  const now=new Date();
+  const nowHm=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  if(nowHm<rm.time) return; // 还没到设定时间
+  const dayMs=86400000;
+  let gap=dayMs;
+  if(rm.freq==="weekly") gap=7*dayMs;
+  else if(rm.freq==="everyN") gap=Math.max(1,rm.intervalDays||3)*dayMs;
+  const lastTs=allExpenses.length?allExpenses.reduce((a,b)=>Math.max(a,(b.created||b.updated||0)),0):0;
+  if(!lastTs) return; // 还没有任何记录，不打扰
+  if(Date.now()-lastTs<gap) return; // 最近已记过账
+  if(rm.last && Date.now()-rm.last<12*3600*1000) return; // 半天内已提醒过，避免重复
+  rm.last=Date.now();
+  persistAppSettings();
+  toast(t("tRmDue"));
+}
+function maybeCheckReminder(){
+  try{ checkReminder(); }catch(_){}
+}
 
 /* ================= 路由 / 标签 ================= */
 function showTab(tab){
@@ -759,26 +1045,27 @@ function renderLedger(){
 }
 function renderSummary(){
   const exps=allExpenses;
-  const inMonth=exps.filter(e=>e.date.slice(0,7)===monthKey(state.ly,state.lm));
+  const isExp=e=>!e.type||e.type!=="income";
+  const inMonth=exps.filter(e=>isExp(e)&&e.date.slice(0,7)===monthKey(state.ly,state.lm));
   const total=inMonth.reduce((s,e)=>s+e.amount,0);
   const days=new Set(inMonth.map(e=>e.date)).size||1;
   const avg=total/days;
   // 上月
   let lm=state.lm-1, ly=state.ly;
   if(lm===0){lm=12;ly--;}
-  const lastTotal=exps.filter(e=>e.date.slice(0,7)===monthKey(ly,lm)).reduce((s,e)=>s+e.amount,0);
+  const lastTotal=exps.filter(e=>isExp(e)&&e.date.slice(0,7)===monthKey(ly,lm)).reduce((s,e)=>s+e.amount,0);
   const card=$("#summaryCard");
   let diff="";
   if(lastTotal>0){
     const pct=Math.round((total-lastTotal)/lastTotal*100);
-    diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% 较上月";
+    diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% "+t("vsMonth");
   }
   card.innerHTML=
-    '<div class="lab">'+fmtCnYm(state.ly,state.lm)+' 总支出</div>'+
+    '<div class="lab">'+fmtCnYm(state.ly,state.lm)+' '+t("total")+'</div>'+
     '<div class="big num">€ '+money(total)+'</div>'+
     '<div class="grid">'+
-      '<span class="chip">笔数 <b>'+inMonth.length+'</b></span>'+
-      '<span class="chip">日均 <b>€ '+money(avg)+'</b></span>'+
+      '<span class="chip">'+t("count")+' <b>'+inMonth.length+'</b></span>'+
+      '<span class="chip">'+t("dailyAvg")+' <b>€ '+money(avg)+'</b></span>'+
       (diff?'<span class="chip">'+diff+'</span>':'')+
     '</div>';
 }
@@ -799,8 +1086,8 @@ function renderLedgerList(){
   }
   if(!exps.length){
     wrap.innerHTML=q
-      ?'<div class="empty">没有匹配「'+esc(q)+'」的记录</div>'
-      :'<div class="empty">本月还没有支出<br><button class="btn btn-primary sm e-btn" id="emptyAdd">记一笔</button></div>';
+      ?'<div class="empty">'+t("noMatch")+'「'+esc(q)+'」</div>'
+      :'<div class="empty">'+t("monthEmpty")+'<br><button class="btn btn-primary sm e-btn" id="emptyAdd">'+t("emptyAdd")+'</button></div>';
     const b=$("#emptyAdd"); if(b)b.addEventListener("click",()=>openModal(null));
     return;
   }
@@ -809,13 +1096,16 @@ function renderLedgerList(){
     ? (a,b)=> s==="amt-asc" ? a.amount-b.amount : b.amount-a.amount
     : (a,b)=> s==="date-asc" ? (a.date.localeCompare(b.date)||a.created-b.created) : (b.date.localeCompare(a.date)||b.created-a.created);
   exps.sort(sortFn);
-  const rowHtml=e=>'<div class="row" data-id="'+e.id+'">'+
-    catChip(e.category)+
-    '<div class="row-main"><div class="row-title">'+esc(e.category)+'</div>'+
-    '<div class="row-sub">'+esc(rowSub(e))+(byAmount||q?' · '+esc(e.date.slice(5)):"")+'</div></div>'+
-    (e.source==="ai"?'<span class="src">AI</span>':'')+
-    '<div class="row-amt num">€ '+money(e.amount)+'</div>'+
-    '<span class="chev">›</span></div>';
+  const rowHtml=e=>{
+    const inc=e.type==="income";
+    return '<div class="row'+(inc?' inc':'')+'" data-id="'+e.id+'">'+
+      catChip(e.category)+
+      '<div class="row-main"><div class="row-title">'+esc(e.category)+(inc?' <span class="tag-inc">'+t("income")+'</span>':"")+'</div>'+
+      '<div class="row-sub">'+esc(rowSub(e))+(byAmount||q?' · '+esc(e.date.slice(5)):"")+'</div></div>'+
+      (e.source==="ai"?'<span class="src">AI</span>':'')+
+      '<div class="row-amt num'+(inc?' inc':'')+'">'+(inc?'+€ ':'€ ')+money(e.amount)+'</div>'+
+      '<span class="chev">›</span></div>';
+  };
   let html="";
   if(byAmount||q){
     exps.forEach(e=>{ html+=rowHtml(e); });
@@ -850,19 +1140,22 @@ function openDetail(id){
   detailId=id;
   $("#dIcon").innerHTML=catChip(e.category,"lg");
   $("#dCat").textContent=e.category;
-  $("#dSrc").textContent=e.source==="ai"?"AI 识别":"手动";
-  $("#dAmt").textContent="€ "+money(e.amount);
+  const inc=e.type==="income";
+  $("#dSrc").textContent=(e.source==="ai"?t("srcAi"):t("srcManual"))+(inc?" · "+t("income"):"");
+  const amtEl=$("#dAmt");
+  amtEl.textContent=(inc?"+€ ":"€ ")+money(e.amount);
+  amtEl.classList.toggle("inc",inc);
   $("#dDate").textContent=fmtCn(e.date)+" · "+fmtCnYm(+e.date.slice(0,4),+e.date.slice(5,7));
   $("#dNote").textContent=e.note||"";
   const itemsBox=$("#dItems");
   const hasItems=e.items&&e.items.length;
   $("#dEditItems").style.display=hasItems?"flex":"none";
-  $("#dEditItems").textContent="编辑明细";
+  $("#dEditItems").textContent=t("detailEditItems");
   $("#dItems").style.display="";
   $("#dItemsEdit").style.display="none";
   if(hasItems){
-    let h='<div class="card" style="margin:10px 0 0;padding:12px"><h3 style="font-size:13px;margin:0 0 4px">购买明细</h3>'+
-      '<table class="item-t"><tr><th>商品</th><th>数量</th><th>单价</th><th class="num">金额</th></tr>';
+    let h='<div class="card" style="margin:10px 0 0;padding:12px"><h3 style="font-size:13px;margin:0 0 4px">'+t("itemsTitle")+'</h3>'+
+      '<table class="item-t"><tr><th>'+t("itName")+'</th><th>'+t("ieQty")+'</th><th>'+t("iePrice")+'</th><th class="num">'+t("itAmount")+'</th></tr>';
     e.items.forEach(it=>{
       const zh=it.nameZh||it.name;
       h+='<tr><td>'+esc(zh)+(it.nameZh&&it.name&&it.nameZh!==it.name?'<small>'+esc(it.name)+'</small>':"")+'</td>'+
@@ -883,27 +1176,27 @@ function startEditItems(){
   editItemsData=e.items.map(it=>({...it}));
   $("#dItems").style.display="none";
   $("#dItemsEdit").style.display="block";
-  $("#dEditItems").textContent="取消";
+  $("#dEditItems").textContent=t("detailCancel");
   renderItemsEdit();
 }
 function renderItemsEdit(){
   const box=$("#dItemsEdit");
-  let h='<div class="card" style="margin:10px 0 0;padding:12px"><h3 style="font-size:13px;margin:0 0 6px">编辑明细 · 改数量/单价自动重算金额</h3><div class="ie-list">';
+  let h='<div class="card" style="margin:10px 0 0;padding:12px"><h3 style="font-size:13px;margin:0 0 6px">'+t("ieTitle")+'</h3><div class="ie-list">';
   editItemsData.forEach((it,i)=>{
     const amt=Math.round(((it.qty||1)*(it.unitPrice||0))*100)/100;
     h+='<div class="ie-row" data-i="'+i+'">'+
       '<div class="ie-name">'+esc(it.nameZh||it.name)+'</div>'+
       '<div class="ie-fields">'+
-        '<label>数量<input type="number" class="ie-q" value="'+(it.qty||1)+'" step="0.01" min="0" inputmode="decimal"></label>'+
-        '<label>单价€<input type="number" class="ie-u" value="'+(it.unitPrice||0)+'" step="0.01" min="0" inputmode="decimal"></label>'+
+        '<label>'+t("ieQty")+'<input type="number" class="ie-q" value="'+(it.qty||1)+'" step="0.01" min="0" inputmode="decimal"></label>'+
+        '<label>'+t("iePrice")+'<input type="number" class="ie-u" value="'+(it.unitPrice||0)+'" step="0.01" min="0" inputmode="decimal"></label>'+
         '<span class="ie-amt num">€ '+money(amt)+'</span>'+
       '</div></div>';
   });
   const total=editItemsData.reduce((s,it)=>s+Math.round(((it.qty||1)*(it.unitPrice||0))*100)/100,0);
-  h+='</div><div class="ie-total">明细合计 <b class="num" id="ieTotalVal">€ '+money(total)+'</b></div>'+
+  h+='</div><div class="ie-total">'+t("ieTotal")+' <b class="num" id="ieTotalVal">€ '+money(total)+'</b></div>'+
     '<div class="ca-actions" style="margin-top:8px">'+
-    '<button class="btn btn-plain sm" id="ieCancel">取消</button>'+
-    '<button class="btn btn-primary sm" id="ieSave">保存并更新总额</button></div></div>';
+    '<button class="btn btn-plain sm" id="ieCancel">'+t("mCancel")+'</button>'+
+    '<button class="btn btn-primary sm" id="ieSave">'+t("ieSave")+'</button></div></div>';
   box.innerHTML=h;
   $$(".ie-q",box).forEach(inp=>inp.addEventListener("input",()=>recalcItem(inp,"q")));
   $$(".ie-u",box).forEach(inp=>inp.addEventListener("input",()=>recalcItem(inp,"u")));
@@ -923,7 +1216,7 @@ function exitItemsEdit(){
   editItemsData=null;
   $("#dItems").style.display="";
   $("#dItemsEdit").style.display="none";
-  $("#dEditItems").textContent="编辑明细";
+  $("#dEditItems").textContent=t("detailEditItems");
 }
 function saveItemsEdit(){
   const e=allExpenses.find(x=>x.id===detailId); if(!e)return;
@@ -958,7 +1251,7 @@ function calRender(){
     html+='<div class="'+cls.join(" ")+'" data-d="'+d+'">'+d+'</div>';
   }
   html+='</div>';
-  html+='<div class="cal-quick"><button type="button" data-q="today">今天</button><button type="button" data-q="yest">昨天</button></div>';
+  html+='<div class="cal-quick"><button type="button" data-q="today">'+t("calToday")+'</button><button type="button" data-q="yest">'+t("calYest")+'</button></div>';
   c.innerHTML=html;
 }
 function setCalDate(y,m,d){
@@ -972,8 +1265,10 @@ function setCalDate(y,m,d){
 function openModal(id){
   state.editingId=id||null;
   const e=id?allExpenses.find(x=>x.id===id):null;
-  $("#modalTitle").textContent=e?"编辑支出":"新增支出";
-  $("#modalSub").textContent=e?("来源："+(e.source==="ai"?"AI 识别":"手动")):"填一笔支出";
+  const inc=e&&e.type==="income";
+  $("#modalTitle").textContent=e?(inc?t("modalEdit"):t("modalEdit")):(t("modalAdd"));
+  $("#modalSub").textContent=e?t("modalSubSrc")+(e.source==="ai"?t("srcAi"):t("srcManual")):t("modalSubAdd");
+  setTypeToggle(inc);
   $("#fAmount").value=e?e.amount:"";
   const d=(e?e.date:todayStr()).split("-").map(Number);
   calState={y:d[0],m:d[1],sel:(e?e.date:todayStr())};
@@ -996,28 +1291,32 @@ function openModal(id){
   $("#catDropdown").style.display="none";
   $("#modal").classList.add("on");
 }
+function setTypeToggle(inc){
+  $$("#typeToggle button").forEach(b=>b.classList.toggle("on",b.dataset.type===(inc?"income":"expense")));
+}
 function closeModal(){ $("#modal").classList.remove("on"); state.editingId=null; }
 function selectedChip(){ const c=$("#catDropdown .chip.on"); return c?c.textContent.trim():(state.cats[0].name); }
 function saveModal(){
   const amt=parseFloat($("#fAmount").value);
   const date=calState.sel||todayStr();
-  if(!(amt>0)){ toast("金额需大于 0"); return; }
-  if(!date){ toast("请选择日期"); return; }
+  if(!(amt>0)){ toast(t("tAmtErr")); return; }
+  if(!date){ toast(t("tDateErr")); return; }
   const cat=selectedChip();
+  const inc=$("#typeToggle button.on")?.dataset.type==="income";
   if(state.editingId){
     const e=allExpenses.find(x=>x.id===state.editingId);
-    e.amount=amt; e.date=date; e.category=cat; e.note=$("#fNote").value.trim(); e.updated=Date.now();
+    e.amount=amt; e.date=date; e.category=cat; e.note=$("#fNote").value.trim(); e.type=inc?"income":"expense"; e.updated=Date.now();
     saveExpense(e);
   }else{
-    const e={id:uid(),amount:amt,date:date,category:cat,note:$("#fNote").value.trim(),
+    const e={id:uid(),amount:amt,date:date,category:cat,note:$("#fNote").value.trim(),type:inc?"income":"expense",
       source:"manual",created:Date.now(),updated:Date.now()};
     saveExpense(e);
   }
-  closeModal(); refresh(); toast("已保存");
+  closeModal(); refresh(); toast(t("tSaved"));
 }
 function deleteModal(){
   if(!state.editingId){closeModal();return;}
-  removeExpense(state.editingId); closeModal(); refresh(); toast("已删除");
+  removeExpense(state.editingId); closeModal(); refresh(); toast(t("tDeleted"));
 }
 /* ================= 统计视图 ================= */
 function updatePeriodLabel(){
@@ -1056,7 +1355,7 @@ function renderStats(){
 }
 function renderMonthStat(){
   const key=monthKey(state.ly,state.lm);
-  const exps=allExpenses.filter(e=>e.date.slice(0,7)===key);
+  const exps=allExpenses.filter(e=>(!e.type||e.type!=="income")&&e.date.slice(0,7)===key);
   const total=exps.reduce((s,e)=>s+e.amount,0);
   const byCat={};
   exps.forEach(e=>{byCat[e.category]=(byCat[e.category]||0)+e.amount;});
@@ -1064,22 +1363,22 @@ function renderMonthStat(){
   if(state.monthCat && !byCat[state.monthCat]) state.monthCat=null;
   const card=$("#statCard");
   let html=
-    '<div class="stats-head"><div><h3 style="margin:0">'+fmtCnYm(state.ly,state.lm)+' 支出</h3>'+
+    '<div class="stats-head"><div><h3 style="margin:0">'+fmtCnYm(state.ly,state.lm)+' '+t("monthExp")+'</h3>'+
     '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">€ '+money(total)+'</div>'+
-    '<div style="font-size:12px;color:var(--muted)">'+exps.length+' 笔 · 点击圆环或分类查看明细</div></div></div>'+
+    '<div style="font-size:12px;color:var(--muted)">'+exps.length+' '+t("count")+' · '+t("donutHint")+'</div></div></div>'+
     '<div class="chart-box">'+donutSVG(segs,total,state.monthCat)+'</div>'+
     '<div class="cat-list">'+segs.map(s=>catLine(s,total)).join("")+
-    (!segs.length?'<div class="empty">本月暂无支出</div>':"")+'</div>';
+    (!segs.length?'<div class="empty">'+t("monthNoData")+'</div>':"")+'</div>';
   if(state.monthCat) html+=monthCatDetail(state.monthCat,key);
   card.innerHTML=html;
 }
 function monthCatDetail(name,key){
-  const exps=allExpenses.filter(e=>e.date.slice(0,7)===key&&e.category===name).sort((a,b)=>a.date.localeCompare(b.date));
+  const exps=allExpenses.filter(e=>(!e.type||e.type!=="income")&&e.date.slice(0,7)===key&&e.category===name).sort((a,b)=>a.date.localeCompare(b.date));
   const sum=exps.reduce((s,e)=>s+e.amount,0);
   const c=catInfo(name);
   return '<div class="mcd"><div class="mcd-head"><span class="cico" style="background:'+c.color+'2e;color:'+c.color+'"><svg viewBox="0 0 24 24">'+(ICONS[c.icon||"other"]||ICONS.other)+'</svg></span>'+
-    '<b>'+esc(name)+'</b><span style="color:var(--muted)">'+exps.length+' 笔 · € '+money(sum)+'</span>'+
-    '<button class="btn btn-ghost sm" id="mcdBack">返回全部</button></div>'+
+    '<b>'+esc(name)+'</b><span style="color:var(--muted)">'+exps.length+' '+t("count")+' · € '+money(sum)+'</span>'+
+    '<button class="btn btn-ghost sm" id="mcdBack">'+t("backAll")+'</button></div>'+
     exps.map(e=>'<div class="mcd-row" data-id="'+e.id+'"><span class="mcd-d">'+esc(e.date.slice(5))+'</span>'+
       '<span class="mcd-n">'+esc(e.note||((e.items&&e.items.length)?(e.items[0].nameZh||e.items[0].name):"")||e.category)+'</span>'+
       '<span class="mcd-a num">€ '+money(e.amount)+'</span></div>').join("")+'</div>';
@@ -1100,7 +1399,7 @@ function donutSVG(segs,total,sel){
     const s=segs[0];
     return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+
       '<circle cx="115" cy="115" r="69" fill="none" stroke="'+s.color+'" stroke-width="26" class="seg" data-name="'+esc(s.name)+'"/>'+
-      '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">总支出</text>'+
+      '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">'+t("donutCenter")+'</text>'+
       '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">€ '+money(total)+'</text></svg>';
   }
   let acc=0;
@@ -1116,72 +1415,79 @@ function donutSVG(segs,total,sel){
     return '<path d="'+d+'" fill="'+s.color+'" class="seg'+(sel?(sel===s.name?" on":" dim"):"")+'" data-name="'+esc(s.name)+'"/>';
   }).join("");
   return '<svg viewBox="0 0 230 230" width="100%" class="donut-holder">'+paths+
-    '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">总支出</text>'+
+    '<text x="115" y="110" text-anchor="middle" font-size="12" fill="#6B747C">'+t("donutCenter")+'</text>'+
     '<text x="115" y="132" text-anchor="middle" font-size="16" font-weight="700" fill="#1B2024" class="num">€ '+money(total)+'</text></svg>';
 }
 function renderYearStat(){
   const y=state.sy;
-  const exps=allExpenses.filter(e=>+e.date.slice(0,4)===y);
+  const isExp=e=>!e.type||e.type!=="income";
+  const exps=allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y);
   const yearTotal=exps.reduce((s,e)=>s+e.amount,0);
   const months=Array.from({length:12},(_,i)=>exps.filter(e=>+e.date.slice(5,7)===i+1).reduce((s,e)=>s+e.amount,0));
-  const lastTotal=allExpenses.filter(e=>+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
+  const lastTotal=allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
   const max=Math.max(...months,1);
   let diff="";
-  if(lastTotal>0){const pct=Math.round((yearTotal-lastTotal)/lastTotal*100); diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% 较去年";}
+  if(lastTotal>0){const pct=Math.round((yearTotal-lastTotal)/lastTotal*100); diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% "+t("vsYear");}
   const card=$("#statCard");
   card.innerHTML=
-    '<div class="stats-head"><div><h3 style="margin:0">'+y+' 年账单</h3>'+
+    '<div class="stats-head"><div><h3 style="margin:0">'+y+' '+t("yearBill")+'</h3>'+
     '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">€ '+money(yearTotal)+'</div>'+
-    '<div style="font-size:12px;color:var(--muted)">'+exps.length+' 笔'+(diff?' · '+diff:"")+'</div></div></div>'+
+    '<div style="font-size:12px;color:var(--muted)">'+exps.length+' '+t("count")+(diff?' · '+diff:"")+'</div></div></div>'+
     '<div class="bars">'+months.map((v,i)=>{
       const w=Math.round(v/max*100);
-      return '<div class="bar-row"><div class="m">'+(i+1)+'月</div>'+
+      return '<div class="bar-row"><div class="m">'+(i+1)+t("monthUnit")+'</div>'+
         '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(w,2)+'%"></div></div>'+
         '<div class="v num">'+(v>0?"€ "+money(v):"—")+'</div></div>';
     }).join("")+'</div>'+
-    (!exps.length?'<div class="empty">该年度暂无支出</div>':"");
+    (!exps.length?'<div class="empty">'+t("yearNoData")+'</div>':"");
 }
 
 function renderTrendStat(){
   const y=state.sy;
-  const months=Array.from({length:12},(_,i)=>allExpenses.filter(e=>+e.date.slice(0,4)===y && +e.date.slice(5,7)===i+1).reduce((s,e)=>s+e.amount,0));
+  const isExp=e=>!e.type||e.type!=="income";
+  const months=Array.from({length:12},(_,i)=>allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y && +e.date.slice(5,7)===i+1).reduce((s,e)=>s+e.amount,0));
   const yearTotal=months.reduce((a,b)=>a+b,0);
   const nonZero=months.filter(v=>v>0);
   const max=Math.max(...months,1);
   const min=nonZero.length?Math.min(...nonZero):0;
   const avg=yearTotal/(nonZero.length||1);
-  const lastTotal=allExpenses.filter(e=>+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
+  const lastTotal=allExpenses.filter(e=>isExp(e)&&+e.date.slice(0,4)===y-1).reduce((s,e)=>s+e.amount,0);
+  const budget=state.budget>0?state.budget:0;
   let diff="";
-  if(lastTotal>0){const pct=Math.round((yearTotal-lastTotal)/lastTotal*100); diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% 较去年";}
+  if(lastTotal>0){const pct=Math.round((yearTotal-lastTotal)/lastTotal*100); diff=(pct>=0?"▲ +":"▼ ")+Math.abs(pct)+"% "+t("vsYear");}
   const card=$("#statCard");
   card.innerHTML=
-    '<div class="stats-head"><div><h3 style="margin:0">'+y+' 支出趋势</h3>'+
+    '<div class="stats-head"><div><h3 style="margin:0">'+y+' '+t("trendTitle")+'</h3>'+
     '<div class="num" style="font-size:22px;font-weight:800;margin-top:2px">€ '+money(yearTotal)+'</div>'+
-    '<div style="font-size:12px;color:var(--muted)">'+expsCount(y)+' 笔'+(diff?' · '+diff:"")+'</div></div></div>'+
-    '<div class="line-wrap">'+lineSVG(months,max,avg)+'</div>'+
+    '<div style="font-size:12px;color:var(--muted)">'+expsCount(y)+' '+t("count")+(diff?' · '+diff:"")+'</div></div></div>'+
+    '<div class="line-wrap">'+lineSVG(months,max,avg,budget)+'</div>'+
     '<div class="stat-metrics">'+
-      '<div class="stat-metric"><div class="l">月均</div><div class="v num">€ '+money(avg)+'</div></div>'+
-      '<div class="stat-metric"><div class="l">最高月</div><div class="v num">€ '+money(max)+'</div></div>'+
-      '<div class="stat-metric"><div class="l">最低月</div><div class="v num">€ '+money(min)+'</div></div>'+
+      '<div class="stat-metric"><div class="l">'+t("monthlyAvg")+'</div><div class="v num">€ '+money(avg)+'</div></div>'+
+      '<div class="stat-metric"><div class="l">'+t("maxMonth")+'</div><div class="v num">€ '+money(max)+'</div></div>'+
+      '<div class="stat-metric"><div class="l">'+t("minMonth")+'</div><div class="v num">€ '+money(min)+'</div></div>'+
     '</div>'+
-    '<div class="legend-mini"><span><i style="background:#1F7A63"></i>月支出</span><span><i style="background:#B08968;height:2px;border-radius:1px;vertical-align:1px"></i>月均</span></div>'+
-    (!yearTotal?'<div class="empty">该年度暂无支出</div>':"");
+    '<div class="legend-mini"><span><i style="background:#1F7A63"></i>'+t("monthExp")+'</span><span><i style="background:#B08968;height:2px;border-radius:1px;vertical-align:1px"></i>'+t("monthlyAvg")+'</span>'+
+    (budget?'<span><i style="background:#E5484D;height:2px;border-radius:1px;vertical-align:1px"></i>'+t("budget")+'</span>':"")+'</div>'+
+    (!yearTotal?'<div class="empty">'+t("yearNoData")+'</div>':"");
 }
-function expsCount(y){ return allExpenses.filter(e=>+e.date.slice(0,4)===y).length; }
-function lineSVG(months,max,avg){
+function expsCount(y){ return allExpenses.filter(e=>(!e.type||e.type!=="income")&&+e.date.slice(0,4)===y).length; }
+function lineSVG(months,max,avg,budget){
   const W=320,H=150,padL=6,padR=8,padT=12,padB=22;
   const iw=W-padL-padR, ih=H-padT-padB;
-  const pts=months.map((v,i)=>({x:padL+i*(iw/11), y:padT+ih-(max>0?v/max:0)*ih}));
+  const yScale=v=>padT+ih-(max>0?v/max:0)*ih;
+  const pts=months.map((v,i)=>({x:padL+i*(iw/11), y:yScale(v)}));
   const line=pts.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
   const area=line+" L"+pts[11].x.toFixed(1)+" "+(padT+ih)+" L"+pts[0].x.toFixed(1)+" "+(padT+ih)+" Z";
-  const avgY=padT+ih-(max>0?avg/max:0)*ih;
+  const avgY=yScale(avg);
+  const budgetY=budget>0?yScale(budget):null;
   const grid=[25,50,75].map(g=>{const gy=padT+ih*(g/100); return '<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="#EEF1F4" stroke-width="1"/>';}).join("");
-  const dots=pts.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.6" fill="#1F7A63"/>').join("");
+  const dots=pts.map((p,i)=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.6" fill="'+(budget>0&&months[i]>budget?"#E5484D":"#1F7A63")+'"/>').join("");
   const labels=months.map((v,i)=> '<text x="'+(padL+i*(iw/11)).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="#9AA3AB">'+(i+1)+'</text>').join("");
   return '<svg viewBox="0 0 320 150" width="100%">'+
     '<defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F7A63" stop-opacity=".26"/><stop offset="1" stop-color="#1F7A63" stop-opacity="0"/></linearGradient></defs>'+
     grid+
     '<path d="'+area+'" fill="url(#lg)"/>'+
+    (budgetY!=null?'<line x1="'+padL+'" y1="'+budgetY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+budgetY.toFixed(1)+'" stroke="#E5484D" stroke-width="1.5" stroke-dasharray="5 4"/>':"")+
     '<path d="'+line+'" fill="none" stroke="#1F7A63" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'+
     (avg>0?'<line x1="'+padL+'" y1="'+avgY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+avgY.toFixed(1)+'" stroke="#B08968" stroke-width="1.4" stroke-dasharray="4 3"/>':"")+
     dots+labels+
@@ -1236,6 +1542,53 @@ const BATCH_PROMPT_TEMPLATE = [
 "",
 "现在请处理用户发来的多张凭证。"
 ].join("\n");
+
+/* 英文提示词：选英文时提示词不含任何中文字段 */
+const PROMPT_TEMPLATE_EN = [
+"You are an expense-receipt recognition and structuring assistant. The user will send you a picture or text of an expense receipt — a shopping till receipt, an e-commerce / online order screenshot, a bank payment or transfer record, a payment bill, etc. Your only task: turn it into a single JSON object that strictly follows the SCHEMA below. Output only that one JSON. Do not output anything else.",
+"",
+"[Receipt type]",
+"- Till receipts / order screenshots: extract the itemized items (fill in nameZh as the item name in Chinese).",
+"- Bank payment / spending screenshots: usually no line items; set items to an empty array [], amount to the actual paid amount, and in note write e.g. \"bank payment / purchase at a merchant\".",
+"",
+"[Hard rules]",
+"1. Output only one JSON object. Do NOT wrap it in ``` code fences. No explanation, greeting, closing words, or Markdown.",
+"2. All amounts must be JSON numbers: no currency symbol, no thousands separators, decimal point in English, two decimal places (e.g. 21.52).",
+"3. Convert every date to YYYY-MM-DD (e.g. 28-10-2026 → 2026-10-28). If unsure, do not invent it; note it in warnings.",
+"4. amount must be the final actual amount paid: tax included, deposit included, all discounts deducted.",
+"5. category must be chosen from: [\"餐饮\",\"超市\",\"交通\",\"购物\",\"日用\",\"娱乐\",\"医疗\",\"教育\",\"房租\",\"衣服\",\"电话费\",\"订阅\",\"水电\",\"网络\",\"其他\"]. When in doubt pick \"其他\".",
+"6. payment from: [\"银行卡\",\"现金\",\"信用卡\",\"手机支付\",\"其他\"].",
+"7. items: one row per product; amount is the final payable per item (after discount). For items sold by count use qty as count and unit \"件\"; for items sold by weight use qty as the weight number and unit \"kg\" and unitPrice as the per-kg price. If no line items, use empty array [].",
+"",
+"[Output SCHEMA (follow exactly; use null or empty array for missing fields)]",
+"{\"expense\":{\"date\":\"YYYY-MM-DD\",\"amount\":0.00,\"category\":\"超市\",\"store\":\"store / merchant name\",\"payment\":\"银行卡\",\"note\":\"note, empty string if none\",\"items\":[{\"name\":\"original name\",\"nameZh\":\"Chinese name\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":0.00,\"amount\":0.00}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]}",
+"",
+"[Example input → output]",
+"① Till: fish sticks 1.75, bananas 0.480kg × 1.15/kg = 0.55; total payable 21.52; Bankpas; date 28-10-2026.",
+"→ {\"expense\":{\"date\":\"2026-10-28\",\"amount\":21.52,\"category\":\"超市\",\"store\":\"LIDL Hengelo\",\"payment\":\"银行卡\",\"note\":\"10 items, saved 0.31\",\"items\":[{\"name\":\"Vissticks MSC\",\"nameZh\":\"鱼柳条\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":1.75,\"amount\":1.75},{\"name\":\"Bananen\",\"nameZh\":\"香蕉\",\"qty\":0.48,\"unit\":\"kg\",\"unitPrice\":1.15,\"amount\":0.55}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]}",
+"② Bank spending screenshot: NS train 35.00, date 15-10-2026.",
+"→ {\"expense\":{\"date\":\"2026-10-15\",\"amount\":35.00,\"category\":\"交通\",\"store\":\"NS train\",\"payment\":\"银行卡\",\"note\":\"bank payment: train ticket\",\"items\":[]},\"currency\":\"EUR\",\"confidence\":0.85,\"warnings\":[]}",
+"",
+"Now process the receipt sent by the user."
+].join("\n");
+
+const BATCH_PROMPT_TEMPLATE_EN = [
+"You are a \"multiple expense receipts\" recognition and structuring assistant. The user will send several expense receipts at once (till receipts / shopping or order screenshots / bank payment records). Your only task: turn each receipt into one expense object, and finally output ONE JSON array — as many elements as there are receipts. Output only that JSON array. Do not output anything else.",
+"",
+"[Key]",
+"- Each receipt may have a different date; fill in date (YYYY-MM-DD) from the real date on each receipt so expenses on different days are separated.",
+"- The array order does not matter; the receiver inserts each one by its own date.",
+"- Other rules are the same as single: amount is the actual paid total; category from [\"餐饮\",\"超市\",\"交通\",\"购物\",\"日用\",\"娱乐\",\"医疗\",\"教育\",\"房租\",\"衣服\",\"电话费\",\"订阅\",\"水电\",\"网络\",\"其他\"]; fill items (with nameZh in Chinese) if there are line items, otherwise [].",
+"- If one receipt is unreadable, skip it and explain in that element's warnings; do not invent. If nothing can be recognized, output only {\"error\":\"无法识别\",\"reason\":\"<reason>\"}.",
+"",
+"[Output format]",
+"[{\"expense\":{\"date\":\"YYYY-MM-DD\",\"amount\":0.00,\"category\":\"超市\",\"store\":\"store name\",\"payment\":\"银行卡\",\"note\":\"\",\"items\":[{\"name\":\"original name\",\"nameZh\":\"Chinese name\",\"qty\":1,\"unit\":\"件\",\"unitPrice\":0.00,\"amount\":0.00}]},\"currency\":\"EUR\",\"confidence\":0.9,\"warnings\":[]},{\"expense\":{…second receipt…}}]",
+"",
+"Now process the multiple receipts sent by the user."
+].join("\n");
+
+function promptText(){ return state.lang==="en"?PROMPT_TEMPLATE_EN:PROMPT_TEMPLATE; }
+function batchPromptText(){ return state.lang==="en"?BATCH_PROMPT_TEMPLATE_EN:BATCH_PROMPT_TEMPLATE; }
 
 let previewRows=[];
 function parseImport(text){
@@ -1311,10 +1664,10 @@ function renderPreview(){
     div.innerHTML=
       '<div class="prev-num"><input type="number" step="0.01" min="0" value="'+r.amount+'" data-i="'+i+'" class="num"></div>'+
       '<div class="prev-main">'+sel+
-      '<div class="pdate">'+esc(r.date)+' · '+(r.source==="ai"?"AI":"手动")+'</div>'+
+      '<div class="pdate">'+esc(r.date)+' · '+(r.source==="ai"?"AI":t("srcManual"))+'</div>'+
       (r.note?'<div class="pnote">'+esc(r.note)+'</div>':'')+
-      (r.items&&r.items.length?'<div class="pnote" style="color:var(--accent-ink)">含 '+r.items.length+' 件商品明细</div>':'')+'</div>'+
-      '<button class="prev-del" data-i="'+i+'" aria-label="删除">✕</button>';
+      (r.items&&r.items.length?'<div class="pnote" style="color:var(--accent-ink)">'+t("hasItems")+' '+r.items.length+'</div>':'')+'</div>'+
+      '<button class="prev-del" data-i="'+i+'" aria-label="'+t("mDelete")+'">✕</button>';
     wrap.appendChild(div);
   });
   $$("input",wrap).forEach(inp=>inp.addEventListener("input",e=>{previewRows[+e.target.dataset.i].amount=parseFloat(e.target.value)||0;}));
@@ -1325,7 +1678,7 @@ function renderPreview(){
 }
 function commitPreview(){
   const good=previewRows.filter(r=>r.amount>0&&/^\d{4}-\d{2}-\d{2}$/.test(r.date));
-  if(!good.length){ toast("没有可入库的有效记录"); return; }
+  if(!good.length){ toast(t("tNoValidCommit")); return; }
   const nowTs=Date.now();
   good.forEach(r=>saveExpense({id:uid(),amount:r.amount,date:r.date,category:r.category,
     note:r.note||"",source:r.source||"manual",items:r.items||[],created:nowTs,updated:nowTs}));
@@ -1333,23 +1686,23 @@ function commitPreview(){
   $("#importText").value="";
   renderPreview();
   refresh();
-  toast("已入库 "+good.length+" 笔");
+  toast(t("tCommitted")+" "+good.length);
 }
 
 /* ================= 导出 / 恢复 ================= */
 function exportJSON(){
-  download("支出备份-"+todayStr()+".json",
-    JSON.stringify({app:"支出记账",version:1,exportedAt:new Date().toISOString(),cats:state.cats,expenses:allExpenses},null,2),
+  download("天天记账备份-"+todayStr()+".json",
+    JSON.stringify({app:"天天记账/DayTally",version:2,exportedAt:new Date().toISOString(),cats:state.cats,expenses:allExpenses},null,2),
     "application/json");
-  toast("已导出 JSON 备份");
+  toast(t("tExpJson"));
 }
 function exportCSV(){
-  const head=["日期","类别","金额(EUR)","件数","备注","来源"];
+  const head=[t("csvDate"),t("csvCat"),t("csvType"),t("csvAmt"),t("csvQty"),t("csvNote"),t("csvSrc")];
   const rows=allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>
-    [e.date,e.category,e.amount,e.items&&e.items.length?e.items.length:"",'"'+(e.note||"").replace(/"/g,'""')+'"',e.source==="ai"?"AI":"手动"]);
+    [e.date,e.category,e.type==="income"?"入账":"支出",e.amount,e.items&&e.items.length?e.items.length:"",'"'+(e.note||"").replace(/"/g,'""')+'"',e.source==="ai"?"AI":t("srcManual")]);
   const csv=[head.join(",")].concat(rows.map(r=>r.join(","))).join("\r\n");
-  download("支出明细-"+todayStr()+".csv",csv,"text/csv");
-  toast("已导出 CSV");
+  download("天天记账明细-"+todayStr()+".csv",csv,"text/csv");
+  toast(t("tExpCsv"));
 }
 async function restoreFile(file){
   const text=await file.text();
@@ -1362,10 +1715,10 @@ async function restoreFile(file){
       const cats=Array.isArray(data.cats)&&data.cats.length?data.cats:null;
       if(!exps) throw new Error("no expenses");
       await dbClear("expenses");
-      for(const e of exps) if(e&&e.amount>0) await saveExpense({id:e.id||uid(),amount:+e.amount,date:e.date||todayStr(),category:e.category||"其他",note:e.note||"",source:e.source||"manual",items:Array.isArray(e.items)?e.items:[],created:e.created||Date.now(),updated:e.updated||Date.now()});
+      for(const e of exps) if(e&&e.amount>0) await saveExpense({id:e.id||uid(),amount:+e.amount,date:e.date||todayStr(),category:e.category||"其他",note:e.note||"",type:e.type||"expense",source:e.source||"manual",items:Array.isArray(e.items)?e.items:[],created:e.created||Date.now(),updated:e.updated||Date.now()});
       if(cats){state.cats=cats.map(c=>({name:String(c.name),color:c.color||"#94A3B8"})); await persistCats();}
-      await refresh(); toast("已恢复 "+exps.length+" 笔");
-    }catch(err){ toast("恢复失败：JSON 格式不正确"); }
+      await refresh(); toast(t("tRestored")+" "+exps.length);
+    }catch(err){ toast(t("tRestoreFail")); }
   }else if(name.endsWith(".csv")||name.endsWith(".txt")){
     const lines=text.split(/\r?\n/).filter(Boolean);
     const header=lines[0].toLowerCase();
@@ -1374,14 +1727,16 @@ async function restoreFile(file){
     const rows=data.map(l=>{
       const c=l.split(",").map(x=>x.trim());
       const date=/^\d{4}-\d{2}-\d{2}$/.test(c[0])?c[0]:todayStr();
-      const amount=parseFloat(String(c[2]||c[1]).replace(/[^0-9.]/g,""))||0;
+      const type=/\u5165\u8d26|income|income/i.test(c[2]||"")?"income":"expense";
+      const amtIdx=(type==="income"&&!hasHeader)?1:(hasHeader?2:2);
+      const amount=parseFloat(String(c[amtIdx]||c[2]||c[1]).replace(/[^0-9.]/g,""))||0;
       const cat=state.cats.find(x=>x.name===c[1])?c[1]:"其他";
-      const note=c[3]||"";
-      return {amount,date,category:cat,note:note.replace(/^"|"$/g,""),source:"manual"};
+      const note=c[hasHeader?5:3]||"";
+      return {amount,date,category:cat,type,note:note.replace(/^"|"$/g,""),source:"manual"};
     }).filter(r=>r.amount>0);
     const nowTs=Date.now();
-    for(const r of rows) await saveExpense({id:uid(),amount:r.amount,date:r.date,category:r.category,note:r.note,source:"manual",created:nowTs,updated:nowTs});
-    await refresh(); toast("已导入 "+rows.length+" 笔");
+    for(const r of rows) await saveExpense({id:uid(),amount:r.amount,date:r.date,category:r.category,type:r.type,note:r.note,source:"manual",created:nowTs,updated:nowTs});
+    await refresh(); toast(t("tRestored")+" "+rows.length);
   }else{ toast("不支持的文件类型"); }
 }
 
@@ -1399,14 +1754,14 @@ function renderSettings(){
   });
   $$("input",wrap).forEach(inp=>inp.addEventListener("change",e=>{
     const v=e.target.value.trim(); const i=+e.target.dataset.i;
-    if(!v){toast("名称不能为空"); e.target.value=state.cats[i].name; return;}
-    if(state.cats.some((c,j)=>j!==i&&c.name===v)){toast("已有同名类别"); e.target.value=state.cats[i].name; return;}
-    state.cats[i].name=v; persistCats(); refresh(); toast("已更新");
+    if(!v){toast(t("tCatEmpty")); e.target.value=state.cats[i].name; return;}
+    if(state.cats.some((c,j)=>j!==i&&c.name===v)){toast(t("tCatDup")); e.target.value=state.cats[i].name; return;}
+    state.cats[i].name=v; persistCats(); refresh(); toast(t("tUpdated"));
   }));
   $$(".cbtn[data-edit]",wrap).forEach(b=>b.addEventListener("click",e=>{ state.catEditI=+e.target.dataset.edit; renderSettings(); }));
   $$(".cbtn.del",wrap).forEach(b=>b.addEventListener("click",e=>{
     const i=+e.target.dataset.i;
-    if(state.cats.length<=1){toast("至少保留一个类别");return;}
+    if(state.cats.length<=1){toast(t("tCatKeep"));return;}
     const name=state.cats[i].name;
     state.cats.splice(i,1);
     persistCats().then(()=>{
@@ -1437,20 +1792,35 @@ function renderSettings(){
     const on=k===state.newCatIcon?" on":"";
     return '<span class="sw ic'+on+'" data-i="'+k+'"><svg viewBox="0 0 24 24">'+ICONS[k]+'</svg></span>';
   }).join("");
+  // 预算 / 语言 / 提醒
+  const bi=$("#budgetInput"); if(bi && bi.value==="") bi.value=state.budget>0?state.budget:"";
+  const ls=$("#langSel"); if(ls) ls.value=state.lang;
+  const rm=state.reminder;
+  const en=$("#rmEnabled"); if(en) en.checked=rm.enabled;
+  const cfg=$("#rmCfg"); if(cfg) cfg.style.display=rm.enabled?"block":"none";
+  const fr=$("#rmFreq"); if(fr) fr.value=rm.freq;
+  const rw=$("#wdRow"); if(rw){
+    rw.innerHTML=[1,2,3,4,5,6,0].map(w=>
+      '<span data-w="'+w+'" class="'+(rm.weekdays.includes(w)?"on":"")+'">'+WEEKDAY_NAMES(w)+'</span>').join("");
+  }
+  const rwWrap=$("#rmWeekday"); if(rwWrap) rwWrap.style.display=rm.freq==="weekly"?"block":"none";
+  const reWrap=$("#rmEvery"); if(reWrap){ reWrap.style.display=rm.freq==="everyN"?"flex":"none"; const ri=$("#rmInterval"); if(ri) ri.value=rm.intervalDays; }
+  const rt=$("#rmTime"); if(rt) rt.value=rm.time||"20:00";
 }
+function WEEKDAY_NAMES(w){ return state.lang==="en"?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][w]:["日","一","二","三","四","五","六"][w]; }
 function renderDash(){
   const sel=state.dashSel||todayStr();
   let y=+sel.slice(0,4), m=+sel.slice(5,7);
   const key=monthKey(y,m);
   const byDay={};
-  allExpenses.forEach(e=>{ if(e.date.slice(0,7)===key){ byDay[e.date]=(byDay[e.date]||0)+e.amount; } });
+  allExpenses.forEach(e=>{ if((!e.type||e.type!=="income")&&e.date.slice(0,7)===key){ byDay[e.date]=(byDay[e.date]||0)+e.amount; } });
   // 顶部：所选日期
-  const selExps=allExpenses.filter(e=>e.date===sel);
+  const selExps=allExpenses.filter(e=>(!e.type||e.type!=="income")&&e.date===sel);
   const selTotal=selExps.reduce((s,e)=>s+e.amount,0);
   const isToday=sel===todayStr();
-  $("#dashDate").textContent=(isToday?"今天 · ":"")+fmtCn(sel);
+  $("#dashDate").textContent=(isToday?t("today")+" · ":"")+fmtCn(sel);
   $("#dashTodayAmt").textContent="€ "+money(selTotal);
-  $("#dashTodayCnt").textContent=selExps.length+" 笔支出 · 点日历某天可切换";
+  $("#dashTodayCnt").textContent=selExps.length+" "+t("dashCount")+" · "+t("dashHint");
   // 日历
   const first=new Date(y,m-1,1);
   const offset=(first.getDay()+6)%7; // 周一开头
@@ -1528,11 +1898,11 @@ function bindEvents(){
     if(mr){ openDetail(mr.dataset.id); }
   });
   $("#dEdit").addEventListener("click",()=>{ if(!detailId)return; const id=detailId; closeDetail(); openModal(id); });
-  $("#dEditItems").addEventListener("click",()=>{ if($("#dEditItems").textContent==="取消") exitItemsEdit(); else startEditItems(); });
-  $("#openManual").addEventListener("click",()=>$("#manualModal").classList.add("on"));
+  $("#dEditItems").addEventListener("click",()=>{ if($("#dEditItems").textContent===t("detailCancel")) exitItemsEdit(); else startEditItems(); });
+  $("#openManual").addEventListener("click",()=>{ renderManual(); $("#manualModal").classList.add("on"); });
   $("#manualClose").addEventListener("click",()=>$("#manualModal").classList.remove("on"));
   $("#manualPdf").addEventListener("click",()=>window.print());
-  $("#dDelete").addEventListener("click",()=>{ if(!detailId)return; const id=detailId; closeDetail(); removeExpense(id); refresh(); toast("已删除"); });
+  $("#dDelete").addEventListener("click",()=>{ if(!detailId)return; const id=detailId; closeDetail(); removeExpense(id); refresh(); toast(t("tDeleted")); });
   // 导入
   function copyText(text){
     if(navigator.clipboard && window.isSecureContext){
@@ -1554,23 +1924,23 @@ function bindEvents(){
     return false;
   }
   function doCopyPrompt(){
-    copyText(PROMPT_TEMPLATE).then(ok=>toast(ok?"识别提示词已复制":"已弹出提示词，请手动全选复制"));
+    copyText(promptText()).then(ok=>toast(ok?t("tPromptCopied"):t("tPromptManual")));
   }
   $("#copyPromptBtn").addEventListener("click",doCopyPrompt);
   $("#copyPrompt2Btn").addEventListener("click",doCopyPrompt);
-  $("#batchCopyBtn").addEventListener("click",()=>copyText(BATCH_PROMPT_TEMPLATE).then(ok=>toast(ok?"批量识别提示词已复制（多张凭证→返回数组，按各自日期入库）":"已弹出提示词，请手动全选复制")));
+  $("#batchCopyBtn").addEventListener("click",()=>copyText(batchPromptText()).then(ok=>toast(ok?t("tBatchCopied"):t("tPromptManual"))));
   $("#viewPromptBtn").addEventListener("click",()=>{
     const box=$("#promptBox"), shown=box.style.display!=="none";
     box.style.display=shown?"none":"block";
-    if(!shown){ $("#promptText").textContent=PROMPT_TEMPLATE; $("#viewPromptBtn").textContent="收起提示词"; }
-    else $("#viewPromptBtn").textContent="查看提示词";
+    if(!shown){ $("#promptText").textContent=promptText(); $("#viewPromptBtn").textContent=t("tHidePrompt"); }
+    else $("#viewPromptBtn").textContent=t("tViewPrompt");
   });
   $("#parseBtn").addEventListener("click",()=>{
-    const t=$("#importText").value.trim(); if(!t){toast("先粘贴内容");return;}
+    const t=$("#importText").value.trim(); if(!t){toast(t("tPasteFirst"));return;}
     const res=parseImport(t);
-    if(res.error){toast("解析失败："+res.error); previewRows=[]; renderPreview(); return;}
+    if(res.error){toast(t("tParseFail")+res.error); previewRows=[]; renderPreview(); return;}
     previewRows=res.rows; renderPreview();
-    if(!res.rows.length) toast("没解析出有效记录，试试 JSON 格式");
+    if(!res.rows.length) toast(t("tNoValid"));
   });
   $("#commitBtn").addEventListener("click",commitPreview);
   $("#clearPreviewBtn").addEventListener("click",()=>{previewRows=[];renderPreview();});
@@ -1592,10 +1962,10 @@ function bindEvents(){
   $("#newCatIcons").addEventListener("click",e=>{ const s=e.target.closest(".sw[data-i]"); if(!s)return; state.newCatIcon=s.dataset.i; renderSettings(); });
   $("#newCatSave").addEventListener("click",()=>{
     const name=$("#newCatName").value.trim();
-    if(!name){toast("请输入类别名称");return;}
-    if(state.cats.some(c=>c.name===name)){toast("已有同名类别");return;}
+    if(!name){toast(t("tCatEmpty"));return;}
+    if(state.cats.some(c=>c.name===name)){toast(t("tCatDup"));return;}
     state.cats.push({name,color:state.newCatColor||PALETTE[0],icon:state.newCatIcon||"other"});
-    persistCats().then(()=>{ state.newCatColor=null; state.newCatIcon=null; $("#catAddForm").style.display="none"; $("#newCatName").value=""; refresh(); toast("已新增 "+name); });
+    persistCats().then(()=>{ state.newCatColor=null; state.newCatIcon=null; $("#catAddForm").style.display="none"; $("#newCatName").value=""; refresh(); toast(t("tUpdated")+" "+name); });
   });
   // 编辑已有类别
   $("#editCatPicker").addEventListener("click",e=>{
@@ -1611,13 +1981,46 @@ function bindEvents(){
     const ic=e.target.closest(".sw[data-i]");
     if(ic){ state.cats[state.catEditI].icon=ic.dataset.i; renderSettings(); return; }
   });
+  // 月度预算
+  $("#budgetInput").addEventListener("change",e=>{
+    const v=parseFloat(e.target.value)||0;
+    state.budget=Math.max(0,v); e.target.value=state.budget>0?state.budget:"";
+    persistAppSettings(); toast(state.budget>0?t("tBudgetSet")+" "+state.budget:t("tBudgetClear"));
+  });
+  // 语言
+  $("#langSel").addEventListener("change",e=>{
+    state.lang=e.target.value==="en"?"en":"zh";
+    persistAppSettings(); applyLang(); renderSettings(); refresh();
+  });
+  // 记账提醒
+  $("#rmEnabled").addEventListener("change",e=>{
+    state.reminder.enabled=e.target.checked; persistAppSettings(); renderSettings();
+    toast(state.reminder.enabled?t("tRmOn"):t("tRmOff"));
+  });
+  $("#rmFreq").addEventListener("change",e=>{
+    state.reminder.freq=e.target.value; persistAppSettings(); renderSettings();
+  });
+  $("#rmTime").addEventListener("change",e=>{ state.reminder.time=e.target.value||"20:00"; persistAppSettings(); });
+  $("#rmInterval").addEventListener("change",e=>{ state.reminder.intervalDays=Math.max(1,parseInt(e.target.value)||3); persistAppSettings(); renderSettings(); });
+  $("#wdRow").addEventListener("click",e=>{
+    const s=e.target.closest("span[data-w]"); if(!s)return;
+    const w=+s.dataset.w;
+    const wd=state.reminder.weekdays;
+    const i=wd.indexOf(w);
+    if(i>=0) wd.splice(i,1); else wd.push(w);
+    if(!wd.length) wd.push(1);
+    persistAppSettings(); renderSettings();
+  });
 }
 async function init(){
   const t=new Date(); state.ly=t.getFullYear(); state.lm=t.getMonth()+1; state.sy=t.getFullYear();
   await loadCats();
+  await loadAppSettings();
   allExpenses=await getExpenses();
   bindEvents();
+  applyLang();
   showTab("ledger");
+  maybeCheckReminder();
   if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 }
 init();

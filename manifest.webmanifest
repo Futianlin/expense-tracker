@@ -1,7 +1,7 @@
 {
-  "name": "支出记账",
-  "short_name": "记账",
-  "description": "离线个人支出记账：明细、月/年账单、类别、可视化、导出。数据仅存本机。",
+  "name": "天天记账 DayTally",
+  "short_name": "天天记账",
+  "description": "完全离线个人记账：明细、入账、月/年账单、类别、可视化、预算、提醒、导出。数据仅存本机。",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
