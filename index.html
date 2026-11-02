@@ -167,6 +167,10 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 /* settings */
 .set-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
 .set-title{padding:13px 14px;font-size:14px;font-weight:700;background:#FBFCFC;border-bottom:1px solid var(--border)}
+.set-title.clickable{cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;user-select:none;-webkit-user-select:none}
+.set-title.clickable:active{background:var(--accent-soft)}
+.cat-caret{color:var(--muted);font-size:12px;transition:transform .15s}
+.set-title.open .cat-caret{transform:rotate(90deg)}
 .set-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer}
 .set-item:last-child{border-bottom:0}
 .set-item .ico{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);
@@ -499,10 +503,12 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
       </div>
 
       <div class="set-group">
-        <div class="set-title" data-i18n="setCats">支出类别</div>
-        <div class="cat-manage" id="catManage"></div>
-        <div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border)">
-          <button class="btn btn-ghost sm" id="addCatBtn" data-i18n="catAdd">+ 新增类别</button>
+        <div class="set-title clickable" id="catsToggle" data-i18n="setCats">支出类别 <span class="cat-caret" id="catsCaret">▸</span></div>
+        <div id="catCollapse" style="display:none">
+          <div class="cat-manage" id="catManage"></div>
+          <div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border)">
+            <button class="btn btn-ghost sm" id="addCatBtn" data-i18n="catAdd">+ 新增类别</button>
+          </div>
         </div>
       </div>
 
@@ -696,7 +702,7 @@ const state = {
   tab: "ledger",
   q: "", sort: "date-desc",
   newCatColor: null, newCatIcon: null,
-  dashYm: null, dashSel: null, catEditI: null,
+  dashYm: null, dashSel: null, catEditI: null, catsOpen: false,
   lang: "zh", budget: 0, currency: "EUR"
 };
 /* ================= 国际化 ================= */
@@ -939,6 +945,20 @@ const pad = n => String(n).padStart(2,"0");
 const CURRENCIES = {EUR:{sym:"€"},USD:{sym:"$"},GBP:{sym:"£"},CNY:{sym:"¥"},JPY:{sym:"¥"}};
 function cur(){ return (CURRENCIES[state.currency]||CURRENCIES.EUR).sym; }
 const money = n => cur()+" "+(Math.round(n*100)/100).toFixed(2);
+/* 数值输入限制：只允许数字与一个小数点，阻断非法按键并清理粘贴 */
+function restrictNumeric(el){
+  el.addEventListener("beforeinput",e=>{
+    if(e.data==null) return; // 删除/退格/粘贴等不在此判断
+    if(!/^[\d.]$/.test(e.data)) e.preventDefault();
+    else if(e.data==="." && el.value.includes(".")) e.preventDefault();
+  });
+  el.addEventListener("input",()=>{
+    let v=el.value.replace(/[^\d.]/g,"");
+    const i=v.indexOf(".");
+    if(i!==-1) v=v.slice(0,i+1)+v.slice(i+1).replace(/\./g,"");
+    if(v!==el.value) el.value=v;
+  });
+}
 const now = new Date();
 function monthKey(y,m){ return y+"-"+pad(m); }
 function todayStr(){ return now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate()); }
@@ -1190,8 +1210,8 @@ function renderItemsEdit(){
     '<button class="btn btn-plain sm" id="ieCancel">'+t("mCancel")+'</button>'+
     '<button class="btn btn-primary sm" id="ieSave">'+t("ieSave")+'</button></div></div>';
   box.innerHTML=h;
-  $$(".ie-q",box).forEach(inp=>inp.addEventListener("input",()=>recalcItem(inp,"q")));
-  $$(".ie-u",box).forEach(inp=>inp.addEventListener("input",()=>recalcItem(inp,"u")));
+  $$(".ie-q",box).forEach(inp=>{ restrictNumeric(inp); inp.addEventListener("input",()=>recalcItem(inp,"q")); });
+  $$(".ie-u",box).forEach(inp=>{ restrictNumeric(inp); inp.addEventListener("input",()=>recalcItem(inp,"u")); });
   $("#ieCancel").addEventListener("click",exitItemsEdit);
   $("#ieSave").addEventListener("click",saveItemsEdit);
 }
@@ -1972,9 +1992,9 @@ function bindEvents(){
       else { state.catEditI=null; $("#editCatModal").classList.remove("on"); }
     }
   });
-  // 月度预算
-  // 月度预算：输入即生效，无需点确认
+  // 月度预算：输入即生效，无需点确认；只允许数字
   let _budgetT=null;
+  restrictNumeric($("#budgetInput"));
   $("#budgetInput").addEventListener("input",e=>{
     const v=parseFloat(e.target.value)||0;
     state.budget=Math.max(0,v);
@@ -1989,6 +2009,14 @@ function bindEvents(){
     state.budget=Math.max(0,parseFloat(e.target.value)||0);
     e.target.value=state.budget>0?state.budget:"";
     persistAppSettings(); renderStats();
+  });
+  // 金额输入：只允许数字与一个小数点
+  restrictNumeric($("#fAmount"));
+  // 支出类别：默认收起，点标题展开/收起
+  $("#catsToggle").addEventListener("click",()=>{
+    state.catsOpen=!state.catsOpen;
+    $("#catCollapse").style.display=state.catsOpen?"block":"none";
+    $("#catsToggle").classList.toggle("open",state.catsOpen);
   });
   // 语言
   $("#langSel").addEventListener("change",e=>{
