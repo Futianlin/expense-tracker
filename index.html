@@ -955,6 +955,52 @@ button{line-height:1.35}
 .settings-directory button{min-width:0}
 .settings-directory button>span{min-width:0;flex:1;overflow-wrap:anywhere;text-align:left}
 @media(max-width:359px){.settings-directory button{font-size:13px}}
+/* V2.9: consistent modal exit and import date correction */
+.detail-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px}
+.detail-head #dCat{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-head #dSrc{margin-left:0!important;white-space:nowrap}
+.detail-close{width:40px;height:40px;flex:none;border:0;background:#F1F4F0;border-radius:50%;font-size:26px;line-height:1;color:#34584B;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.detail-close:focus-visible,.preview-date:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.preview-date-label{display:flex;align-items:center;gap:7px;margin-top:5px;color:var(--muted);font-size:12px;max-width:100%}
+.preview-date-label input{width:min(180px,100%);min-width:0;max-width:100%;box-sizing:border-box;font:inherit;font-size:13px;border:1px solid #D9E5DC;background:#fff;border-radius:8px;color:var(--text);padding:7px 6px;min-height:36px}
+.wizard-preview .prev-row .prev-main{min-width:145px}
+@media(max-width:370px){.detail-head{gap:6px}.detail-head #dSrc{font-size:10px!important}.wizard-preview .prev-row .prev-main{min-width:120px}.preview-date-label{flex-wrap:wrap}}
+
+/* === V2.10 native-like keyboard and calendar overlays === */
+:root{--daytally-visual-height:100dvh}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+input:not([type=checkbox]):not([type=radio]),textarea,select,[contenteditable="true"]{
+  font-size:max(16px,1rem)!important;
+  -webkit-text-size-adjust:100%;
+}
+#modal .note-field input,#modal #fCur,#modal #fNote,#importText,.preview-date-label input,
+#fAmount,#fCur,#fNote,#searchInput,#budMonth,#budYear,
+#restoreFile,#dashJump,.wizard-input{font-size:16px!important}
+input,textarea,select{max-width:100%;min-width:0}
+#modal .sheet,.settings-sheet{max-height:min(92dvh,calc(var(--daytally-visual-height) - env(safe-area-inset-top) - 12px));overscroll-behavior:contain}
+#modal .sheet:focus-within{scroll-padding-bottom:22px}
+
+.period-cal{position:fixed!important;z-index:95!important;width:min(322px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:min(75dvh,420px);overflow:auto;margin:0;box-sizing:border-box;overscroll-behavior:contain}
+.pcal-head{gap:8px}
+.pcal-dismiss,.cal-dismiss{display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:32px;border:0;background:#EDF3EE;color:#286F50;border-radius:9px;cursor:pointer;font-size:18px;flex:none}
+#fCal{position:relative!important;left:auto!important;right:auto!important;top:auto!important;width:100%!important;max-width:100%;z-index:8;box-shadow:none!important;margin-top:7px}
+#fCal .cal-head{display:flex;gap:6px;align-items:center}
+#fCal .cal-title{flex:1;text-align:center}
+#fCal .cal-dismiss{min-width:34px}
+#receiptDatePicker{position:fixed;display:none;z-index:110;width:min(330px,calc(100vw - 20px));max-height:min(410px,70dvh);overflow:auto;background:#fff;border:1px solid #DDE5DE;border-radius:16px;padding:13px;box-shadow:0 12px 36px #10281F28;overscroll-behavior:contain}
+#receiptDatePicker .rdp-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:11px}
+#receiptDatePicker .rdp-head strong{font-size:14px}
+#receiptDatePicker .rdp-head button{border:0;background:#EDF3EE;border-radius:9px;color:#286F50;min-height:34px;min-width:34px;font-size:20px}
+#receiptDatePicker .rdp-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+#receiptDatePicker .rdp-week{font-size:11px;color:#84918B;padding:5px 0}
+#receiptDatePicker .rdp-day{border:0;min-width:0;height:36px;background:transparent;border-radius:9px;color:#163D2E;font-size:14px;cursor:pointer}
+#receiptDatePicker .rdp-day.today{outline:1px solid #2E7D5B}
+#receiptDatePicker .rdp-day.selected{background:#2E7D5B;color:white}
+#receiptDatePicker .rdp-today{width:100%;border:0;background:#E3F0E8;border-radius:9px;min-height:38px;margin-top:10px;color:#286F50;font-size:14px}
+.preview-date{cursor:pointer;caret-color:transparent}
+
+@media (max-width:360px){.period-cal{width:min(300px,calc(100vw - 20px))}}
+
 </style>
 </head>
 <body>
@@ -1067,7 +1113,7 @@ button{line-height:1.35}
         <div class="directory-label" data-ui28="groupPrefs">偏好与帮助</div>
         <button data-target="setLang">◉ <span data-ui28="language">语言 / Language</span><i>›</i></button>
         <button data-target="setManual">ⓘ <span data-ui28="guide">用户手册</span><i>›</i></button>
-        <button data-target="setAbout">ⓘ <span data-ui28="about">本地数据与安装说明</span><i>›</i></button>
+        <button data-target="setAbout">ⓘ <span data-ui28="about">本地数据与隐私</span><i>›</i></button>
       </div>
       <div class="set-group">
         <div class="set-title" data-i18n="setDash">今日看板</div>
@@ -1300,8 +1346,9 @@ button{line-height:1.35}
       <span id="dIcon"></span>
       <h3 id="dCat" style="margin:0;font-size:17px">—</h3>
       <span id="dSrc" style="margin-left:auto;font-size:11px;color:var(--muted2)"></span>
+      <button type="button" class="detail-close" id="detailCloseBtn" aria-label="关闭详情" title="关闭">×</button>
     </div>
-    <div class="detail-amt num" id="dAmt">€ 0.00</div>
+    <div class="detail-amt num" id="dAmt">—</div>
     <div class="detail-meta" id="dDate"></div>
     <div class="detail-note" id="dNote"></div>
     <div id="dItems"></div>
@@ -1584,7 +1631,9 @@ zh:[
    {t:"p",v:"<b>三星（One UI）</b>：浏览器菜单里点<b>「添加到主屏幕」</b>；也可在桌面长按空白处 → 添加小组件/快捷方式 → 选浏览器书签。"},
    {t:"p",v:"<b>华为（EMUI/HarmonyOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>；HarmonyOS 桌面长按也可直接添加。"},
    {t:"p",v:"<b>小米（MIUI/HyperOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>；若浏览器是小米自带，菜单里叫<b>「添加到主屏幕」</b>。"},
-   {t:"p",v:"<b>vivo（OriginOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>，确认后桌面生成图标。"}]},
+   {t:"p",v:"<b>vivo（OriginOS）</b>：浏览器菜单 → <b>「添加到桌面」</b>，确认后桌面生成图标。"},
+   {t:"h5",v:"Windows / macOS / 折叠屏"},
+   {t:"p",v:"电脑端可用 Chrome / Edge 的「安装应用」功能建立独立窗口；部分 Safari 版本也提供「添加到程序坞」。折叠屏按系统所使用的 Chrome / Safari / 厂商浏览器执行安装，应用会随窗口宽度调整布局；实际多屏铰链布局依设备支持而定。"}]},
  {h:"12. 常见问题", b:[
    {t:"p",v:"<b>装了没网络能用吗？</b>能。首次打开并加载完成后即可离线记账，数据始终在本机。"},
    {t:"p",v:"<b>想换手机/备份？</b>定期导出 JSON，需要时在新设备“恢复”。"},
@@ -1594,7 +1643,7 @@ en:[
  {h:"1. What is this", b:[
    {t:"p",v:"A fully offline personal bookkeeping app: all data lives only on your device (IndexedDB) — no network, no upload, no AI API. Supports AI receipt recognition, monthly/yearly bills, categories, charts, income, budget and export backup."}]},
  {h:"2. Quick start", b:[
-   {t:"p",v:"Four tabs at the bottom: <b>Records</b> (ledger), <b>Stats</b> (month / year / trend), <b>Import</b> (AI recognition), <b>Settings</b> (categories, dashboard, budget, schedules, language, data). Tap the “＋” button to add an <b>expense</b> or <b>income</b>."}]},
+   {t:"p",v:"Four tabs at the bottom: <b>Home</b>, <b>Records</b>, <b>Analysis</b>, <b>Settings</b> (categories, dashboard, budget, schedules, language, data). Tap the “＋” button to add an <b>expense</b> or <b>income</b>."}]},
  {h:"3. Add an expense / income", b:[
    {t:"p",v:"Tap “＋” → pick <b>Expense / Income</b> → enter amount, date (tap to open calendar), category (tap to open dropdown), note → save. Amount and date are required; date defaults to today. Pick a <b>currency</b> next to the amount (per-record; different currency = different ledger, no conversion). Decimal points are supported — a European comma is treated as the decimal point."}]},
  {h:"4. AI recognition (most used)", b:[
@@ -1626,7 +1675,9 @@ en:[
    {t:"p",v:"<b>Samsung (One UI):</b> browser menu → <b>“Add to Home Screen”</b>; or long-press a blank spot on the home screen → add widget/shortcut → pick the browser bookmark."},
    {t:"p",v:"<b>Huawei (EMUI/HarmonyOS):</b> browser menu → <b>“Add to Home”</b>; long-press on the HarmonyOS home screen also works."},
    {t:"p",v:"<b>Xiaomi (MIUI/HyperOS):</b> browser menu → <b>“Add to Home”</b>; on the stock browser it's called <b>“Add to Home Screen”</b>."},
-   {t:"p",v:"<b>vivo (OriginOS):</b> browser menu → <b>“Add to Home”</b>, confirm and the icon appears."}]},
+   {t:"p",v:"<b>vivo (OriginOS):</b> browser menu → <b>“Add to Home”</b>, confirm and the icon appears."},
+   {t:"h5",v:"Windows / macOS / foldables"},
+   {t:"p",v:"On desktop, use Chrome / Edge's Install app action to open DayTally in its own window; compatible Safari versions can add it to the Dock. On foldables, use your browser's install action. Multi-screen hinge support depends on the device and browser."}]},
  {h:"12. FAQ", b:[
    {t:"p",v:"<b>Does it work offline after install?</b> Yes. Once the first load completes, record fully offline — data stays on-device."},
    {t:"p",v:"<b>Moving to a new phone / backup?</b> Export JSON regularly, then “Restore” on the new device."},
@@ -1654,17 +1705,22 @@ const CURRENCIES = {
   HKD:{sym:"HK$"}, SGD:{sym:"S$"}, AUD:{sym:"A$"}, CAD:{sym:"C$"}, CHF:{sym:"Fr"},
   KRW:{sym:"₩"}, SEK:{sym:"kr"}, DKK:{sym:"kr"}, NOK:{sym:"kr"}, NZD:{sym:"NZ$"}, INR:{sym:"₹"}
 };
-function curSym(c){ return (CURRENCIES[c]||CURRENCIES.EUR).sym; }
-/* 聚合/合计默认用 EUR 符号；单笔记录用 moneyC(n, c) 按其自带货币显示 */
-const money = n => CURRENCIES.EUR.sym+" "+(Math.round(n*100)/100).toFixed(2);
+/* RMB is a common receipt label for the ISO CNY currency. Keep historical storage intact. */
+function canonicalCurrency(c){
+  const code=String(c||'EUR').trim().toUpperCase();
+  return ({RMB:'CNY', 'CNH':'CNY', 'RMB¥':'CNY', 'EURO':'EUR', 'EUROS':'EUR', '￥':'CNY', '¥':'CNY', '元':'CNY', '人民币':'CNY'}[code]||code);
+}
+function curSym(c){ const code=canonicalCurrency(c); return CURRENCIES[code]?.sym||code; }
+/* Never assume EUR for a visible amount. */
+const money = (n,c) => curSym(c||state.statCur)+" "+(Math.round(n*100)/100).toFixed(2);
 const moneyC = (n,c) => curSym(c)+" "+(Math.round(n*100)/100).toFixed(2);
 /* ===== 不同货币 = 不同账本：按账本筛选与排序 ===== */
 function isExp(e){ return !e.type||e.type!=="income"; }
-function inLedger(e){ return (e.cur||"EUR")===state.statCur; }
+function inLedger(e){ return canonicalCurrency(e.cur)===canonicalCurrency(state.statCur); }
 /* 每种货币的记录条数（含 AI 导入），用于把常用货币排到前面 */
 function currencyCounts(){
   const c={};
-  allExpenses.forEach(e=>{const k=e.cur||"EUR"; c[k]=(c[k]||0)+1;});
+  allExpenses.forEach(e=>{const k=canonicalCurrency(e.cur); c[k]=(c[k]||0)+1;});
   return c;
 }
 const CUR_TIE=["CNY","USD","EUR","GBP","JPY","HKD","SGD","AUD","CAD","CHF","KRW","SEK","DKK","NOK","NZD","INR"];
@@ -1683,7 +1739,7 @@ function statCurList(){
   const cnt=currencyCounts();
   const present=Object.keys(cnt).filter(k=>cnt[k]>0);
   if(!present.length) present.push("EUR");
-  if(present.indexOf(state.statCur)<0) present.push(state.statCur);
+  if(present.indexOf(canonicalCurrency(state.statCur))<0) present.push(canonicalCurrency(state.statCur));
   return present.sort((a,b)=>{
     const ca=cnt[a]||0, cb=cnt[b]||0;
     if(cb!==ca) return cb-ca;
@@ -1789,7 +1845,11 @@ async function persistAppSettings(){
   await dbPut("settings",{key:"app",val:{lang:state.lang,budgets:state.budgets,rec:state.recurring}});
 }
 /* 读取某账本的预算（自动建默认） */
-function curBudget(c){ return state.budgets[c]||(state.budgets[c]={m:0,y:0}); }
+function curBudget(c){
+  const code=canonicalCurrency(c);
+  if(code==='CNY' && state.budgets.RMB && !state.budgets.CNY){state.budgets.CNY={...state.budgets.RMB};}
+  return state.budgets[code]||(state.budgets[code]={m:0,y:0});
+}
 /* ===== 每月定时记账 ===== */
 function nowHHMM(){ const t=new Date(); return String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"); }
 /* 给定基准日期，返回下一个月第 day 天的日期（day 超出当月天数则取月末） */
@@ -1861,10 +1921,11 @@ function renderHome(){
   const zh=state.lang!=="en";
   const now=new Date();
   const key=monthKey(now.getFullYear(),now.getMonth()+1);
-  const cur=state.statCur;
+  const cur=canonicalCurrency(state.statCur);
+  state.statCur=cur;
   const monthly=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&e.date.slice(0,7)===key);
   const amount=monthly.reduce((v,e)=>v+e.amount,0);
-  const budget=Number((state.budgets[cur]||{}).m||0);
+  const budget=Number(curBudget(cur).m||0);
   const pct=budget>0?amount/budget*100:0;
   document.querySelector(".home-tab-label").textContent=zh?"首页":"Home";
   document.getElementById("homeTitle").textContent=zh?"天天记账":"DayTally";
@@ -2091,7 +2152,7 @@ function calRender(){
   const startDow=first.getDay(), dim=new Date(calState.y,calState.m,0).getDate();
   let html='<div class="cal-head"><button type="button" data-act="pm" aria-label="上一月">‹</button>'+
     '<div class="cal-title">'+calState.y+'年'+calState.m+'月</div>'+
-    '<button type="button" data-act="nm" aria-label="下一月">›</button></div>';
+    '<button type="button" data-act="nm" aria-label="下一月">›</button><button type="button" class="cal-dismiss" data-calendar-collapse="entry" aria-label="Close calendar">×</button></div>';
   html+='<div class="cal-week">'+WD.map(w=>'<span>'+w+'</span>').join("")+'</div><div class="cal-grid">';
   for(let i=0;i<startDow;i++) html+='<div class="cal-cell blank"></div>';
   for(let d=1;d<=dim;d++){
@@ -2205,7 +2266,7 @@ function togglePeriodCal(){
 }
 function renderPeriodCal(){
   const c=$("#periodCal"), y=periodCalYm.y, m=periodCalYm.m;
-  let html='<div class="pcal-head"><button class="pnav" data-py="-1">‹</button><span>'+y+'年 · '+m+'月</span><button class="pnav" data-py="1">›</button></div><div class="pcal-grid">';
+  let html='<div class="pcal-head"><button type="button" class="pnav" data-py="-1">‹</button><span>'+y+'年 · '+m+'月</span><button type="button" class="pnav" data-py="1">›</button><button type="button" class="pcal-dismiss" data-calendar-collapse="period" aria-label="Close calendar">×</button></div><div class="pcal-grid">';
   for(let i=1;i<=12;i++){
     const on=(y===state.ly&&i===state.lm);
     html+='<button class="pcal-m'+(on?' on':'')+'" data-y="'+y+'" data-m="'+i+'">'+i+'月</button>';
@@ -2505,14 +2566,18 @@ function parseImport(text){
   cleaned.split(/\n+/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
     const parts=l.split(/\t|,| {2,}|\s+/).filter(x=>x!=="");
     if(!parts.length) return;
-    const amtIdx=parts.findIndex(p=>/^[€£$]?\d+([.,]\d+)?$/.test(p.replace(/€|EUR|EUR|欧/g,"").trim()));
+    const currencyMarkers=/^(?:EUR|EURO|CNY|RMB|CNH|USD|GBP|JPY|HKD|SGD|AUD|CAD|CHF|KRW|SEK|DKK|NOK|NZD|INR|€|£|\$|¥|￥|元|欧元|人民币)/i;
+    const stripCurrency=p=>p.replace(/^(?:EUR|EURO|CNY|RMB|CNH|USD|GBP|JPY|HKD|SGD|AUD|CAD|CHF|KRW|SEK|DKK|NOK|NZD|INR|€|£|\$|¥|￥|元|欧元|人民币)/i,'').trim();
+    const amtIdx=parts.findIndex(p=>/^\d+([.,]\d+)?$/.test(stripCurrency(p)));
     if(amtIdx<0) return;
-    const amt=parseFloat(parts[amtIdx].replace(/€|£|$|EUR|欧/g,"").replace(",","."));
+    const amt=parseFloat(stripCurrency(parts[amtIdx]).replace(",","."));
     const dateIdx=parts.findIndex(p=>/^\d{4}-\d{2}-\d{2}$/.test(p));
     const date=dateIdx>=0?parts[dateIdx]:(/^\d{4}-\d{2}-\d{2}$/.test(parts[0])?parts[0]:"");
     const cat=parts.find(p=>state.cats.some(c=>c.name===p))||"其他";
     const note=parts.filter((p,i)=>i!==amtIdx&&i!==dateIdx&&p!==cat).join(" ").trim();
-    rows.push({amount:amt,date:date||todayStr(),category:cat,note:note.slice(0,60),source:"manual"});
+    const token=parts[amtIdx].match(currencyMarkers)?.[0]||parts.find(p=>/^(EUR|CNY|RMB|USD|GBP|JPY)$/i.test(p))||'EUR';
+    const code=({'€':'EUR','欧元':'EUR','£':'GBP','$':'USD','¥':'CNY','￥':'CNY','元':'CNY','人民币':'CNY'})[token]||token;
+    rows.push({amount:amt,date:date||todayStr(),category:cat,note:note.slice(0,60),source:"manual",cur:canonicalCurrency(code)});
   });
   return {rows};
 }
@@ -2544,7 +2609,7 @@ function pushExpenseRow(rows,o,wrap){
     }));
     note=(note?note+" · ":"")+"共"+items.length+"件";
   }
-  rows.push({amount,date,category,note:note.slice(0,60),source:"ai",cur:((wrap&&wrap.currency)||o.currency||"EUR"),items});
+  rows.push({amount,date,category,note:note.slice(0,60),source:"ai",cur:canonicalCurrency((wrap&&wrap.currency)||o.currency||"EUR"),items});
 }
 /* Same-day product-level duplicate warning (local-only; never silently discard). */
 const DUPLICATE_PRODUCT_THRESHOLD=0.80;
@@ -2569,7 +2634,7 @@ function productOverlap(a,b){
   return shared/Math.max(left.length,right.length);
 }
 function sameImportDayAndCurrency(a,b){
-  return a.date===b.date&&String(a.cur||'EUR').toUpperCase()===String(b.cur||'EUR').toUpperCase();
+  return a.date===b.date&&canonicalCurrency(a.cur)===canonicalCurrency(b.cur);
 }
 function duplicateCandidates(row,previewIndex){
   const candidates=[];
@@ -2609,7 +2674,7 @@ function renderPreview(){
     div.innerHTML=
       '<label class="wizard-check"><input type="checkbox" class="wizard-row-check" data-i="'+i+'" '+(r.wizardSelected===false?'':'checked')+'></label><div class="prev-num"><input type="number" step="0.01" min="0" value="'+r.amount+'" data-i="'+i+'" class="num"></div>'+
       '<div class="prev-main">'+sel+
-      '<div class="pdate">'+esc(r.date)+' · '+(r.source==="ai"?"AI":t("srcManual"))+'</div>'+
+      '<label class="preview-date-label"><span>'+(state.lang==='en'?'Date':'日期')+'</span><input type="text" inputmode="none" readonly class="preview-date" data-i="'+i+'" value="'+esc(r.date)+'" aria-label="'+(state.lang==='en'?'Receipt date':'识别凭证日期')+'"></label><div class="pdate">'+(r.source==="ai"?"AI":t("srcManual"))+'</div>'+
       (r.note?'<div class="pnote">'+esc(r.note)+'</div>':'')+
       (r.items&&r.items.length?'<div class="pnote" style="color:var(--accent-ink)">'+t("hasItems")+' '+r.items.length+'</div>':'')+'</div>'+
       '<button type="button" class="wizard-row-toggle" data-i="'+i+'" aria-label="Expand record">⌄</button>'+
@@ -2618,6 +2683,17 @@ function renderPreview(){
       ((r.items||[]).map(it=>'<div class="wizard-item-line"><span>'+esc(it.nameZh||it.name||'Item')+'</span><span>'+esc(String(it.qty||1))+' × '+esc(String(it.unitPrice||0))+' · '+esc(String(it.amount||0))+'</span></div>').join('')||'<div class="wizard-detail-meta">'+(state.lang==='en'?'No itemized products':'没有商品明细')+'</div>')+'</div>'+duplicateRiskHtml(r,i);
     wrap.appendChild(div);
   });
+  $$('.preview-date',wrap).forEach(inp=>inp.addEventListener('change',e=>{
+    const i=Number(e.target.dataset.i), value=e.target.value;
+    const date=new Date(value+'T12:00:00');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||Number.isNaN(date.getTime())||date.getFullYear()!==+value.slice(0,4)||date.getMonth()+1!==+value.slice(5,7)||date.getDate()!==+value.slice(8,10)){
+      toast(state.lang==='en'?'Please choose a valid date':'请选择有效日期');
+      e.target.value=previewRows[i].date; return;
+    }
+    previewRows[i].date=value;
+    previewRows.forEach(r=>r.duplicateAcknowledged=false); // changed date changes duplicate risk for other batch rows
+    renderPreview();
+  }));
   $$(".prev-num input",wrap).forEach(inp=>inp.addEventListener("input",e=>{previewRows[+e.target.dataset.i].amount=parseFloat(e.target.value)||0;}));
   $$(".duplicate-ack",wrap).forEach(inp=>inp.addEventListener("change",e=>{previewRows[+e.target.dataset.i].duplicateAcknowledged=e.target.checked;}));
   $$("select",wrap).forEach(sel=>sel.addEventListener("change",e=>{previewRows[+e.target.dataset.i].category=e.target.value;}));
@@ -2653,7 +2729,7 @@ async function commitPreview(){
     }
   }catch(err){console.error('Import commit failed',err); toast(state.lang==='en'?'Import failed; please check saved records':'保存出错，请检查已入账记录'); return;}
   const totals={}; const dates=new Set(); let itemCount=0;
-  good.forEach(r=>{const cur=r.cur||'EUR';totals[cur]=(totals[cur]||0)+Number(r.amount||0);dates.add(r.date);itemCount+=Array.isArray(r.items)?r.items.length:0;});
+  good.forEach(r=>{const cur=canonicalCurrency(r.cur);totals[cur]=(totals[cur]||0)+Number(r.amount||0);dates.add(r.date);itemCount+=Array.isArray(r.items)?r.items.length:0;});
   window.__importReceipt={count:good.length,totals,dates:dates.size,itemCount,ids};
   previewRows=[];
   $("#importText").value="";
@@ -2854,7 +2930,7 @@ function renderDash(){
   const key=monthKey(y,m);
   // 每天 -> 各币种 {n:笔数, amt:金额}
   const byDay={};
-  allExpenses.forEach(e=>{ if(isExp(e)&&e.date.slice(0,7)===key){ const c=e.cur||"EUR"; byDay[e.date]=byDay[e.date]||{}; byDay[e.date][c]=byDay[e.date][c]||{n:0,amt:0}; byDay[e.date][c].n++; byDay[e.date][c].amt+=e.amount; } });
+  allExpenses.forEach(e=>{ if(isExp(e)&&e.date.slice(0,7)===key){ const c=canonicalCurrency(e.cur); byDay[e.date]=byDay[e.date]||{}; byDay[e.date][c]=byDay[e.date][c]||{n:0,amt:0}; byDay[e.date][c].n++; byDay[e.date][c].amt+=e.amount; } });
   const isToday=sel===todayStr();
   $("#dashDate").textContent=(isToday?t("today")+" · ":"")+fmtCn(sel);
   // 所选日期：分币种展示 金额+笔数
@@ -2959,6 +3035,7 @@ function bindEvents(){
   });
   // 详情
   $("#detailModal").addEventListener("click",e=>{ if(e.target.id==="detailModal") closeDetail(); });
+  $("#detailCloseBtn").addEventListener("click",closeDetail);
   $("#statCard").addEventListener("click",e=>{
     const lc=e.target.closest("button[data-cur]");
     if(lc){ state.statCur=lc.dataset.cur; state.monthCat=null; renderStats(); return; }
@@ -3126,11 +3203,11 @@ async function init(){
     const ia=CUR_TIE.indexOf(a),ib=CUR_TIE.indexOf(b);
     return (ia<0?999:ia)-(ib<0?999:ib)||a.localeCompare(b);
   });
-  state.statCur=ordered[0]||"EUR";
+  state.statCur=canonicalCurrency(ordered[0]||"EUR");
   bindEvents();
   applyLang();
   if($("#dashBreak")) $("#dashBreak").innerHTML='<div class="dash-break dash-empty"><span class="num">'+moneyC(0,state.statCur)+'</span><small>0</small></div>';
-  $("#dAmt").textContent=money(0);
+  $("#dAmt").textContent=money(0,state.statCur);
   showTab("home");
   // 每月定时：打开时补录已到期项；运行中每分钟再查一次
   checkRecurring();
@@ -3198,7 +3275,7 @@ init();
       state.catsOpen=true;
     }
     if(key==='setBudget' && typeof renderSettings==='function')renderSettings();
-    const title={setCats:isEn?'Expense categories':'支出类别',recTitle:isEn?'Monthly recurring entries':'每月定时记账',setBudget:isEn?'Budget management':'预算管理',setData:isEn?'Backup and restore':'数据备份与恢复',setLang:isEn?'Language':'语言 / Language',setAbout:isEn?'Local data and installation':'本地数据与安装说明'};
+    const title={setCats:isEn?'Expense categories':'支出类别',recTitle:isEn?'Monthly recurring entries':'每月定时记账',setBudget:isEn?'Budget management':'预算管理',setData:isEn?'Backup and restore':'数据备份与恢复',setLang:isEn?'Language':'语言 / Language',setAbout:isEn?'Local data & privacy':'本地数据与隐私'};
     $('#settingsSheetTitle').textContent=title[key]||'设置';
     sheet.classList.add('on');sheet.setAttribute('aria-hidden','false');document.body.classList.add('settings-dialog-open');
     sheetContent.scrollTop=0;
@@ -3227,7 +3304,7 @@ init();
   window.updateWizardSummary=function(){
     const rows=typeof previewRows!=='undefined'?previewRows:[];
     const chosen=rows.filter(r=>r.wizardSelected!==false);
-    const group={};chosen.forEach(r=>group[r.cur||'EUR']=(group[r.cur||'EUR']||0)+Number(r.amount||0));
+    const group={};chosen.forEach(r=>{const c=canonicalCurrency(r.cur);group[c]=(group[c]||0)+Number(r.amount||0)});
     const amounts=Object.entries(group).map(([cur,v])=>moneyC(v,cur)).join(' · ');
     $('#wizardSummary').textContent=(state.lang==='en'?`Selected ${chosen.length} of ${rows.length} records`:`已选 ${chosen.length} / ${rows.length} 笔记录`)+(amounts?' · '+amounts:'');
     $('#wizardSelectAll').checked=rows.length>0 && chosen.length===rows.length;
@@ -3249,7 +3326,7 @@ init();
   $('#wizardToOne').addEventListener('click',()=>wizardGo(1));
   $('#wizardToTwoBack').addEventListener('click',()=>wizardGo(2));
   $('#wizardPaste').addEventListener('click',async()=>{try{const text=await navigator.clipboard.readText();$('#importText').value=text;$('#importText').dispatchEvent(new Event('input'));}catch(e){$('#importText').focus();toast(state.lang==='en'?'Paste manually from clipboard':'请长按输入框粘贴');}});
-  $('#wizardClear').addEventListener('click',()=>{$('#importText').value='';$('#importText').focus();});
+  $('#wizardClear').addEventListener('click',()=>{ $('#importText').value=''; previewRows=[];window.__importReceipt=null; $('#previewCard').style.display='none'; $('#previewList').replaceChildren(); $('#wizardSummary').textContent=''; $('#importText').dispatchEvent(new Event('input',{bubbles:true})); wizardGo(1); toast(state.lang==='en'?'Cleared; start again':'已清空，请重新获取识别结果'); });
   $('#wizardSelectAll').addEventListener('change',e=>{previewRows.forEach(r=>r.wizardSelected=e.target.checked);document.querySelectorAll('.wizard-row-check').forEach(c=>c.checked=e.target.checked);updateWizardSummary();});
   $('#wizardEdit').addEventListener('click',()=>{$('#previewList').classList.toggle('wizard-editing');});
   $('#parseBtn').addEventListener('click',()=>setTimeout(()=>{if(previewRows.length)wizardGo(3);else wizardGo(2)},0));
@@ -3323,6 +3400,8 @@ init();
 })();
 </script>
 <script>
+/* V2.10: prevent iOS focus zoom: all editable fields stay >=16 CSS px.
+   Do not disable pinch-zoom or page accessibility zoom. */
 /* Suppress Safari's legacy double-tap zoom on app chrome, without blocking pinch zoom,
    form selection, or editing of transaction descriptions. */
 document.addEventListener('dblclick', function(event){
@@ -3336,8 +3415,8 @@ document.addEventListener('dblclick', function(event){
 /* V2.8 locale coverage for V2 components. Existing records, currency codes, storage and parser stay untouched. */
 (function(){
  const strings={
- zh:{groupRecords:'记账管理',groupData:'数据与隐私',groupPrefs:'偏好与帮助',cats:'支出类别',recurring:'每月定时记账',budget:'预算管理',backup:'数据备份与恢复',language:'语言 / Language',guide:'用户手册',about:'本地数据与安装说明',quickManual:'手动记账',quickImport:'AI 辅助导入',stepPrompt:'获取提示词',stepPaste:'粘贴结果',stepReview:'核对导入',calendar:'日历',backSettings:'返回设置',close:'关闭',add:'记一笔',summary:'本月汇总',month:'月度',year:'年度',category:'类别分布',trend:'趋势',search:'搜索',filters:'筛选及排序',date:'日期',home:'首页'},
- en:{groupRecords:'RECORD MANAGEMENT',groupData:'DATA & PRIVACY',groupPrefs:'PREFERENCES & HELP',cats:'Expense categories',recurring:'Monthly recurring entries',budget:'Budget management',backup:'Backup & restore',language:'Language',guide:'User guide',about:'Local data & installation',quickManual:'Manual entry',quickImport:'AI-assisted import',stepPrompt:'Get prompt',stepPaste:'Paste results',stepReview:'Review & import',calendar:'Calendar',backSettings:'Back to settings',close:'Close',add:'Add transaction',summary:'Monthly summary',month:'Monthly',year:'Yearly',category:'Categories',trend:'Trend',search:'Search',filters:'Filters & sorting',date:'Date',home:'Home'}
+ zh:{groupRecords:'记账管理',groupData:'数据与隐私',groupPrefs:'偏好与帮助',cats:'支出类别',recurring:'每月定时记账',budget:'预算管理',backup:'数据备份与恢复',language:'语言 / Language',guide:'用户手册',about:'本地数据与隐私',quickManual:'手动记账',quickImport:'AI 辅助导入',stepPrompt:'获取提示词',stepPaste:'粘贴结果',stepReview:'核对导入',calendar:'日历',backSettings:'返回设置',close:'关闭',add:'记一笔',summary:'本月汇总',month:'月度',year:'年度',category:'类别分布',trend:'趋势',search:'搜索',filters:'筛选及排序',date:'日期',home:'首页'},
+ en:{groupRecords:'RECORD MANAGEMENT',groupData:'DATA & PRIVACY',groupPrefs:'PREFERENCES & HELP',cats:'Expense categories',recurring:'Monthly recurring entries',budget:'Budget management',backup:'Backup & restore',language:'Language',guide:'User guide',about:'Local data & privacy',quickManual:'Manual entry',quickImport:'AI-assisted import',stepPrompt:'Get prompt',stepPaste:'Paste results',stepReview:'Review & import',calendar:'Calendar',backSettings:'Back to settings',close:'Close',add:'Add transaction',summary:'Monthly summary',month:'Monthly',year:'Yearly',category:'Categories',trend:'Trend',search:'Search',filters:'Filters & sorting',date:'Date',home:'Home'}
  };
  function ui28(){
   const en=state.lang==='en', map=strings[en?'en':'zh'];
@@ -3360,6 +3439,7 @@ document.addEventListener('dblclick', function(event){
   document.querySelectorAll('#entryCategoryGrid [data-entry-category] span:last-child').forEach(el=>{const key=el.closest('[data-entry-category]').dataset.entryCategory;el.textContent=en?(catOptions[key]||key):key;});
   const recDelete=document.querySelectorAll('#recList .rec-del');recDelete.forEach(el=>el.setAttribute('aria-label',en?'Delete':'删除'));
   const close=document.querySelector('#entryClose');if(close)close.setAttribute('aria-label',map.close);
+  const detailClose=document.querySelector('#detailCloseBtn');if(detailClose){detailClose.setAttribute('aria-label',map.close);detailClose.setAttribute('title',map.close);}
   Object.entries(labels).forEach(([q,v])=>{const a=document.querySelector(q);if(a)a.textContent=v});
   const x=document.querySelector('#ledgerSearchToggle');if(x)x.setAttribute('aria-label',map.search);
   const y=document.querySelector('#ledgerFilterToggle');if(y)y.setAttribute('aria-label',map.filters);
@@ -3368,7 +3448,9 @@ document.addEventListener('dblclick', function(event){
   const pdf=document.querySelector('#manualPdf');if(pdf)pdf.textContent=en?'Print / Save PDF':'导出 PDF';
   const guideClose=document.querySelector('#manualClose');if(guideClose)guideClose.textContent=map.close;
   const about=document.querySelector('#settingsAbout');
-  if(about)about.innerHTML=en?'<h3 style="font-size:14px;color:var(--text)">About your data</h3>All records are kept on this device in IndexedDB; no AI API is called and spending data is not uploaded.<br><br><b>Add to Home Screen:</b> Open the GitHub Pages website in Safari on iPhone, then Share → Add to Home Screen. Once installed and cached, the app can work offline.<br><br><b>Backup:</b> Export a JSON backup before changing phones or clearing browser data.':'<h3 style="font-size:14px;color:var(--text)">说明</h3>数据只保存在本机浏览器（IndexedDB），不调用 AI 接口，也不上传消费记录。<br><br><b>安装到主屏幕：</b>用 iPhone Safari 打开项目网址 → 分享 → 添加到主屏幕；完成首次缓存后可离线使用。<br><br><b>备份：</b>换手机或清理浏览器数据之前，请先导出 JSON 备份。';
+  if(about)about.innerHTML=en?
+    '<h3 style="font-size:15px;color:var(--text)">Local data & privacy</h3><p>Transactions, categories, budgets and recurring rules remain in this browser’s IndexedDB on your device. No transaction data is sent to an AI or OCR API.</p><p>Clearing site data, removing this web app, or switching devices can lose local records. Export a JSON backup regularly. Restoring a backup is available under Data & Privacy.</p><p>For installation steps on iPhone, iPad, Android and other devices, open the separate User guide.</p>':
+    '<h3 style="font-size:15px;color:var(--text)">本地数据与隐私</h3><p>交易、类别、预算和定时规则保存在本设备浏览器的 IndexedDB 中，不调用 AI 或 OCR 接口，也不上传交易记录。</p><p>清除网站数据、卸载 Web App 或更换设备可能导致本地记录丢失，请定期导出 JSON 备份。数据恢复请从「数据与隐私」进入。</p><p>iPhone、iPad、Android 等设备的安装步骤集中在「用户手册」，这里不重复介绍。</p>';
   const allSummary=document.querySelector('#wizardSummary');if(allSummary&&!document.querySelector('#previewCard[style*="block"]'))allSummary.textContent=en?'Review parsed records before importing.':'检查识别到的消费记录，编辑后确认导入。';
   const wp=document.querySelector('#wizardDoneCount');if(wp&&document.querySelector('#wizardDone[hidden]'))wp.textContent=en?'Records are saved locally.':'记录已安全保存到本机。';
   const helper=document.querySelector('#importBack');if(helper)helper.setAttribute('aria-label',en?'Back to home':'返回首页');
@@ -3381,5 +3463,145 @@ document.addEventListener('dblclick', function(event){
  ui28();
 })();
 </script>
+
+<script>
+/* V2.10 Calendar controller: anchor positioning, today-first, 10-second inactivity timeout.
+   Keep source-selected transaction dates intact until the user actually selects a date. */
+(function(){
+ const get=id=>document.getElementById(id);
+ const month=get('periodCal'), entry=get('fCal');
+ if(!month||!entry)return;
+ let monthTimer=null,entryTimer=null,activeAnchor=null;
+ const DELAY=10000;
+ const isOpen=el=>el&&el.style.display!=='none'&&getComputedStyle(el).display!=='none';
+ const closeMonth=()=>{clearTimeout(monthTimer);month.style.display='none';activeAnchor=null};
+ const closeEntry=()=>{clearTimeout(entryTimer);entry.style.display='none'};
+ const bumpMonth=()=>{clearTimeout(monthTimer);if(isOpen(month))monthTimer=setTimeout(closeMonth,DELAY)};
+ const bumpEntry=()=>{clearTimeout(entryTimer);if(isOpen(entry))entryTimer=setTimeout(closeEntry,DELAY)};
+ const placeMonth=()=>{
+  if(!activeAnchor||!isOpen(month))return;
+  const r=activeAnchor.getBoundingClientRect(),w=month.offsetWidth||322,
+        vw=document.documentElement.clientWidth,vh=window.visualViewport?.height||window.innerHeight,
+        left=Math.max(10,Math.min(r.left,vw-w-10)),
+        below=r.bottom+8,above=r.top-month.offsetHeight-8;
+  month.style.setProperty('left',left+'px','important');
+  month.style.setProperty('right','auto','important');
+  month.style.setProperty('top',(below+month.offsetHeight>vh-10&&above>=8?above:below)+'px','important');
+ };
+ const todayPeriod=()=>{let d=new Date();periodCalYm={y:d.getFullYear(),m:d.getMonth()+1};renderPeriodCal()};
+ const openMonth=(anchor)=>{
+  const wasOpen=isOpen(month)&&activeAnchor===anchor;
+  closeMonth();if(wasOpen)return;
+  activeAnchor=anchor;month.classList.remove('ledger-period-popup');
+  month.style.display='block';todayPeriod();placeMonth();bumpMonth();
+ };
+ for(const id of ['ledgerPeriodChip','statsPeriodChip','periodLabel']){
+  const el=get(id);if(!el)continue;
+  el.addEventListener('click',ev=>{ev.preventDefault();ev.stopImmediatePropagation();openMonth(el)},true);
+ }
+ // Older period-picker handler still performs the actual month selection.
+ month.addEventListener('click',ev=>{
+   if(ev.target.closest('[data-calendar-collapse]')){ev.preventDefault();ev.stopImmediatePropagation();closeMonth();return}
+   if(ev.target.closest('.pcal-m')){setTimeout(closeMonth,0);return}
+   bumpMonth();requestAnimationFrame(placeMonth);
+ },true);
+ const watch=(el,bump)=>{for(const name of ['pointerdown','pointermove','keydown','focusin','wheel','touchstart'])el.addEventListener(name,bump,{passive:true})};
+ watch(month,bumpMonth);watch(entry,bumpEntry);
+ const entryButton=get('fDateBtn');
+ if(entryButton)entryButton.addEventListener('click',()=>{
+  // Original click handler opens at today's month without mutating the saved date.
+  setTimeout(()=>{if(isOpen(entry)){bumpEntry();entry.scrollIntoView({block:'nearest',behavior:'instant'})}else closeEntry()},0)
+ });
+ entry.addEventListener('click',ev=>{
+  if(ev.target.closest('[data-calendar-collapse]')){ev.preventDefault();ev.stopImmediatePropagation();closeEntry();return}
+  setTimeout(()=>{if(isOpen(entry))bumpEntry();else closeEntry()},0);
+ },true);
+ // Place the popup exactly under its trigger even after viewport changes.
+ window.addEventListener('resize',()=>{if(isOpen(month))placeMonth();if(window.visualViewport&&isOpen(month))bumpMonth()},{passive:true});
+ window.visualViewport?.addEventListener('resize',()=>{if(isOpen(month))placeMonth()},{passive:true});
+ window.addEventListener('scroll',()=>{if(isOpen(month))placeMonth()},{passive:true});
+ document.addEventListener('pointerdown',ev=>{
+  if(isOpen(month)&&!month.contains(ev.target)&&!activeAnchor?.contains(ev.target))closeMonth();
+  if(isOpen(entry)&&!entry.contains(ev.target)&&!entryButton?.contains(ev.target))closeEntry();
+ },true);
+ document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){closeMonth();closeEntry()}});
+ // Keep the popup out of the next screen and cancel timers.
+ document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>{closeMonth();closeEntry()},true));
+ // Entry calendar dynamically receives new buttons from calRender().
+ window.__daytallyCalendarV210={openMonth,closeMonth,closeEntry};
+})();
+</script>
+
+
+<script>
+/* V2.10: Local receipt-date picker. Always opens to the current month; a saved
+   receipt date remains untouched until a date is explicitly selected. */
+(function(){
+ const pop=document.createElement('div');pop.id='receiptDatePicker';pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Receipt date');
+ document.body.appendChild(pop);
+ let target=null, y=0, m=0, idle=null;
+ const isVisible=()=>pop.style.display==='block';
+ const close=()=>{clearTimeout(idle);pop.style.display='none';target=null};
+ const bump=()=>{clearTimeout(idle);if(isVisible())idle=setTimeout(close,10000)};
+ const position=()=>{
+  if(!target||!isVisible())return;
+  const rect=target.getBoundingClientRect(),vp=window.visualViewport;
+  const h=vp?.height||innerHeight,w=document.documentElement.clientWidth;
+  const pw=pop.offsetWidth,ph=pop.offsetHeight;
+  const x=Math.max(10,Math.min(rect.left,w-pw-10));
+  const below=rect.bottom+8,above=rect.top-ph-8;
+  pop.style.left=x+'px';pop.style.top=(below+ph>h-12&&above>=8?above:below)+'px';
+ };
+ const draw=()=>{
+  const en=typeof state!=='undefined'&&state.lang==='en',numDays=new Date(y,m,0).getDate();
+  const dayZero=new Date(y,m-1,1).getDay();
+  const now=todayStr();
+  let grid=(en?['S','M','T','W','T','F','S']:['日','一','二','三','四','五','六']).map(w=>'<span class="rdp-week">'+w+'</span>').join('');
+  for(let i=0;i<dayZero;i++)grid+='<span></span>';
+  for(let d=1;d<=numDays;d++){
+   const value=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+   grid+='<button type="button" class="rdp-day '+(value===now?'today ':'')+(value===target?.value?'selected':'')+'" data-date="'+value+'">'+d+'</button>';
+  }
+  pop.innerHTML='<div class="rdp-head"><button type="button" data-shift="-1" aria-label="Previous month">‹</button><strong>'+y+(en?' / ':'年 ')+m+(en?'':'月')+'</strong><button type="button" data-shift="1" aria-label="Next month">›</button><button type="button" data-close="1" aria-label="Close calendar">×</button></div><div class="rdp-grid">'+grid+'</div><button type="button" class="rdp-today" data-date="'+now+'">'+(en?'Today':'今天')+'</button>';
+  requestAnimationFrame(position);bump();
+ };
+ const open=(el)=>{if(isVisible()&&target===el){close();return}close();target=el;const d=new Date();y=d.getFullYear();m=d.getMonth()+1;pop.style.display='block';draw();};
+ document.addEventListener('click',ev=>{
+  const input=ev.target.closest('input.preview-date[readonly]');
+  if(input){ev.preventDefault();open(input);return}
+  if(!isVisible())return;
+  if(pop.contains(ev.target)){
+   if(ev.target.closest('[data-close]')){close();return}
+   const shift=ev.target.closest('[data-shift]');
+   if(shift){m+=Number(shift.dataset.shift);if(m<1){m=12;y--}if(m>12){m=1;y++}draw();return}
+   const day=ev.target.closest('[data-date]');
+   if(day&&target){const field=target;const selected=day.dataset.date;close();field.value=selected;field.dispatchEvent(new Event('change',{bubbles:true}));return}
+   bump();return;
+  }
+  close();
+ });
+ for(const type of ['pointermove','keydown','touchstart','wheel'])pop.addEventListener(type,bump,{passive:true});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+ document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',close,true));
+ window.addEventListener('scroll',()=>{if(isVisible())position()},{passive:true});
+ window.visualViewport?.addEventListener('resize',()=>{if(isVisible())position()},{passive:true});
+ // iOS keyboard reduces the visual viewport without always resizing the layout viewport.
+ function syncViewport(){
+  const vv=window.visualViewport;
+  document.documentElement.style.setProperty('--daytally-visual-height',(vv?.height||innerHeight)+'px');
+ }
+ syncViewport();window.visualViewport?.addEventListener('resize',syncViewport,{passive:true});
+ window.addEventListener('resize',syncViewport,{passive:true});
+ document.addEventListener('focusin',e=>{
+   if(!e.target.matches('input:not([readonly]),textarea,select'))return;
+   // Scroll the actual focused field into the visible sheet when the soft keyboard opens.
+   setTimeout(()=>{
+    if(!document.activeElement||document.activeElement!==e.target)return;
+    if(e.target.closest('.sheet'))e.target.scrollIntoView({block:'nearest',inline:'nearest'});
+   },300);
+ });
+})();
+</script>
+
 </body>
 </html>
