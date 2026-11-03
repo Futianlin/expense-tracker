@@ -1001,6 +1001,38 @@ input,textarea,select{max-width:100%;min-width:0}
 
 @media (max-width:360px){.period-cal{width:min(300px,calc(100vw - 20px))}}
 
+
+/* V2.12: unmistakable currency selection and budget empty-state CTA */
+#modal .entry-currency-wrap{
+ position:relative;display:inline-flex;align-items:center;justify-content:center;
+ min-height:44px;max-width:100%;border-radius:999px;background:#E4F0E8;
+ border:1px solid #BBD6C6;box-shadow:0 1px 2px rgba(19,59,40,.04);
+}
+#modal .entry-currency-wrap:focus-within{outline:2px solid #267C58;outline-offset:2px}
+#modal .entry-currency-wrap #fCur{
+ appearance:none!important;-webkit-appearance:none!important;
+ cursor:pointer;min-width:112px!important;max-width:170px!important;
+ width:auto!important;min-height:44px!important;flex:none!important;
+ font-size:16px!important;font-weight:700!important;color:#1F6246!important;
+ border:0!important;background:transparent!important;border-radius:999px!important;
+ padding:9px 40px 9px 17px!important;text-align:center;text-align-last:center;
+}
+#modal .entry-currency-caret{
+ position:absolute;right:13px;width:17px;height:17px;pointer-events:none;
+ stroke:#246E50;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;fill:none;
+}
+#modal .entry-currency-wrap:active{background:#D6E9DC}
+#homeHero .hero-budget-setup{
+ display:inline-flex;align-items:center;gap:8px;min-height:44px;max-width:100%;
+ margin:5px 0 6px;padding:8px 12px;background:rgba(255,255,255,.62);
+ border:1px solid rgba(42,123,82,.18);border-radius:12px;
+ color:#20684B;font-size:14px;font-weight:650;cursor:pointer;text-align:left;
+}
+#homeHero .hero-budget-setup-icon{display:inline-grid;place-items:center;width:20px;height:20px;font-size:18px;line-height:1}
+#homeHero .hero-budget-setup svg{height:16px;width:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#homeHero .hero-budget-setup:focus-visible{outline:2px solid #247C57;outline-offset:2px}
+#homeHero .hero-count{margin-top:3px}
+
 </style>
 </head>
 <body>
@@ -1260,13 +1292,16 @@ input,textarea,select{max-width:100%;min-width:0}
       <label data-i18n="fAmount">金额</label>
       <div style="display:flex;gap:8px;align-items:center">
         <input type="text" id="fAmount" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0.00" style="flex:1;min-width:0">
-        <select id="fCur" aria-label="货币" style="width:104px;border:1px solid var(--border);border-radius:10px;padding:11px 8px;font-size:16px;background:var(--surface);color:var(--text)">
-          <option value="EUR">€ EUR</option>
-          <option value="USD">$ USD</option>
-          <option value="GBP">£ GBP</option>
-          <option value="CNY">¥ CNY</option>
-          <option value="JPY">¥ JPY</option>
-        </select>
+        <div class="entry-currency-wrap" id="entryCurrencyWrap">
+          <select id="fCur" aria-label="选择币种 / Choose currency" title="选择币种 / Choose currency">
+            <option value="EUR">€ EUR</option>
+            <option value="USD">$ USD</option>
+            <option value="GBP">£ GBP</option>
+            <option value="CNY">¥ CNY</option>
+            <option value="JPY">¥ JPY</option>
+          </select>
+          <svg class="entry-currency-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
       </div>
     </div>
     <div class="field entry-date-field">
@@ -1349,7 +1384,7 @@ input,textarea,select{max-width:100%;min-width:0}
       <button type="button" class="detail-close" id="detailCloseBtn" aria-label="关闭详情" title="关闭">×</button>
     </div>
     <div class="detail-amt num" id="dAmt">—</div>
-    <div class="detail-meta" id="dDate"></div>
+    <button type="button" class="detail-date-action" id="dDateEdit" aria-label="修改交易日期"><span id="dDate"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zm9-13 4 4"/></svg></button>
     <div class="detail-note" id="dNote"></div>
     <div id="dItems"></div>
     <div id="dItemsEdit" style="display:none"></div>
@@ -1755,9 +1790,9 @@ function ledgerBar(){
 function restrictNumeric(el){
   el.addEventListener("beforeinput",e=>{
     if(e.data==null) return; // 删除/退格/粘贴等不在此判断
-    if(!/^[\d.,]$/.test(e.data)){ e.preventDefault(); return; }
+    if(!/^[\d.,]+$/.test(e.data)){ e.preventDefault(); return; }
     // 已有小数点（. 或 ,）则不再允许第二个
-    if(/[.,]/.test(e.data) && /[.,]/.test(el.value)) e.preventDefault();
+    if((e.data.match(/[.,]/g)||[]).length+(el.value.match(/[.,]/g)||[]).length>1) e.preventDefault();
   });
   el.addEventListener("input",()=>{
     let v=el.value.replace(/[^\d.,]/g,"");
@@ -1769,7 +1804,7 @@ function restrictNumeric(el){
 }
 const now = new Date();
 function monthKey(y,m){ return y+"-"+pad(m); }
-function todayStr(){ return now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate()); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function parseDate(s){ const p=s.split("-").map(Number); return new Date(p[0],p[1]-1,p[2]); }
 function fmtCn(dstr){ // "2026-11-02" -> "11月2日"
   const p=dstr.split("-"); return (+p[1])+"月"+(+p[2])+"日";
@@ -1937,10 +1972,11 @@ function renderHome(){
   document.querySelector('[data-home="calendar"]').textContent=zh?"日历":"Calendar";
   document.querySelector('[data-home="budget"]').textContent=zh?"预算":"Budget";
   const monthLabel=zh?(now.getFullYear()+"年"+(now.getMonth()+1)+"月"):(now.toLocaleDateString("en",{month:"long",year:"numeric"}));
-  document.getElementById("homeHero").innerHTML='<div class="hero-overline">'+monthLabel+'</div><div class="hero-label">'+(zh?'本月支出':'Monthly spending')+'</div><div class="hero-amount">'+moneyC(amount,cur)+'</div>'+(budget>0?'<div class="hero-meta"><span>'+(zh?'月度预算 ':'Monthly budget ')+moneyC(budget,cur)+'</span><span>'+(zh?'已使用 ':'Used ')+pct.toFixed(1)+'%</span></div><div class="hero-progress" role="button" tabindex="0" title="预算管理"><div style="width:'+Math.min(100,pct)+'%"></div></div><div class="hero-bottom">'+(zh?'剩余 ':'Remaining ')+moneyC(Math.max(0,budget-amount),cur)+'</div>':'<div class="hero-meta">'+monthly.length+' '+(zh?'笔记录':'transactions')+'</div>');
+  document.getElementById("homeHero").innerHTML='<div class="hero-overline">'+monthLabel+'</div><div class="hero-label">'+(zh?'本月支出':'Monthly spending')+'</div><div class="hero-amount">'+moneyC(amount,cur)+'</div>'+(budget>0?'<div class="hero-meta"><span>'+(zh?'月度预算 ':'Monthly budget ')+moneyC(budget,cur)+'</span><span>'+(zh?'已使用 ':'Used ')+pct.toFixed(1)+'%</span></div><div class="hero-progress" role="button" tabindex="0" title="预算管理"><div style="width:'+Math.min(100,pct)+'%"></div></div><div class="hero-bottom">'+(zh?'剩余 ':'Remaining ')+moneyC(Math.max(0,budget-amount),cur)+'</div>':'<button type="button" class="hero-budget-setup" id="heroBudgetSetup" aria-label="'+(zh?'点我设置预算':'Set monthly budget')+'"><span class="hero-budget-setup-icon" aria-hidden="true">＋</span><span>'+(zh?'点我设置预算':'Tap to set a budget')+'</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button><div class="hero-meta hero-count">'+monthly.length+' '+(zh?'笔记录':'transactions')+'</div>');
   document.getElementById("homeCurTop").innerHTML='<select id="homeCurrency" aria-label="Currency">'+statCurList().map(c=>'<option value="'+esc(c)+'" '+(c===cur?'selected':'')+'>'+esc(c)+'</option>').join('')+'</select>';
   document.getElementById("homeCurrency").addEventListener("change",e=>{state.statCur=e.target.value;renderHome();});
   const progress=document.querySelector('#homeHero .hero-progress');if(progress){progress.addEventListener('click',()=>document.querySelector('#homeBudget').click());progress.addEventListener('keydown',e=>{if(e.key==='Enter')document.querySelector('#homeBudget').click();});}
+  const setup=document.getElementById('heroBudgetSetup');if(setup)setup.addEventListener('click',()=>document.getElementById('homeBudget').click());
 
   const recent=allExpenses.filter(e=>inLedger(e)).sort((a,b)=>b.date.localeCompare(a.date)||(b.created||0)-(a.created||0)).slice(0,5);
   document.getElementById("homeRecent").innerHTML=recent.length?recent.map(e=>'<button class="recent-row" data-id="'+e.id+'">'+catChip(e.category)+'<span class="recent-info"><b>'+esc(e.category)+'</b><small>'+esc(rowSub(e)||e.date)+'</small></span><span class="recent-amount">'+(e.type==='income'?'+':'−')+moneyC(e.amount,e.cur||'EUR')+'<small>'+esc(e.date.slice(5))+'</small></span></button>').join(''):'<div class="empty">'+(zh?'还没有交易，点击「记一笔」开始。':'No transactions yet. Tap Add to get started.')+'</div>';
@@ -1992,13 +2028,13 @@ function renderLedgerList(){
       return false;
     });
   }else{
-    exps=allExpenses.filter(e=>inLedger(e)&&e.date.slice(0,7)===monthKey(state.ly,state.lm));
+    exps=allExpenses.filter(e=>inLedger(e)&&(window.__ledgerDateFilter === "all" || (window.__ledgerDateFilter ? e.date===window.__ledgerDateFilter : e.date.slice(0,7)===monthKey(state.ly,state.lm))));
   }
   if(window.__ledgerCategory) exps=exps.filter(e=>e.category===window.__ledgerCategory);
   if(!exps.length){
     wrap.innerHTML=q
       ?'<div class="empty">'+t("noMatch")+'「'+esc(q)+'」</div>'
-      :'<div class="empty">'+t("monthEmpty")+'<br><button class="btn btn-primary sm e-btn" id="emptyAdd">'+t("emptyAdd")+'</button></div>';
+      :'<div class="empty">'+(window.__ledgerDateFilter==='all'?(state.lang==='en'?'No transactions yet':'暂无记录'):window.__ledgerDateFilter===todayStr()?(state.lang==='en'?'No transactions today':'今天暂无记录'):t("monthEmpty"))+'<br><button class="btn btn-primary sm e-btn" id="emptyAdd">'+t("emptyAdd")+'</button></div>';
     const b=$("#emptyAdd"); if(b)b.addEventListener("click",()=>openModal(null));
     return;
   }
@@ -2188,7 +2224,7 @@ function openModal(id){
     sortedCurrencies().forEach(c=>{
       const o=document.createElement("option"); o.value=c; o.textContent=curSym(c)+" "+c; fcur.appendChild(o);
     });
-    fcur.value=(e&&e.cur)?e.cur:"EUR";
+    fcur.value=(e&&e.cur)?canonicalCurrency(e.cur):canonicalCurrency(state.statCur||"EUR");
   }
   const d=(e?e.date:todayStr()).split("-").map(Number);
   calState={y:d[0],m:d[1],sel:(e?e.date:todayStr())};
@@ -3144,13 +3180,13 @@ function bindEvents(){
       const v=parseFloat(e.target.value)||0;
       const b=curBudget($("#budCur").value); b[id==="#budMonth"?"m":"y"]=Math.max(0,v);
       clearTimeout(_budgetT);
-      _budgetT=setTimeout(()=>{ persistAppSettings(); if(state.tab==="stats") renderStats(); toast(t("tBudgetSaved")); },400);
+      _budgetT=setTimeout(()=>{ persistAppSettings(); if(state.tab==="stats") renderStats(); if(state.tab==="home") renderHome(); toast(t("tBudgetSaved")); },400);
     });
     el.addEventListener("change",e=>{
       const v=Math.max(0,parseFloat(e.target.value)||0);
       const b=curBudget($("#budCur").value); b[id==="#budMonth"?"m":"y"]=v;
       e.target.value=v>0?v:"";
-      persistAppSettings(); if(state.tab==="stats") renderStats();
+      persistAppSettings(); if(state.tab==="stats") renderStats(); if(state.tab==="home") renderHome();
     });
   };
   bindBudgetInp("#budMonth"); bindBudgetInp("#budYear");
@@ -3241,7 +3277,12 @@ init();
   const calendarSection=$('#view-settings .set-group:has(#dashCal)');
   if(calendarSection){calendarSection.classList.add('calendar-special');$('#calendarMount').appendChild(calendarSection);}
   $('#calendarBack').addEventListener('click',()=>showTab('home'));
-  $('#homeBudget').addEventListener('click',e=>{e.stopImmediatePropagation();showTab('settings');window.__openSettingsSheet('setBudget');},true);
+  $('#homeBudget').addEventListener('click',e=>{
+    e.stopImmediatePropagation();
+    // Keep Home mounted: reuse the existing Settings budget form in its original sheet.
+    if(state.tab!=='home')showTab('home');
+    window.__openSettingsSheet('setBudget');
+  },true);
   $('#importBack').addEventListener('click',()=>showTab('home'));
   $('#ledgerSearchToggle').addEventListener('click',()=>$('#searchInput').focus());
   $('#ledgerFilterToggle').addEventListener('click',()=>$('#sortSel').focus());
@@ -3254,7 +3295,7 @@ init();
   const dataGroup=settingGroups.find(g=>g.querySelector('#exportJson'));
   const restoreGroup=settingGroups.find(g=>g.querySelector('#settingsRestoreAction'));
   function moveBack(){while(sheetContent.firstChild) storage.appendChild(sheetContent.firstChild);}
-  function closeSettingsSheet(){sheet.classList.remove('on');sheet.setAttribute('aria-hidden','true');document.body.classList.remove('settings-dialog-open');moveBack();}
+  function closeSettingsSheet(){sheet.classList.remove('on');sheet.setAttribute('aria-hidden','true');document.body.classList.remove('settings-dialog-open');moveBack();if(state.tab==='home')renderHome();}
   function openSettingsSheet(key){
     const isEn=state.lang==='en';
     if(key==='setManual'){renderManual();$('#manualModal').classList.add('on');return;}
@@ -3600,6 +3641,174 @@ document.addEventListener('dblclick', function(event){
     if(e.target.closest('.sheet'))e.target.scrollIntoView({block:'nearest',inline:'nearest'});
    },300);
  });
+})();
+</script>
+
+
+<style id="daytally-v211-style">
+/* V2.11: shared geometry for filter triggers, overlays and record action icons. */
+#view-ledger .ledger-filters{display:flex;align-items:center;gap:9px;overflow-x:auto;overflow-y:hidden;padding:3px 2px 7px;margin-bottom:18px;max-width:100%;scrollbar-width:none}
+#view-ledger .ledger-filter-chip,#ledgerCategoryButton{font-family:inherit;font-size:14px;font-weight:500;line-height:1.25;background:#F0F3F0;color:#1C4434;border:1px solid transparent;border-radius:999px;min-height:42px;max-width:none;min-width:0;padding:9px 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;white-space:nowrap;box-sizing:border-box}
+#view-ledger .ledger-filter-chip:focus-visible,#ledgerCategoryButton:focus-visible,.daytally-popover button:focus-visible,.detail-date-action:focus-visible{outline:2px solid #287C5A;outline-offset:2px}
+#ledgerCategoryFilter{display:none!important}
+#ledgerCategoryButton svg,.filter-chevron{width:14px;height:14px;display:block;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#ledgerCategoryButton{max-width:170px}
+#ledgerCategoryButton .filter-name{overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:135px}
+#ledgerPeriodChip{max-width:170px}
+#ledgerCurrencyChip{max-width:100px}
+.daytally-popover{position:fixed;z-index:105;width:min(316px,calc(100vw - 24px));max-height:min(65dvh,460px);overflow:auto;overscroll-behavior:contain;border:1px solid #E5EAE5;background:#fff;box-shadow:0 14px 42px rgba(20,52,36,.16);border-radius:18px;padding:8px;box-sizing:border-box}
+.daytally-popover[hidden]{display:none!important}
+.daytally-popover button{font:inherit;color:#244636;border:0;background:transparent;cursor:pointer;min-height:43px;padding:10px 12px;border-radius:10px;text-align:left;display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box}
+.daytally-popover button[aria-selected="true"]{background:#E4F2E9;color:#176341;font-weight:650}
+.daytally-popover button .selcheck{margin-left:auto;color:#287C5A;font-weight:700}
+#periodCal{width:min(334px,calc(100vw - 20px))!important;max-height:min(68dvh,460px)!important;overflow:auto!important}
+#periodCal .pcal-head{display:grid;grid-template-columns:40px 1fr 40px 34px;align-items:center;gap:3px;text-align:center;margin:0 0 10px}
+#periodCal .pcal-head button{width:36px;height:36px;min-width:36px;display:grid;place-items:center;border:0;border-radius:10px;background:#F2F5F2;color:#20533C;font-size:22px;cursor:pointer}
+#periodCal .pcal-week,#periodCal .pcal-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+#periodCal .pcal-week span{font-size:11px;color:#89978F;padding:8px 0;text-align:center}
+#periodCal .pcal-days button{min-width:0;min-height:37px;padding:0;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;font-size:13px;color:#214632;cursor:pointer;font-family:inherit}
+#periodCal .pcal-days button.today{box-shadow:inset 0 0 0 1.5px #5F9D7A}
+#periodCal .pcal-days button.selected{background:#287C5A;color:#fff;font-weight:700;box-shadow:none}
+#periodCal .pcal-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:9px 0 0}
+#periodCal .pcal-actions button{border:0;background:#E8F1E9;padding:9px 12px;border-radius:10px;color:#1F6446;font:600 12px inherit;cursor:pointer;min-height:36px}
+.detail-date-action{border:0;background:transparent;display:flex;align-items:center;justify-content:flex-end;gap:9px;width:100%;min-height:42px;padding:6px 0;color:#6D8277;cursor:pointer;font:inherit}
+.detail-date-action svg{width:18px;height:18px;flex:none;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linejoin:round;stroke-linecap:round}
+.detail-close svg{height:20px;width:20px;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;fill:none}
+#modal .sheet,#detailModal .sheet{min-width:0;max-width:min(560px,100vw)!important}
+#view-ledger .row{min-width:0}#view-ledger .row-main{min-width:0;overflow:hidden}#view-ledger .row-amt{flex:none;white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:359px){#ledgerCategoryButton{max-width:125px}#view-ledger .ledger-filter-chip{padding:8px 9px;font-size:13px}}
+</style>
+<script id="daytally-v211-interactions">
+/* V2.11: deterministic ledger filters, day picker and native-like anchor menus.
+   No AI/API calls, no database migration. Never touch transaction IDs or amounts. */
+(function(){
+ 'use strict';
+ const q=(s)=>document.querySelector(s);
+ const today=()=>{let d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
+ const lang=()=>state.lang==='en';
+ const getSaved=()=>{try{const obj=JSON.parse(localStorage.getItem('daytally-ledger-filter-v211')||'null');return obj&&typeof obj==='object'?obj:null}catch{return null}};
+ const store=()=>{try{localStorage.setItem('daytally-ledger-filter-v211',JSON.stringify({date:window.__ledgerDateFilter,currency:state.statCur,category:window.__ledgerCategory||'',sort:state.sort}))}catch{}};
+ const dateOK=v=>/^\d{4}-\d{2}-\d{2}$/.test(v)&&!Number.isNaN(new Date(v+'T12:00:00').getTime());
+ const prefs=getSaved();
+ const initialDate=prefs&&(prefs.date==='all'||dateOK(prefs.date))?prefs.date:today();
+ window.__ledgerDateFilter=initialDate;
+ window.__ledgerCategory=prefs?.category||'';
+ if(prefs?.sort&&q('#sortSel')){state.sort=prefs.sort;q('#sortSel').value=prefs.sort}
+ const pickCurrency=()=>{const counts=currencyCounts();const best=sortedCurrencies().find(c=>counts[c]>0);return best||sortedCurrencies()[0]||'EUR'};
+ let userCurrency=prefs?.currency||null;
+ let firstLedger=true;
+ const chevron='<svg class="filter-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+ // Replace category native iOS wheel picker with compact anchored menu, while retaining the original select for compatibility.
+ const nativeCat=q('#ledgerCategoryFilter'), button=document.createElement('button');
+ button.id='ledgerCategoryButton';button.type='button';button.setAttribute('aria-haspopup','listbox');nativeCat.after(button);
+ const popup=document.createElement('div');popup.id='ledgerChoicePopup';popup.className='daytally-popover';popup.hidden=true;popup.setAttribute('role','listbox');document.body.appendChild(popup);
+ let anchor=null,timeout=null;
+ const close=()=>{popup.hidden=true;anchor=null;clearTimeout(timeout)};
+ const position=()=>{
+   if(!anchor||popup.hidden)return;
+   const r=anchor.getBoundingClientRect(),vw=document.documentElement.clientWidth,vh=visualViewport?.height||innerHeight;
+   const width=Math.min(316,vw-24);popup.style.width=width+'px';
+   popup.style.left=Math.max(12,Math.min(r.left,vw-width-12))+'px';
+   const bottom=r.bottom+8,above=r.top-popup.offsetHeight-8;
+   popup.style.top=(bottom+popup.offsetHeight>vh-12&&above>=12?above:bottom)+'px';
+ };
+ const bump=()=>{clearTimeout(timeout);if(!popup.hidden)timeout=setTimeout(close,10000)};
+ const open=(el,options,selected,done)=>{
+   if(!popup.hidden&&anchor===el){close();return}
+   close();anchor=el;popup.innerHTML='';
+   for(const opt of options){const b=document.createElement('button');b.type='button';b.setAttribute('role','option');b.setAttribute('aria-selected',String(opt.value===selected));b.append(document.createTextNode(opt.label));if(opt.value===selected){let check=document.createElement('span');check.className='selcheck';check.textContent='✓';b.append(check)}b.addEventListener('click',()=>{close();done(opt.value)});popup.append(b)}
+   popup.hidden=false;requestAnimationFrame(()=>{position();bump()});
+ };
+ const sync=()=>{
+   if(!q('#view-ledger'))return;
+   const d=window.__ledgerDateFilter;
+   const dateLabel=d==='all'?(lang()?'All dates':'全部日期'):(d===today()?(lang()?'Today':'今天'):(lang()?d:`${Number(d.slice(5,7))}月${Number(d.slice(8))}日`));
+   q('#ledgerPeriodChip').innerHTML=dateLabel+chevron;
+   q('#ledgerCurrencyChip').innerHTML=state.statCur+chevron;
+   let cat=window.__ledgerCategory||'';
+   if(cat&&!state.cats.some(c=>c.name===cat)){cat='';window.__ledgerCategory=''}
+   nativeCat.value=cat;
+   button.innerHTML='<span class="filter-name">'+(cat|| (lang()?'All categories':'全部分类')).replace(/</g,'&lt;')+'</span>'+chevron;
+   button.setAttribute('aria-label',lang()?'Category filter':'类别筛选');
+ };
+ const rerender=()=>{renderLedger();sync();store()};
+ // Existing V2.6 category listener must not run; stop propagation in capture before it receives a change.
+ nativeCat.addEventListener('change',ev=>{ev.stopImmediatePropagation();window.__ledgerCategory=nativeCat.value;rerender()},true);
+ button.addEventListener('click',()=>open(button,[{value:'',label:lang()?'All categories':'全部分类'},...state.cats.map(c=>({value:c.name,label:lang()?({'餐饮':'Dining','超市':'Groceries','购物':'Shopping','交通':'Transport','日用':'Essentials','娱乐':'Entertainment','医疗':'Healthcare','教育':'Education','房租':'Housing','衣服':'Clothing','电话费':'Phone','订阅':'Subscriptions','水电':'Utilities','网络':'Internet','其他':'Other'}[c.name]||c.name):c.name}))],window.__ledgerCategory||'',v=>{window.__ledgerCategory=v;nativeCat.value=v;rerender()}));
+ q('#ledgerCurrencyChip').addEventListener('click',ev=>{ev.preventDefault();ev.stopImmediatePropagation();open(q('#ledgerCurrencyChip'),sortedCurrencies().map(c=>({value:c,label:curSym(c)+' '+c})),state.statCur,v=>{state.statCur=v;userCurrency=v;rerender()})},true);
+ const oldShow=showTab;
+ showTab=function(tab){
+   if(tab==='ledger'){
+     if(firstLedger){firstLedger=false;state.statCur=canonicalCurrency(userCurrency||pickCurrency());
+       if(window.__ledgerDateFilter!=='all'&&dateOK(window.__ledgerDateFilter)){let d=window.__ledgerDateFilter;state.ly=+d.slice(0,4);state.lm=+d.slice(5,7)}
+     }
+   }
+   oldShow(tab);if(tab==='ledger')sync();
+ };
+ const oldRender=renderLedger;
+ renderLedger=function(){oldRender();sync()};
+ q('#sortSel').addEventListener('change',store);
+ // Capture the ledger period trigger and use the current anchor controller from V2.10.
+ // The new calendar supports full day selection, with a dedicated 'All dates' option.
+ let scope='ledger';
+ renderPeriodCal=function(){
+   const el=q('#periodCal');if(!el)return;
+   scope=state.tab==='ledger'?'ledger':'stats';
+   const y=periodCalYm.y,m=periodCalYm.m;
+   const first=new Date(y,m-1,1).getDay(),days=new Date(y,m,0).getDate();
+   const active=scope==='ledger'?window.__ledgerDateFilter:(state.sy+'-'+String(state.lm).padStart(2,'0')+'-01');
+   let html='<div class="pcal-head"><button type="button" data-day-shift="-1" aria-label="Previous month">‹</button><b>'+y+(lang()?' / ':'年')+m+(lang()?'':'月')+'</b><button type="button" data-day-shift="1" aria-label="Next month">›</button><button type="button" data-calendar-collapse="period" aria-label="Close">×</button></div><div class="pcal-week">';
+   html+=(lang()?['Su','Mo','Tu','We','Th','Fr','Sa']:['日','一','二','三','四','五','六']).map(s=>'<span>'+s+'</span>').join('')+'</div><div class="pcal-days">';
+   for(let i=0;i<first;i++)html+='<span></span>';
+   for(let day=1;day<=days;day++){
+     const d=y+'-'+String(m).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+     html+='<button type="button" data-choose-day="'+d+'" class="'+(d===today()?'today ':'')+(d===active?'selected':'')+'" aria-label="'+d+'">'+day+'</button>';
+   }
+   html+='</div><div class="pcal-actions"><button type="button" data-choose-day="'+today()+'">'+(lang()?'Today':'今天')+'</button>'+(scope==='ledger'?'<button type="button" data-choose-day="all">'+(lang()?'All dates':'全部日期')+'</button>':'')+'</div>';
+   el.innerHTML=html;
+ };
+ // Original click handler is delegated on periodCal. Override day controls in capture phase.
+ q('#periodCal').addEventListener('click',ev=>{
+   const shift=ev.target.closest('[data-day-shift]');
+   if(shift){ev.preventDefault();ev.stopImmediatePropagation();periodCalYm.m+=Number(shift.dataset.dayShift);if(periodCalYm.m<1){periodCalYm.m=12;periodCalYm.y--}if(periodCalYm.m>12){periodCalYm.m=1;periodCalYm.y++}renderPeriodCal();return}
+   const select=ev.target.closest('[data-choose-day]');
+   if(!select)return;
+   ev.preventDefault();ev.stopImmediatePropagation();
+   const d=select.dataset.chooseDay;
+   if(scope==='ledger'){
+     window.__ledgerDateFilter=d;
+     if(d!=='all'){state.ly=+d.slice(0,4);state.lm=+d.slice(5,7)}
+     rerender();
+   }else if(d!=='all'){
+     state.ly=+d.slice(0,4);state.lm=+d.slice(5,7);state.sy=state.ly;updatePeriodLabel();renderStats();
+   }
+   window.__daytallyCalendarV210?.closeMonth();
+ },true);
+ // Existing period button opens the anchor before our bubble event. Scope in capture.
+ q('#ledgerPeriodChip').addEventListener('click',()=>{scope='ledger'},true);
+ q('#statsPeriodChip').addEventListener('click',()=>{scope='stats'},true);
+ q('#periodLabel').addEventListener('click',()=>{scope=state.tab==='ledger'?'ledger':'stats'},true);
+ // keep popover aligned when viewport moves, do not cover the status bar.
+ document.addEventListener('pointerdown',ev=>{if(!popup.hidden&&!popup.contains(ev.target)&&!anchor?.contains(ev.target))close()},true);
+ document.addEventListener('keydown',ev=>{if(ev.key==='Escape')close()});
+ popup.addEventListener('pointermove',bump,{passive:true});popup.addEventListener('touchstart',bump,{passive:true});
+ addEventListener('resize',()=>{if(!popup.hidden)position()},{passive:true});
+ addEventListener('scroll',()=>{if(!popup.hidden)position()},{passive:true});
+ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',close,true));
+ // From the transaction details, provide an obvious route to edit the saved date.
+ const dateButton=q('#dDateEdit');
+ dateButton.addEventListener('click',()=>{
+   const id=detailId;if(!id)return;
+   closeDetail();openModal(id);
+   q('#fDateBtn').click();
+ });
+ const x=q('#detailCloseBtn');
+ x.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>';
+ x.setAttribute('title',lang()?'Close':'关闭');
+ const oldLang=applyLang;
+ applyLang=function(){oldLang();sync();x.setAttribute('title',lang()?'Close':'关闭');dateButton.setAttribute('aria-label',lang()?'Change transaction date':'修改交易日期')};
+ // If the ledger has not been customized, start from today's date and most-used currency.
+ sync();
 })();
 </script>
 
