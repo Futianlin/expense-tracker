@@ -849,6 +849,112 @@ button,select{font-family:inherit}button:focus-visible,select:focus-visible,inpu
 .year-all-months{display:block;margin:14px 0 5px;padding:8px 0;border:0;background:transparent;color:var(--accent);font-size:12px;cursor:pointer}
 #view-stats .bars:has(.bar-row:not([hidden])){gap:12px}
 #view-stats .bars .bar-row:not([hidden]){min-width:56px}
+
+/* DayTally V2.7: geometry audit and adaptive sizing, after legacy overrides */
+:root{--content-gutter:clamp(14px,4.6vw,24px);--tap-target:44px}
+html{min-width:280px;overflow-x:clip}
+body{min-width:280px;overflow-x:clip}
+.app,.app main,.view,.card,.sheet,.set-group,.settings-sheet-content{min-width:0;max-inline-size:100%}
+.app{width:100%;min-height:100dvh}
+.app main{width:100%;min-height:0;padding-inline:var(--content-gutter);padding-bottom:calc(96px + env(safe-area-inset-bottom));}
+button,select,input,textarea{max-width:100%;min-width:0}
+button{line-height:1.35}
+.icon-action,.screen-icon,.entry-close,.screen-controls button{display:inline-grid;place-items:center;flex:0 0 var(--tap-target);min-width:var(--tap-target);min-height:var(--tap-target);padding:0;line-height:1}
+.icon-action svg,.screen-icon svg{width:22px;height:22px;display:block}
+.home-top,.home-section-head,.screen-heading,.hero-meta,.day-head{min-width:0;gap:10px;align-items:center}
+.home-header-actions{flex-shrink:0;gap:5px}
+.home-top>div:first-child,.home-section-head>h2{min-width:0}
+.home-currency-top select{max-width:108px;min-height:42px;padding:8px 30px 8px 12px}
+.hero-amount,.stats-head .num,.row-amt,.recent-amount,.bar-row .v{font-variant-numeric:tabular-nums;min-width:0}
+.hero-amount{font-size:clamp(29px,9vw,43px)!important;letter-spacing:-.045em!important;overflow-wrap:anywhere}
+.hero-meta{flex-wrap:wrap;align-items:center;justify-content:space-between}
+.home-hero{width:100%;min-width:0}
+.recent-row{display:grid!important;grid-template-columns:43px minmax(0,1fr) auto;column-gap:12px;align-items:center;text-align:left}
+.recent-row .cico{grid-column:1;flex:none}
+.recent-row .recent-info{grid-column:2;overflow:hidden}
+.recent-row .recent-amount{grid-column:3;max-width:35vw;text-align:right;overflow-wrap:anywhere;white-space:normal;font-size:clamp(13px,3.7vw,17px)!important}
+#view-ledger .day{width:100%;min-width:0}
+#view-ledger .row{display:grid;grid-template-columns:43px minmax(0,1fr) auto;column-gap:12px;min-width:0}
+#view-ledger .row .cico{grid-column:1}
+#view-ledger .row-main{grid-column:2;overflow:hidden}
+#view-ledger .row-amt{grid-column:3;text-align:right;font-size:clamp(13px,3.8vw,17px)!important;max-width:36vw;overflow-wrap:anywhere}
+#view-ledger .row .chev,#view-ledger .row .src{display:none!important}
+#view-ledger .ledger-filters{min-width:0;max-width:100%;overflow-x:auto;align-items:center;scrollbar-width:none}
+#view-ledger .ledger-filter-chip{flex-shrink:0;max-width:none;white-space:nowrap}
+#view-ledger .day-head{min-width:0}
+#view-ledger .day-head span:last-child{white-space:nowrap}
+#view-stats #statCard,#view-stats svg{max-width:100%}
+#view-stats .bars{min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+#view-stats .bar-row{min-width:48px;max-width:85px}
+#view-stats .bar-row .v{overflow-wrap:anywhere;white-space:normal}
+#view-stats .analysis-period,#view-stats .analysis-secondary{width:100%;min-width:0}
+#modal .sheet,#recModal .sheet,.settings-sheet,.manual-sheet{box-sizing:border-box;overscroll-behavior:contain;max-width:min(100%,560px)}
+#modal .sheet{padding-inline:var(--content-gutter);overflow-y:auto}
+#modal .sheet .field,#modal .sheet .sheet-actions{width:100%;min-width:0}
+#modal .field:has(#fAmount)>div{min-width:0;display:flex}
+#modal #fAmount{min-width:0!important;flex:1 1 0!important;font-size:clamp(31px,8vw,44px)!important}
+#modal #fCur{flex:0 0 auto;max-width:106px;width:88px!important}
+.entry-category-grid{grid-template-columns:repeat(4,minmax(0,1fr));width:100%;min-width:0;gap:clamp(5px,2vw,9px)}
+.entry-category-grid button{min-width:0;max-width:100%;overflow:hidden;padding:7px 3px;word-break:break-word}
+.entry-category-grid button .cico{display:grid;place-items:center;margin-inline:auto;flex:0 0 25px}
+.entry-category-grid button span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#modal .sheet-actions{display:flex;gap:10px;align-items:center}
+#modal .sheet-actions .btn{min-width:0}
+.home-cta-area{padding:19px 0 24px!important;min-width:0;position:relative;z-index:1}
+.home-main-add{max-width:100%;min-height:50px;white-space:nowrap}
+.tabbar{width:100%;max-width:560px;min-width:0}
+.tabbar .tab{min-width:0}
+.fab{width:52px;height:52px;display:grid!important;place-items:center;padding:0;line-height:1}
+.wizard-preview .prev-row{width:100%;min-width:0;gap:7px}
+.wizard-preview .prev-row .prev-main{min-width:70px;flex:1 1 115px}
+.wizard-preview .prev-row .prev-num{min-width:0;flex:0 1 85px}
+.wizard-preview .prev-row .prev-num input{width:100%!important;min-width:0}
+.wizard-preview .wizard-row-details{overflow-wrap:anywhere;min-width:0}
+.wizard-preview .wizard-item-line{min-width:0;flex-wrap:wrap}
+.wizard-commit-bar{flex-wrap:wrap}
+/* Duplicates are warning-only; explicit acknowledgement is required before saving. */
+.duplicate-risk{order:8;flex:0 0 100%;padding:11px 12px;border-radius:12px;background:#FFF6E9;border:1px solid #E9D5AE;color:#714C17;font-size:12px;line-height:1.55}
+.duplicate-risk strong{font-size:12.5px;color:#6A4413}
+.duplicate-risk p{margin:4px 0 8px}
+.duplicate-risk label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.duplicate-risk input{accent-color:#A06B24;min-width:17px;width:17px;height:17px;margin-top:2px}
+.duplicate-risk .duplicate-types{font-size:11px;color:#8E6C42}
+@media(max-width:359px){
+ .home-hero{padding:17px!important}.home-top h1{font-size:20px!important}
+ .home-currency-top select{max-width:87px;font-size:12px;padding-inline:8px 22px}
+ .recent-row,#view-ledger .row{column-gap:9px}
+ .recent-row .cico,#view-ledger .row .cico{width:38px!important;height:38px!important}
+ .recent-row{grid-template-columns:38px minmax(0,1fr) auto}
+ #view-ledger .row{grid-template-columns:38px minmax(0,1fr) auto}
+ .hero-meta{font-size:12px!important}
+ .entry-category-grid button{font-size:11px;min-height:68px}
+ .wizard-preview .prev-row .prev-num{flex-basis:65px}
+}
+@media(min-width:700px){
+ .app{max-width:min(100%,1040px)}
+ .app main{padding-inline:clamp(24px,4vw,48px)}
+ .tabbar{max-width:min(100%,1040px)}
+ #view-home.on{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:start;column-gap:clamp(20px,4vw,48px)}
+ #view-home .home-hero{grid-column:1;grid-row:2}
+ #view-home .home-section-head{grid-column:2;grid-row:2;align-self:start;margin-top:5px}
+ #view-home .home-recent{grid-column:2;grid-row:2 / span 2;margin-top:43px}
+ #view-home .home-cta-area{grid-column:1;grid-row:3;justify-self:end;align-self:start}
+ #view-stats #statCard{max-width:750px}
+ .hero-amount{font-size:43px!important}
+ .recent-row .recent-amount,#view-ledger .row-amt{max-width:175px}
+}
+@media(horizontal-viewport-segments:2){
+ .app main{max-width:env(viewport-segment-width 0 0);margin-left:env(viewport-segment-left 0 0)}
+ .modal-mask,.settings-mask{width:env(viewport-segment-width 0 0);left:env(viewport-segment-left 0 0);right:auto}
+}
+
+
+/* V2.8: persistent shared action in the centre of the primary navigation. */
+#fabBtn{display:grid;place-items:center;visibility:visible;opacity:1;pointer-events:auto}
+#view-settings.on ~ #fabBtn{display:grid}
+.settings-directory button{min-width:0}
+.settings-directory button>span{min-width:0;flex:1;overflow-wrap:anywhere;text-align:left}
+@media(max-width:359px){.settings-directory button{font-size:13px}}
 </style>
 </head>
 <body>
@@ -878,13 +984,13 @@ button,select{font-family:inherit}button:focus-visible,select:focus-visible,inpu
   <!-- ===== 视图：明细 ===== -->
   <main id="main">
     <section id="view-home" class="view on">
-      <div class="home-top"><div><h1 id="homeTitle">天天记账</h1><div class="home-eyebrow" id="homeGreeting">DayTally · 本地离线</div></div><div class="home-header-actions"><div class="home-currency-top" id="homeCurTop"></div><button id="homeCalBtn" class="icon-action" title="日历" aria-label="日历"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h2M14 14h2"/></svg></button></div></div>
+      <div class="home-top"><div><h1 id="homeTitle">天天记账</h1><div class="home-eyebrow" id="homeGreeting">DayTally · 本地离线</div></div><div class="home-header-actions"><div class="home-currency-top" id="homeCurTop"></div><button id="homeCalBtn" class="icon-action" title="日历" aria-label="日历" data-ui28-title="calendar" data-ui28-aria="calendar"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h2M14 14h2"/></svg></button></div></div>
       <div class="home-hero" id="homeHero"></div>
       <div class="home-actions"><button id="homeAdd" class="home-action primary">＋ <span data-home="add">记一笔</span></button><button id="homeImport" class="home-action">⇩ <span data-home="import">识别导入</span></button><button id="homeCalendar" class="home-action">▦ <span data-home="calendar">日历</span></button><button id="homeBudget" class="home-action">◉ <span data-home="budget">预算</span></button></div>
       <div class="home-section-head"><h2 id="homeRecentLabel">近期记录</h2><button id="homeAll" class="text-link">查看全部 ›</button></div><div class="home-recent" id="homeRecent"></div><div class="home-cta-area"><button type="button" id="homeMainAdd" class="home-main-add">＋ <span>记一笔</span></button></div>
     </section>
     <section id="view-ledger" class="view">
-      <div class="screen-heading"><h1 data-v2="transactions">交易记录</h1><div class="screen-controls"><button id="ledgerSearchToggle" class="screen-icon" aria-label="搜索">⌕</button><button id="ledgerFilterToggle" class="screen-icon" aria-label="筛选及排序">☷</button></div></div>
+      <div class="screen-heading"><h1 data-v2="transactions">交易记录</h1><div class="screen-controls"><button id="ledgerSearchToggle" class="screen-icon" aria-label="搜索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button><button id="ledgerFilterToggle" class="screen-icon" aria-label="筛选及排序"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="white"/><circle cx="16" cy="17" r="2" fill="white"/></svg></button></div></div>
       <div class="ledger-filters"><button id="ledgerPeriodChip" type="button" class="ledger-filter-chip">本月⌄</button><button id="ledgerCurrencyChip" type="button" class="ledger-filter-chip">EUR⌄</button><select id="ledgerCategoryFilter" class="ledger-filter-chip" aria-label="类别筛选"><option value="">全部分类</option></select></div>
       <details class="ledger-overview" id="ledgerOverview"><summary id="ledgerOverviewToggle"><span data-v25="ledgerSummary">本月汇总</span><span aria-hidden="true">⌄</span></summary><div class="card summary" id="summaryCard"></div></details>
       <div class="ledger-tool" id="ledgerTool">
@@ -910,7 +1016,7 @@ button,select{font-family:inherit}button:focus-visible,select:focus-visible,inpu
     <!-- ===== 视图：导入 ===== -->
     <section id="view-import" class="view">
       <div class="screen-heading"><button id="importBack" class="screen-icon" aria-label="返回首页">‹</button><h1 data-v2="import">识别结果导入</h1><span></span></div>
-      <div class="import-steps"><div class="import-step current" data-step="1"><b>1</b><span>获取提示词</span></div><div class="import-step" data-step="2"><b>2</b><span>粘贴结果</span></div><div class="import-step" data-step="3"><b>3</b><span>核对导入</span></div></div>
+      <div class="import-steps"><div class="import-step current" data-step="1"><b>1</b><span data-ui28="stepPrompt">获取提示词</span></div><div class="import-step" data-step="2"><b>2</b><span data-ui28="stepPaste">粘贴结果</span></div><div class="import-step" data-step="3"><b>3</b><span data-ui28="stepReview">核对导入</span></div></div>
       <div id="wizardOne" class="wizard-panel">
         <div class="wizard-illustration" aria-hidden="true"><div class="wizard-document">☷<small>Receipt</small></div><span>→</span><div class="wizard-document target">☑<small>DayTally</small></div></div>
         <h2 data-wz="step1">第 1 步：获取识别提示词</h2>
@@ -952,16 +1058,16 @@ button,select{font-family:inherit}button:focus-visible,select:focus-visible,inpu
     <section id="view-settings" class="view">
       <div class="screen-heading"><h1 data-v2="settings">设置</h1></div>
       <div class="settings-directory" id="settingsDirectory">
-        <div class="directory-label">记账管理</div>
-        <button data-target="setCats">◈ <span>支出类别</span><i>›</i></button>
-        <button data-target="recTitle">▦ <span>每月定时记账</span><i>›</i></button>
-        <button data-target="setBudget">◎ <span>预算管理</span><i>›</i></button>
-        <div class="directory-label">数据与隐私</div>
-        <button data-target="setData">⇩ <span>数据备份与恢复</span><i>›</i></button>
-        <div class="directory-label">偏好与帮助</div>
-        <button data-target="setLang">◉ <span>语言 / Language</span><i>›</i></button>
-        <button data-target="setManual">ⓘ <span>用户手册</span><i>›</i></button>
-        <button data-target="setAbout">ⓘ <span>本地数据与安装说明</span><i>›</i></button>
+        <div class="directory-label" data-ui28="groupRecords">记账管理</div>
+        <button data-target="setCats">◈ <span data-ui28="cats">支出类别</span><i>›</i></button>
+        <button data-target="recTitle">▦ <span data-ui28="recurring">每月定时记账</span><i>›</i></button>
+        <button data-target="setBudget">◎ <span data-ui28="budget">预算管理</span><i>›</i></button>
+        <div class="directory-label" data-ui28="groupData">数据与隐私</div>
+        <button data-target="setData">⇩ <span data-ui28="backup">数据备份与恢复</span><i>›</i></button>
+        <div class="directory-label" data-ui28="groupPrefs">偏好与帮助</div>
+        <button data-target="setLang">◉ <span data-ui28="language">语言 / Language</span><i>›</i></button>
+        <button data-target="setManual">ⓘ <span data-ui28="guide">用户手册</span><i>›</i></button>
+        <button data-target="setAbout">ⓘ <span data-ui28="about">本地数据与安装说明</span><i>›</i></button>
       </div>
       <div class="set-group">
         <div class="set-title" data-i18n="setDash">今日看板</div>
@@ -1071,14 +1177,14 @@ button,select{font-family:inherit}button:focus-visible,select:focus-visible,inpu
   <!-- V2.4: Settings are modal-only; original functional DOM nodes move into this sheet. -->
   <div class="modal-mask settings-mask" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="settingsSheetTitle" aria-hidden="true">
     <div class="sheet settings-sheet" role="document">
-      <div class="settings-sheet-head"><button type="button" id="settingsSheetBack" aria-label="返回设置">‹</button><h2 id="settingsSheetTitle">设置</h2><button type="button" id="settingsSheetClose" aria-label="关闭">×</button></div>
+      <div class="settings-sheet-head"><button type="button" id="settingsSheetBack" aria-label="返回设置" data-ui28-aria="backSettings">‹</button><h2 id="settingsSheetTitle">设置</h2><button type="button" id="settingsSheetClose" aria-label="关闭" data-ui28-aria="close">×</button></div>
       <div id="settingsSheetContent" class="settings-sheet-content"></div>
     </div>
   </div>
   <div id="settingsStorage" hidden></div>
 
-  <button class="fab" id="fabBtn" aria-label="记一笔">＋</button>
-  <div id="quickMenu" class="quick-menu" hidden><button id="quickManual">＋ <span>手动记账</span></button><button id="quickImport">⇩ <span>AI 辅助导入</span></button></div>
+  <button class="fab" id="fabBtn" aria-label="记一笔" data-ui28-aria="add">＋</button>
+  <div id="quickMenu" class="quick-menu" hidden><button id="quickManual">＋ <span data-ui28="quickManual">手动记账</span></button><button id="quickImport">⇩ <span data-ui28="quickImport">AI 辅助导入</span></button></div>
 
   <!-- ===== 底部 tab ===== -->
   <nav class="tabbar">
@@ -1738,7 +1844,7 @@ function showTab(tab){
   const isStats=tab==="stats";
   $("#periodWrap").style.display=(tab==="home"||tab==="import")?"none":"flex";
   $("#statSegWrap").style.display=isStats?"flex":"none";
-  $("#fabBtn").style.display=(tab==="home"||tab==="ledger"||tab==="stats")?"flex":"none";
+  $("#fabBtn").style.display=(tab==="import"||tab==="calendar")?"none":"grid";
   updatePeriodLabel();
   if(tab==="home") renderHome();
   if(tab==="ledger") renderLedger();
@@ -2440,6 +2546,55 @@ function pushExpenseRow(rows,o,wrap){
   }
   rows.push({amount,date,category,note:note.slice(0,60),source:"ai",cur:((wrap&&wrap.currency)||o.currency||"EUR"),items});
 }
+/* Same-day product-level duplicate warning (local-only; never silently discard). */
+const DUPLICATE_PRODUCT_THRESHOLD=0.80;
+function normalizeProductName(v){
+  return String(v||'').normalize('NFKC').toLowerCase().replace(/[\s\p{P}\p{S}]+/gu,'');
+}
+function itemIdentityAliases(it){
+  return [...new Set([normalizeProductName(it.name),normalizeProductName(it.nameZh)].filter(Boolean))];
+}
+function sameProduct(a,b){
+  const al=itemIdentityAliases(a),bl=itemIdentityAliases(b);
+  return al.length>0&&al.some(x=>bl.includes(x));
+}
+function productOverlap(a,b){
+  const left=Array.isArray(a?.items)?a.items:[],right=Array.isArray(b?.items)?b.items:[];
+  if(!left.length||!right.length) return 0; // Bank-only records never trigger item similarity.
+  const used=new Set();let shared=0;
+  for(const l of left){
+    const j=right.findIndex((r,i)=>!used.has(i)&&sameProduct(l,r));
+    if(j>=0){used.add(j);shared++;}
+  }
+  return shared/Math.max(left.length,right.length);
+}
+function sameImportDayAndCurrency(a,b){
+  return a.date===b.date&&String(a.cur||'EUR').toUpperCase()===String(b.cur||'EUR').toUpperCase();
+}
+function duplicateCandidates(row,previewIndex){
+  const candidates=[];
+  const historical=Array.isArray(allExpenses)?allExpenses:[];
+  historical.forEach(e=>{
+    if(e.type==='income'||!sameImportDayAndCurrency(row,e))return;
+    const overlap=productOverlap(row,e);
+    if(overlap>DUPLICATE_PRODUCT_THRESHOLD)candidates.push({kind:'saved',overlap,record:e});
+  });
+  previewRows.forEach((other,j)=>{
+    if(j===previewIndex||!sameImportDayAndCurrency(row,other))return;
+    const overlap=productOverlap(row,other);
+    if(overlap>DUPLICATE_PRODUCT_THRESHOLD)candidates.push({kind:'batch',overlap,record:other,position:j+1});
+  });
+  return candidates.sort((a,b)=>b.overlap-a.overlap);
+}
+function duplicateRiskHtml(row,i){
+  const matches=duplicateCandidates(row,i);
+  if(!matches.length){row.duplicateAcknowledged=false;return '';} // Changing the record clears obsolete warning.
+  const best=matches[0],en=state.lang==='en';
+  const name=best.kind==='batch'?(en?'row #':'本批第')+best.position+(en?'':'笔'):(best.record.category||'');
+  const pct=Math.round(best.overlap*100);
+  const description=(en?'Same date, currency, and ':'同一天、同币种，')+pct+'%'+(en?' product overlap with ':' 商品与')+(best.kind==='saved'?(en?'saved record ':'已有记录 '):(en?'another imported ':''))+name+' · '+moneyC(best.record.amount,best.record.cur||'EUR');
+  return '<div class="duplicate-risk" role="alert"><strong>⚠ '+(en?'Possible duplicate import':'疑似重复导入')+' · '+pct+'%</strong><p>'+esc(description)+'</p><label><input type="checkbox" class="duplicate-ack" data-i="'+i+'" '+(row.duplicateAcknowledged?'checked':'')+'><span>'+(en?'I reviewed this risk and still want to import this record':'我已核对，仍要导入这笔记录')+'</span></label></div>';
+}
 /* ================= 导入预览 / 确认 ================= */
 function renderPreview(){
   const card=$("#previewCard"), wrap=$("#previewList");
@@ -2460,10 +2615,11 @@ function renderPreview(){
       '<button type="button" class="wizard-row-toggle" data-i="'+i+'" aria-label="Expand record">⌄</button>'+
       '<button class="prev-del" data-i="'+i+'" aria-label="'+t("mDelete")+'">✕</button>'+
       '<div class="wizard-row-details" hidden>'+('<div class="wizard-detail-meta">'+esc(r.date)+' · '+esc(r.cur||'EUR')+' · '+esc(r.note||'')+'</div>')+
-      ((r.items||[]).map(it=>'<div class="wizard-item-line"><span>'+esc(it.nameZh||it.name||'Item')+'</span><span>'+esc(String(it.qty||1))+' × '+esc(String(it.unitPrice||0))+' · '+esc(String(it.amount||0))+'</span></div>').join('')||'<div class="wizard-detail-meta">'+(state.lang==='en'?'No itemized products':'没有商品明细')+'</div>')+'</div>';
+      ((r.items||[]).map(it=>'<div class="wizard-item-line"><span>'+esc(it.nameZh||it.name||'Item')+'</span><span>'+esc(String(it.qty||1))+' × '+esc(String(it.unitPrice||0))+' · '+esc(String(it.amount||0))+'</span></div>').join('')||'<div class="wizard-detail-meta">'+(state.lang==='en'?'No itemized products':'没有商品明细')+'</div>')+'</div>'+duplicateRiskHtml(r,i);
     wrap.appendChild(div);
   });
-  $$("input",wrap).forEach(inp=>inp.addEventListener("input",e=>{previewRows[+e.target.dataset.i].amount=parseFloat(e.target.value)||0;}));
+  $$(".prev-num input",wrap).forEach(inp=>inp.addEventListener("input",e=>{previewRows[+e.target.dataset.i].amount=parseFloat(e.target.value)||0;}));
+  $$(".duplicate-ack",wrap).forEach(inp=>inp.addEventListener("change",e=>{previewRows[+e.target.dataset.i].duplicateAcknowledged=e.target.checked;}));
   $$("select",wrap).forEach(sel=>sel.addEventListener("change",e=>{previewRows[+e.target.dataset.i].category=e.target.value;}));
   $$(".wizard-row-check",wrap).forEach(el=>el.addEventListener("change",e=>{previewRows[+e.target.dataset.i].wizardSelected=e.target.checked;updateWizardSummary();}));
   $$(".wizard-row-toggle",wrap).forEach(b=>b.addEventListener("click",()=>{const details=b.parentNode.querySelector(".wizard-row-details");details.hidden=!details.hidden;b.textContent=details.hidden?"⌄":"⌃";}));
@@ -2472,9 +2628,21 @@ function renderPreview(){
     previewRows.splice(+e.target.dataset.i,1); renderPreview();
   }));
 }
+function wrapDuplicateRiskTarget(i){
+  const row=document.querySelectorAll('#previewList .prev-row')[i];
+  return row?row.querySelector('.duplicate-risk'):null;
+}
 async function commitPreview(){
   const good=previewRows.filter(r=>r.wizardSelected!==false&&r.amount>0&&/^\d{4}-\d{2}-\d{2}$/.test(r.date));
   if(!good.length){ toast(t("tNoValidCommit")); return; }
+  const unreviewed=previewRows.map((r,i)=>({r,i})).filter(({r,i})=>r.wizardSelected!==false&&r.amount>0&&duplicateCandidates(r,i).length&&!r.duplicateAcknowledged);
+  if(unreviewed.length){
+    renderPreview();
+    const at=wrapDuplicateRiskTarget(unreviewed[0].i);
+    if(at)at.scrollIntoView({behavior:'smooth',block:'center'});
+    toast(state.lang==='en'?'Review and acknowledge possible duplicate records before saving':'请先核对并勾选疑似重复记录的风险确认');
+    return;
+  }
   const nowTs=Date.now();
   const ids=[];
   try{
@@ -3022,6 +3190,7 @@ init();
     else if(key==='setData')group=dataGroup;
     else if(key==='setAbout')group=about;
     if(!group)return;
+    sheet.dataset.activeKey=key;
     sheetContent.appendChild(group);
     if(key==='setData' && restoreGroup)sheetContent.appendChild(restoreGroup);
     if(key==='setCats'){
@@ -3161,6 +3330,56 @@ document.addEventListener('dblclick', function(event){
   if(event.pointerType === 'mouse') return;
   if(window.matchMedia('(pointer:coarse)').matches) event.preventDefault();
 }, {passive:false});
+</script>
+
+<script>
+/* V2.8 locale coverage for V2 components. Existing records, currency codes, storage and parser stay untouched. */
+(function(){
+ const strings={
+ zh:{groupRecords:'记账管理',groupData:'数据与隐私',groupPrefs:'偏好与帮助',cats:'支出类别',recurring:'每月定时记账',budget:'预算管理',backup:'数据备份与恢复',language:'语言 / Language',guide:'用户手册',about:'本地数据与安装说明',quickManual:'手动记账',quickImport:'AI 辅助导入',stepPrompt:'获取提示词',stepPaste:'粘贴结果',stepReview:'核对导入',calendar:'日历',backSettings:'返回设置',close:'关闭',add:'记一笔',summary:'本月汇总',month:'月度',year:'年度',category:'类别分布',trend:'趋势',search:'搜索',filters:'筛选及排序',date:'日期',home:'首页'},
+ en:{groupRecords:'RECORD MANAGEMENT',groupData:'DATA & PRIVACY',groupPrefs:'PREFERENCES & HELP',cats:'Expense categories',recurring:'Monthly recurring entries',budget:'Budget management',backup:'Backup & restore',language:'Language',guide:'User guide',about:'Local data & installation',quickManual:'Manual entry',quickImport:'AI-assisted import',stepPrompt:'Get prompt',stepPaste:'Paste results',stepReview:'Review & import',calendar:'Calendar',backSettings:'Back to settings',close:'Close',add:'Add transaction',summary:'Monthly summary',month:'Monthly',year:'Yearly',category:'Categories',trend:'Trend',search:'Search',filters:'Filters & sorting',date:'Date',home:'Home'}
+ };
+ function ui28(){
+  const en=state.lang==='en', map=strings[en?'en':'zh'];
+  document.documentElement.lang=en?'en':'zh-CN';
+  document.querySelectorAll('[data-ui28]').forEach(el=>{let v=map[el.dataset.ui28];if(v!==undefined)el.textContent=v;});
+  document.querySelectorAll('[data-ui28-aria]').forEach(el=>{let v=map[el.dataset.ui28Aria];if(v!==undefined)el.setAttribute('aria-label',v);});
+  document.querySelectorAll('[data-ui28-title]').forEach(el=>{let v=map[el.dataset.ui28Title];if(v!==undefined)el.setAttribute('title',v);});
+  const el=document.querySelector('#settingsSheetTitle');
+  const sheet=document.querySelector('#settingsSheet');
+  if(el && sheet && sheet.classList.contains('on')){
+    const active=sheet.dataset.activeKey;
+    const titles={setCats:'cats',recTitle:'recurring',setBudget:'budget',setData:'backup',setLang:'language',setAbout:'about'};
+    el.textContent=map[titles[active]]||(en?'Settings':'设置');
+  } else if(el)el.textContent=en?'Settings':'设置';
+  const m=document.querySelector('#ledgerOverviewToggle [data-v25]');if(m)m.textContent=map.summary;
+  const labels={'[data-tab="stats"] [data-i18n="tabStats"]':en?'Analysis':'分析'};
+  document.querySelectorAll('[data-analysis-period]').forEach(b=>b.textContent=b.dataset.analysisPeriod==='month'?(en?'Monthly':'月度'):(en?'Yearly':'年度'));
+  document.querySelectorAll('[data-analysis-chart]').forEach(b=>b.textContent=b.dataset.analysisChart==='year'?(en?'Bills':'账单'):(en?'Trend':'趋势'));
+  const catOptions={'餐饮':'Dining','超市':'Groceries','购物':'Shopping','交通':'Transport','日用':'Essentials','娱乐':'Entertainment','医疗':'Healthcare','教育':'Education','房租':'Housing','衣服':'Clothing','电话费':'Phone','订阅':'Subscriptions','水电':'Utilities','网络':'Internet','其他':'Other'};
+  document.querySelectorAll('#entryCategoryGrid [data-entry-category] span:last-child').forEach(el=>{const key=el.closest('[data-entry-category]').dataset.entryCategory;el.textContent=en?(catOptions[key]||key):key;});
+  const recDelete=document.querySelectorAll('#recList .rec-del');recDelete.forEach(el=>el.setAttribute('aria-label',en?'Delete':'删除'));
+  const close=document.querySelector('#entryClose');if(close)close.setAttribute('aria-label',map.close);
+  Object.entries(labels).forEach(([q,v])=>{const a=document.querySelector(q);if(a)a.textContent=v});
+  const x=document.querySelector('#ledgerSearchToggle');if(x)x.setAttribute('aria-label',map.search);
+  const y=document.querySelector('#ledgerFilterToggle');if(y)y.setAttribute('aria-label',map.filters);
+  const z=document.querySelector('#calendarBack');if(z)z.setAttribute('aria-label',en?'Back to home':'返回首页');
+  const title=document.querySelector('#view-stats .screen-caption');if(title)title.textContent=en?'SPENDING OVERVIEW':'消费概览';
+  const pdf=document.querySelector('#manualPdf');if(pdf)pdf.textContent=en?'Print / Save PDF':'导出 PDF';
+  const guideClose=document.querySelector('#manualClose');if(guideClose)guideClose.textContent=map.close;
+  const about=document.querySelector('#settingsAbout');
+  if(about)about.innerHTML=en?'<h3 style="font-size:14px;color:var(--text)">About your data</h3>All records are kept on this device in IndexedDB; no AI API is called and spending data is not uploaded.<br><br><b>Add to Home Screen:</b> Open the GitHub Pages website in Safari on iPhone, then Share → Add to Home Screen. Once installed and cached, the app can work offline.<br><br><b>Backup:</b> Export a JSON backup before changing phones or clearing browser data.':'<h3 style="font-size:14px;color:var(--text)">说明</h3>数据只保存在本机浏览器（IndexedDB），不调用 AI 接口，也不上传消费记录。<br><br><b>安装到主屏幕：</b>用 iPhone Safari 打开项目网址 → 分享 → 添加到主屏幕；完成首次缓存后可离线使用。<br><br><b>备份：</b>换手机或清理浏览器数据之前，请先导出 JSON 备份。';
+  const allSummary=document.querySelector('#wizardSummary');if(allSummary&&!document.querySelector('#previewCard[style*="block"]'))allSummary.textContent=en?'Review parsed records before importing.':'检查识别到的消费记录，编辑后确认导入。';
+  const wp=document.querySelector('#wizardDoneCount');if(wp&&document.querySelector('#wizardDone[hidden]'))wp.textContent=en?'Records are saved locally.':'记录已安全保存到本机。';
+  const helper=document.querySelector('#importBack');if(helper)helper.setAttribute('aria-label',en?'Back to home':'返回首页');
+  const restoreHeading=document.querySelector('#view-settings .set-group:has(#settingsRestoreAction) .set-title');if(restoreHeading)restoreHeading.textContent=en?'Restore from file':'从文件恢复';
+  const preview=document.querySelector('#wizardDone');if(preview&& !preview.hidden && typeof window.__showImportComplete==='function')window.__showImportComplete();
+ }
+ const oldApply=applyLang; applyLang=function(){oldApply();ui28();};
+ const oldShow=showTab;showTab=function(tab){oldShow(tab);const f=document.querySelector('#fabBtn');if(f)f.style.display=['home','ledger','stats','settings'].includes(tab)?'grid':'none';ui28();};
+ const lang=document.querySelector('#langSel');if(lang)lang.addEventListener('change',()=>queueMicrotask(ui28));
+ ui28();
+})();
 </script>
 </body>
 </html>
