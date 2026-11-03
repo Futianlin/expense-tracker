@@ -346,6 +346,32 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 .ledger-cats .lchip{flex:none;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--text);cursor:pointer}
 .ledger-cats .lchip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
 .ledger-cats .lchip.all.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* 导入 4 阶段 */
+.imp-head{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 16px 14px;margin-bottom:12px}
+.imp-title{font-size:17px;font-weight:800;color:var(--text)}
+.imp-sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.imp-step{display:flex;align-items:center;gap:2px;margin-top:14px}
+.istep{display:flex;align-items:center;gap:6px;flex:1;color:var(--muted);font-size:11px}
+.istep .in{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);color:var(--muted2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+.istep.on .in{background:var(--accent);border-color:var(--accent);color:#fff}
+.istep.done .in{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--accent-ink)}
+.istep b{white-space:nowrap}
+.step-card{margin-bottom:12px}
+.sc-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
+.sc-title .imp-count{color:var(--accent);font-weight:800}
+.sc-body{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.sc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sc-actions2{display:flex;gap:8px;margin-top:10px}
+.imp-sum{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px}
+.imp-cursum{font-size:12px;color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:4px 10px;font-weight:600}
+.prev-row{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+.prev-row:last-child{border-bottom:0}
+.prev-num input{width:92px;border:1px solid var(--border);border-radius:10px;padding:9px 10px;font-size:15px;font-weight:700;background:var(--surface);color:var(--text);font-variant-numeric:tabular-nums}
+.prev-main{flex:1;min-width:0}
+.prev-main select{width:100%;border:1px solid var(--border);border-radius:10px;padding:9px 10px;font-size:14px;background:var(--surface);color:var(--text)}
+.prev-main .pdate{font-size:12px;color:var(--muted);margin-top:5px}
+.prev-main .pnote{font-size:12px;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev-del{border:0;background:none;color:var(--muted2);font-size:16px;cursor:pointer;padding:6px;line-height:1}
 .over-chip{font-size:12px;color:var(--danger);background:rgba(217,83,79,.12);border:1px solid rgba(217,83,79,.4);border-radius:8px;padding:5px 9px;font-weight:600;white-space:nowrap}
 .num.over{color:var(--danger)!important}
 .bud-line{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted);margin:0 0 12px}
@@ -557,36 +583,51 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 
     <!-- ===== 视图：导入 ===== -->
     <section id="view-import" class="view">
-      <div class="import-tip">
-        <b data-i18n="importTitle">AI 识别支出凭证 → 粘贴入库</b><br>
-        <span data-i18n="importTip">在 DeepSeek 里识别前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。支持小票、购物/订单截图、银行消费记录；一次可识别多张（用「批量识别提示词」，返回的数组会按各自的日期分别入库）。金额以「实付总价」为准。</span>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <div class="imp-head">
+        <div class="imp-title" data-i18n="importTitle">识别结果导入</div>
+        <div class="imp-sub" data-i18n="importSub">使用外部 AI 识别，数据在本地整理和保存</div>
+        <div class="imp-step" id="impStep">
+          <div class="istep on" data-step="1"><span class="in">1</span><b data-i18n="impS1">获取提示词</b></div>
+          <div class="istep" data-step="2"><span class="in">2</span><b data-i18n="impS2">粘贴结果</b></div>
+          <div class="istep" data-step="3"><span class="in">3</span><b data-i18n="impS3">核对导入</b></div>
+          <div class="istep" data-step="4"><span class="in">4</span><b data-i18n="impS4">确认入库</b></div>
+        </div>
+      </div>
+      <div class="card step-card" id="stepCard1">
+        <div class="sc-title" data-i18n="impStep1T">第 1 步 · 获取识别提示词</div>
+        <div class="sc-body" data-i18n="impStep1B">将识别指令与消费凭证发送给你使用的 AI 工具，复制返回内容后，回到这里导入。</div>
+        <div class="sc-actions">
           <button class="btn btn-primary sm" id="copyPromptBtn" data-i18n="copyPrompt">复制识别提示词</button>
           <button class="btn btn-ghost sm" id="batchCopyBtn" data-i18n="batchPrompt">批量识别提示词</button>
           <button class="btn btn-ghost sm" id="viewPromptBtn" data-i18n="viewPrompt">查看提示词</button>
         </div>
+        <div class="card" id="promptBox" style="display:none">
+          <div class="prompt-scroll" id="promptText"></div>
+          <button class="btn btn-primary block" id="copyPrompt2Btn" data-i18n="copyPrompt">复制识别提示词</button>
+        </div>
       </div>
-      <div class="card" id="promptBox" style="display:none">
-        <h3 data-i18n="promptBoxTitle">识别提示词（整段发给 DeepSeek）</h3>
-        <div class="prompt-scroll" id="promptText"></div>
-        <button class="btn btn-primary block" id="copyPrompt2Btn" data-i18n="copyPrompt">复制识别提示词</button>
+      <div class="card step-card" id="stepCard2" style="display:none">
+        <div class="sc-title" data-i18n="impStep2T">第 2 步 · 粘贴识别结果</div>
+        <div class="sc-body" data-i18n="impStep2B">将 AI 返回的 JSON 或文本粘贴到下方，点击「解析」在本地整理。</div>
+        <textarea class="in" id="importText" data-i18n-ph="importPh" placeholder="粘贴识别结果（JSON 或文本）…"></textarea>
+        <div class="hint" id="importHint" data-i18n="importHint">支持：小票 / 订单 / 银行消费 JSON、简单 JSON、以及「日期 金额 类别 备注」格式的行；批量结果自动按各自日期拆开。</div>
+        <div class="sc-actions2">
+          <button class="btn btn-primary sm" id="parseBtn" data-i18n="parse">解析</button>
+          <button class="btn btn-plain sm" id="clearTextBtn" data-i18n="clear">清空</button>
+        </div>
       </div>
-      <div class="card">
-        <textarea class="in" id="importText" data-i18n-ph="importPh" placeholder="粘贴 DeepSeek 返回的 JSON 或文本…"></textarea>
-        <div class="hint" id="importHint" data-i18n="importHint">支持：小票 / 订单 / 银行消费 JSON（含 expense 字段或数组）、简单 JSON、以及「日期 金额 类别 备注」格式的行。批量识别返回的数组会自动按各自日期拆开入库。</div>
-        <button class="btn btn-primary block mt" id="parseBtn" data-i18n="parse">解析</button>
-      </div>
-      <div class="card" id="previewCard" style="display:none">
-        <h3><span data-i18n="previewTitle">待入库</span> <span id="previewCount"></span> 笔</h3>
+      <div class="card step-card" id="stepCard3" style="display:none">
+        <div class="sc-title"><span data-i18n="impStep3T">第 3 步 · 核对并导入</span> <span class="imp-count" id="previewCount"></span> <span data-i18n="impRows">笔</span></div>
+        <div class="imp-sum" id="previewSum"></div>
         <div id="previewList"></div>
         <button class="btn btn-primary block mt" id="commitBtn" data-i18n="commit">确认入库</button>
-        <button class="btn btn-plain block mt" id="clearPreviewBtn" data-i18n="clear">清空</button>
+        <button class="btn btn-plain block mt" id="clearPreviewBtn" data-i18n="clear">清空重来</button>
       </div>
-      <div class="card">
-        <h3 data-i18n="restoreTitle">从文件恢复</h3>
+      <div class="card step-card">
+        <div class="sc-title" data-i18n="restoreTitle">从文件恢复</div>
         <label class="btn btn-plain block" for="restoreFile" style="margin-bottom:8px" data-i18n="restoreBtn">选择 JSON / CSV 文件</label>
         <input type="file" id="restoreFile" accept=".json,.csv,.txt" style="display:none">
-        <div class="hint" data-i18n="restoreHint">用于恢复之前导出的备份（JSON 完整备份 / CSV 明细）。</div>
+        <div class="hint" data-i18n="restoreHint">用于恢复之前导出的备份（JSON 完整备份 / CSV 明细），与 AI 导入相互独立。</div>
       </div>
     </section>
 
@@ -941,6 +982,10 @@ zh:{
   quickTitle:"记一笔", qsManual:"手动记账", qsImport:"AI 辅助导入", qsDash:"日历 / 看板", qsBudget:"预算",
   homeCalendar:"日历", hqAdd:"记一笔", hqImport:"AI 导入", hqCalendar:"日历", hqStats:"分析",
   homeRecent:"近期记录", homeViewAll:"查看全部", homeBudgetLab:"预算", homeRemain:"剩余预算", homeNoBudget:"未设预算", homeEmpty:"还没有记录，点「记一笔」开始", catAll:"全部分类",
+  importSub:"使用外部 AI 识别，数据在本地整理和保存", impS1:"获取提示词", impS2:"粘贴结果", impS3:"核对导入", impS4:"确认入库",
+  impStep1T:"第 1 步 · 获取识别提示词", impStep1B:"将识别指令与消费凭证发送给你使用的 AI 工具（如 DeepSeek），复制它返回的内容后，回到这里导入。",
+  impStep2T:"第 2 步 · 粘贴识别结果", impStep2B:"把 AI 返回的 JSON 或文本粘贴到下方，点击「解析」在本地整理。",
+  impStep3T:"第 3 步 · 核对并导入", impRows:"笔",
   segMonth:"本月", segYear:"年账单", segTrend:"趋势",
   total:"总支出", count:"笔数", dailyAvg:"日均", vsMonth:"较上月", vsYear:"较去年",
   searchPh:"搜索备注 / 类别 / 商品名",
@@ -1013,6 +1058,10 @@ en:{
   quickTitle:"Add", qsManual:"Manual entry", qsImport:"AI-assisted import", qsDash:"Calendar", qsBudget:"Budget",
   homeCalendar:"Calendar", hqAdd:"Add", hqImport:"AI import", hqCalendar:"Calendar", hqStats:"Analytics",
   homeRecent:"Recent", homeViewAll:"View all", homeBudgetLab:"Budget", homeRemain:"Left", homeNoBudget:"No budget set", homeEmpty:"No records yet — tap Add to start", catAll:"All categories",
+  importSub:"Recognize with an external AI; data is parsed and stored locally", impS1:"Get prompt", impS2:"Paste result", impS3:"Review", impS4:"Confirm",
+  impStep1T:"Step 1 · Get the recognition prompt", impStep1B:"Send the prompt together with your receipt / screenshot to an AI tool (e.g. DeepSeek), then copy what it returns and come back here.",
+  impStep2T:"Step 2 · Paste the result", impStep2B:"Paste the returned JSON or text below and tap Parse to organize it locally.",
+  impStep3T:"Step 3 · Review & import", impRows:"records",
   segMonth:"Month", segYear:"Year", segTrend:"Trend",
   total:"Total spending", count:"entries", dailyAvg:"daily avg", vsMonth:"vs last month", vsYear:"vs last year",
   searchPh:"Search note, category or item",
@@ -1388,6 +1437,7 @@ function showTab(tab){
   if(tab==="ledger") renderLedger();
   if(tab==="stats") renderStats();
   if(tab==="settings") renderSettings();
+  if(tab==="import") restoreDraft();
 }
 /* ================= 首页视图 ================= */
 function renderHome(){
@@ -2077,11 +2127,35 @@ function pushExpenseRow(rows,o,wrap){
   rows.push({amount,date,category,note:note.slice(0,60),source:"ai",cur:((wrap&&wrap.currency)||o.currency||"EUR"),items});
 }
 /* ================= 导入预览 / 确认 ================= */
+const DRAFT_KEY="daytally_import_draft";
+function updateImportStepper(){
+  const hasText=($("#importText").value||"").trim().length>0;
+  const hasPrev=previewRows.length>0;
+  let step=hasPrev?3:(hasText?2:1);
+  $$(".istep").forEach(s=>{
+    const n=+s.dataset.step;
+    s.classList.toggle("done",n<step);
+    s.classList.toggle("on",n===step);
+  });
+  $("#stepCard1").style.display=step===1?"block":"none";
+  $("#stepCard2").style.display=step===2?"block":"none";
+  $("#stepCard3").style.display=step===3?"block":"none";
+}
+function saveDraft(){ try{ localStorage.setItem(DRAFT_KEY,$("#importText").value||""); }catch(e){} }
+function restoreDraft(){
+  try{
+    const d=localStorage.getItem(DRAFT_KEY);
+    if(d&&!$("#importText").value){ $("#importText").value=d; }
+  }catch(e){}
+  updateImportStepper();
+}
 function renderPreview(){
-  const card=$("#previewCard"), wrap=$("#previewList");
-  if(!previewRows.length){ card.style.display="none"; return; }
-  card.style.display="block";
+  const wrap=$("#previewList");
+  if(!previewRows.length){ updateImportStepper(); return; }
   $("#previewCount").textContent=previewRows.length;
+  const sum={};
+  previewRows.forEach(r=>{const c=r.cur||"EUR"; sum[c]=(sum[c]||0)+r.amount;});
+  $("#previewSum").innerHTML=Object.keys(sum).map(c=>'<span class="imp-cursum">'+curSym(c)+' '+moneyC(sum[c],c)+'</span>').join("");
   wrap.innerHTML="";
   previewRows.forEach((r,i)=>{
     const div=document.createElement("div"); div.className="prev-row";
@@ -2101,6 +2175,7 @@ function renderPreview(){
   $$(".prev-del",wrap).forEach(b=>b.addEventListener("click",e=>{
     previewRows.splice(+e.target.dataset.i,1); renderPreview();
   }));
+  updateImportStepper();
 }
 function commitPreview(){
   const good=previewRows.filter(r=>r.amount>0&&/^\d{4}-\d{2}-\d{2}$/.test(r.date));
@@ -2110,6 +2185,7 @@ function commitPreview(){
     note:r.note||"",source:r.source||"manual",cur:r.cur||"EUR",items:r.items||[],created:nowTs,updated:nowTs}));
   previewRows=[];
   $("#importText").value="";
+  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
   renderPreview();
   refresh();
   toast(t("tCommitted")+" "+good.length);
@@ -2480,6 +2556,8 @@ function bindEvents(){
   });
   $("#commitBtn").addEventListener("click",commitPreview);
   $("#clearPreviewBtn").addEventListener("click",()=>{previewRows=[];renderPreview();});
+  $("#clearTextBtn").addEventListener("click",()=>{ $("#importText").value=""; try{localStorage.removeItem(DRAFT_KEY);}catch(e){} previewRows=[]; updateImportStepper(); });
+  $("#importText").addEventListener("input",saveDraft);
   $("#restoreFile").addEventListener("change",e=>{if(e.target.files[0])restoreFile(e.target.files[0]); e.target.value="";});
   // 明细搜索 / 排序
   $("#searchInput").addEventListener("input",e=>{ state.q=e.target.value; renderLedgerList(); });
