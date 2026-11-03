@@ -14,12 +14,14 @@
 <title>天天记账 DayTally</title>
 <style>
 :root{
-  --bg:#F7F2E8; --surface:#FFFFFF; --border:#E8DFD1;
-  --text:#123B2A; --muted:#6B716E; --muted2:#9AA09B;
-  --accent:#2E7D5B; --accent-soft:#DDF0E4; --accent-ink:#1F5B42;
+  /* Warm Minimal iOS Utility — DayTally V2 */
+  --bg:#F8F8F5; --surface:#FFFFFF; --border:#E6E9E4;
+  --text:#173D31; --muted:#758079; --muted2:#9AA09B;
+  --accent:#287C5A; --accent-soft:#DDEDE3; --accent-ink:#1F5B42;
   --gold:#D4A73C; --income:#3FA66B; --expense:#D96C4F;
   --danger:#D9534F; --danger-soft:#FBE9E7;
-  --radius:14px;
+  --radius:16px; --hairline:1px solid var(--border);
+  --shadow-sm:0 1px 2px rgba(23,61,49,.05),0 2px 8px rgba(23,61,49,.04);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html,body{margin:0;padding:0}
@@ -110,6 +112,71 @@ main{flex:1;padding:14px 16px 8px;display:block}
   font-size:11px;color:var(--muted);cursor:pointer;background:transparent;border:0}
 .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tab.on{color:var(--accent);font-weight:600}
+/* ===== V2：底部导航 / 全局入口 / 首页 ===== */
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:520px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-top:1px solid var(--border);
+  display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;
+  font-size:10.5px;color:var(--muted);cursor:pointer;background:transparent;border:0;min-height:48px}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--accent)}
+.tab.on svg{stroke-width:2.1}
+.fab{position:fixed;z-index:30;right:max(18px,calc(50% - 260px + 16px));bottom:calc(86px + env(safe-area-inset-bottom));
+  width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;
+  border:0;font-size:30px;font-weight:600;line-height:1;box-shadow:0 6px 18px rgba(40,124,90,.30);cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.fab:active{transform:scale(.94)}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.linkbtn{border:0;background:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:6px 4px}
+/* 快捷弹层 */
+.qs{display:flex;flex-direction:column;align-items:stretch;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+.qs-handle{width:38px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 14px}
+.qs-title{font-size:16px;font-weight:700;color:var(--text);margin:0 0 4px 2px}
+.qs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.qs-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 10px;border:1px solid var(--border);
+  background:var(--surface);border-radius:16px;cursor:pointer;font-size:13px;color:var(--text);font-weight:600;min-height:96px}
+.qs-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.qs-ico svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/* 首页 */
+.home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:4px 2px 14px}
+.home-date{font-size:15px;font-weight:700;color:var(--text)}
+.home-ledger-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.home-ledger-row .chip{font-size:12px;color:var(--accent-ink);background:var(--accent-soft);border-radius:8px;padding:3px 8px;font-weight:600;cursor:default}
+.home-overview{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;box-shadow:var(--shadow-sm)}
+.ov-lab{font-size:13px;color:var(--muted)}
+.ov-amt{font-size:40px;font-weight:800;letter-spacing:.2px;color:var(--text);line-height:1.1;margin:6px 0 8px;font-variant-numeric:tabular-nums}
+.ov-amt.over{color:var(--danger)}
+.ov-sub{font-size:12.5px;color:var(--muted)}
+.ov-budget{margin-top:14px}
+.ov-budget .bline{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.ov-budget .bline b{color:var(--text);font-variant-numeric:tabular-nums}
+.ov-budget .btrack{height:6px;border-radius:99px;background:var(--border);overflow:hidden}
+.ov-budget .bfill{height:100%;border-radius:99px;background:var(--accent)}
+.ov-budget .bfill.over{background:var(--danger)}
+.ov-budget .bwarn{font-size:12px;color:var(--danger);font-weight:600;margin-top:6px}
+.home-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.hq{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:12px 4px 10px;cursor:pointer;color:var(--text);font-size:11.5px;font-weight:600}
+.hq-ico{width:38px;height:38px;border-radius:12px;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center}
+.hq-ico svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hq-add .hq-ico{background:var(--accent);color:#fff}
+.home-recent{margin-top:6px}
+.home-sec-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.home-sec-title>span{font-size:15px;font-weight:700;color:var(--text)}
+.hrow{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--border)}
+.hrow:last-child{border-bottom:0}
+.hrow .cico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.hrow .cico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hrow .hm{flex:1;min-width:0}
+.hrow .hm b{font-size:14px;color:var(--text);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrow .hm small{font-size:11.5px;color:var(--muted);display:block;margin-top:1px}
+.hrow .ha{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.hrow .ha.exp{color:var(--text)}
+.hrow .ha.inc{color:var(--income)}
+.home-empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:36px 16px;text-align:center}
+.home-empty .eico{width:56px;height:56px;border-radius:18px;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center}
+.home-empty .eico svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.home-empty p{margin:0;font-size:13.5px;color:var(--muted)}
 /* stats */
 .seg-2{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);width:100%}
 .seg-2 button{flex:1;border:0;background:transparent;padding:9px;font-size:14px;color:var(--muted);cursor:pointer}
@@ -418,9 +485,50 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
     <div class="period-cal" id="periodCal" style="display:none"></div>
 
-  <!-- ===== 视图：明细 ===== -->
+  <!-- ===== 视图：首页 ===== -->
   <main id="main">
-    <section id="view-ledger" class="view on">
+    <section id="view-home" class="view on">
+      <div class="home-head">
+        <div>
+          <div class="home-date" id="homeDate"></div>
+          <div class="home-ledger-row">
+            <span class="chip" id="homeLedger"></span>
+            <button type="button" class="linkbtn" id="homeDashBtn" data-i18n="homeCalendar">日历</button>
+          </div>
+        </div>
+        <button type="button" class="iconbtn" id="homeCalBtn" aria-label="日历"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+      </div>
+
+      <div class="home-overview">
+        <div class="ov-lab" id="homeOvLab">本月支出</div>
+        <div class="ov-amt" id="homeOvAmt">€0.00</div>
+        <div class="ov-sub" id="homeOvSub"></div>
+        <div class="ov-budget" id="homeBudget"></div>
+      </div>
+
+      <div class="home-quick">
+        <button class="hq hq-add" id="homeAddBtn">
+          <span class="hq-ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span data-i18n="hqAdd">记一笔</span>
+        </button>
+        <button class="hq" id="homeImportBtn">
+          <span class="hq-ico"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg></span><span data-i18n="hqImport">AI 导入</span>
+        </button>
+        <button class="hq" id="homeCalBtn2">
+          <span class="hq-ico"><svg viewBox="0 0 24 24"><path d="M5 4h14v4H5zM5 8v12h14V8M8 2v3M16 2v3"/></svg></span><span data-i18n="hqCalendar">日历</span>
+        </button>
+        <button class="hq" id="homeStatsBtn">
+          <span class="hq-ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span><span data-i18n="hqStats">分析</span>
+        </button>
+      </div>
+
+      <div class="home-recent">
+        <div class="home-sec-title"><span data-i18n="homeRecent">近期记录</span><button type="button" class="linkbtn" id="homeAllBtn" data-i18n="homeViewAll">查看全部</button></div>
+        <div id="homeList"></div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：明细 ===== -->
+    <section id="view-ledger" class="view">
       <div class="card summary" id="summaryCard"></div>
       <div class="ledger-tool">
         <div class="lt-search"><svg viewBox="0 0 24 24"><path d="M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM16 16l4 4"/></svg><input id="searchInput" type="search" data-i18n-ph="searchPh" placeholder="搜索备注 / 类别 / 商品名"></div>
@@ -576,21 +684,47 @@ textarea.in:focus{outline:2px solid var(--accent);border-color:transparent}
 
   <button class="fab" id="fabBtn" aria-label="记一笔">＋</button>
 
-  <!-- ===== 底部 tab ===== -->
+  <!-- ===== 底部 tab：首页 / 明细 / 分析 / 设置 ===== -->
   <nav class="tabbar">
-    <button class="tab on" data-tab="ledger">
+    <button class="tab on" data-tab="home">
+      <svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></svg><span data-i18n="tabHome">首页</span>
+    </button>
+    <button class="tab" data-tab="ledger">
       <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="tabLedger">明细</span>
     </button>
     <button class="tab" data-tab="stats">
-      <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg><span data-i18n="tabStats">统计</span>
-    </button>
-    <button class="tab" data-tab="import">
-      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg><span data-i18n="tabImport">导入</span>
+      <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg><span data-i18n="tabStats">分析</span>
     </button>
     <button class="tab" data-tab="settings">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5l-.3 2.5a7 7 0 0 0-1.7 1L5 5.5l-2 3.5L5 10.5a7 7 0 0 0 0 2L3 14l2 3.5 2.4-1a7 7 0 0 0 1.7 1l.3 2.5h5l.3-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5L19 13a7 7 0 0 0 .1-1z"/></svg><span data-i18n="tabSettings">设置</span>
     </button>
   </nav>
+</div>
+
+<!-- ===== 全局「＋」快捷弹层 ===== -->
+<div class="modal-mask" id="quickSheet" style="align-items:flex-end">
+  <div class="sheet qs">
+    <div class="qs-handle"></div>
+    <div class="qs-title" data-i18n="quickTitle">记一笔</div>
+    <div class="qs-grid">
+      <button class="qs-item" id="qsManual">
+        <span class="qs-ico" style="background:var(--accent-soft);color:var(--accent-ink)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+        <span data-i18n="qsManual">手动记账</span>
+      </button>
+      <button class="qs-item" id="qsImport">
+        <span class="qs-ico" style="background:var(--accent-soft);color:var(--accent-ink)"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg></span>
+        <span data-i18n="qsImport">AI 辅助导入</span>
+      </button>
+      <button class="qs-item" id="qsDash">
+        <span class="qs-ico" style="background:var(--accent-soft);color:var(--accent-ink)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+        <span data-i18n="qsDash">日历 / 看板</span>
+      </button>
+      <button class="qs-item" id="qsBudget">
+        <span class="qs-ico" style="background:var(--accent-soft);color:var(--accent-ink)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+        <span data-i18n="qsBudget">预算</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== 新增/编辑弹窗 ===== -->
@@ -795,7 +929,10 @@ const I18N = {
 zh:{
   app:"天天记账", appTag:"本地 · 离线",
   pickMonth:"点我选月份", pcalHint:"← → 切换年份，点某月跳转到该月",
-  tabLedger:"明细", tabStats:"统计", tabImport:"导入", tabSettings:"设置",
+  tabHome:"首页", tabLedger:"明细", tabStats:"分析", tabImport:"导入", tabSettings:"设置",
+  quickTitle:"记一笔", qsManual:"手动记账", qsImport:"AI 辅助导入", qsDash:"日历 / 看板", qsBudget:"预算",
+  homeCalendar:"日历", hqAdd:"记一笔", hqImport:"AI 导入", hqCalendar:"日历", hqStats:"分析",
+  homeRecent:"近期记录", homeViewAll:"查看全部", homeBudgetLab:"预算", homeRemain:"剩余预算", homeNoBudget:"未设预算", homeEmpty:"还没有记录，点「记一笔」开始",
   segMonth:"本月", segYear:"年账单", segTrend:"趋势",
   total:"总支出", count:"笔数", dailyAvg:"日均", vsMonth:"较上月", vsYear:"较去年",
   searchPh:"搜索备注 / 类别 / 商品名",
@@ -864,7 +1001,10 @@ zh:{
 en:{
   app:"DayTally", appTag:"Local · Offline",
   pickMonth:"Tap to pick a month", pcalHint:"Use ‹ › to change year; tap a month to jump",
-  tabLedger:"Records", tabStats:"Stats", tabImport:"Import", tabSettings:"Settings",
+  tabHome:"Home", tabLedger:"Records", tabStats:"Analytics", tabImport:"Import", tabSettings:"Settings",
+  quickTitle:"Add", qsManual:"Manual entry", qsImport:"AI-assisted import", qsDash:"Calendar", qsBudget:"Budget",
+  homeCalendar:"Calendar", hqAdd:"Add", hqImport:"AI import", hqCalendar:"Calendar", hqStats:"Analytics",
+  homeRecent:"Recent", homeViewAll:"View all", homeBudgetLab:"Budget", homeRemain:"Left", homeNoBudget:"No budget set", homeEmpty:"No records yet — tap Add to start",
   segMonth:"Month", segYear:"Year", segTrend:"Trend",
   total:"Total spending", count:"entries", dailyAvg:"daily avg", vsMonth:"vs last month", vsYear:"vs last year",
   searchPh:"Search note, category or item",
@@ -1231,14 +1371,62 @@ function showTab(tab){
   $$(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
   $$(".view").forEach(v=>v.classList.toggle("on",v.id==="view-"+tab));
   const isStats=tab==="stats";
-  $("#periodWrap").style.display="flex";
+  $("#periodWrap").style.display=(tab==="home")?"none":"flex";
   $("#statSegWrap").style.display=isStats?"flex":"none";
-  $("#fabBtn").style.display=(tab==="ledger")?"flex":"none";
+  const showFab=(tab==="home"||tab==="ledger"||tab==="stats");
+  $("#fabBtn").style.display=showFab?"flex":"none";
   updatePeriodLabel();
+  if(tab==="home") renderHome();
   if(tab==="ledger") renderLedger();
   if(tab==="stats") renderStats();
   if(tab==="settings") renderSettings();
 }
+/* ================= 首页视图 ================= */
+function renderHome(){
+  const ly=state.ly, lm=state.lm, cur=state.statCur;
+  $("#homeDate").textContent=fmtCnYm(ly,lm);
+  $("#homeLedger").textContent=curSym(cur)+" "+cur;
+  // 本月支出（当前账本）
+  const key=monthKey(ly,lm);
+  const inM=allExpenses.filter(e=>isExp(e)&&inLedger(e)&&e.date.slice(0,7)===key);
+  const total=inM.reduce((s,e)=>s+e.amount,0);
+  const n=inM.length;
+  const inc=allExpenses.filter(e=>e.type==="income"&&inLedger(e)&&e.date.slice(0,7)===key).reduce((s,e)=>s+e.amount,0);
+  const ov=$("#homeOvAmt");
+  ov.textContent=moneyC(total,cur);
+  ov.classList.toggle("over",false);
+  // 预算进度
+  const b=curBudget(cur); const bm=b.m;
+  const bb=$("#homeBudget");
+  if(bm>0){
+    const pct=Math.min(100,Math.round(total/bm*100));
+    const over=total>bm;
+    ov.classList.toggle("over",over);
+    bb.innerHTML='<div class="bline"><span data-i18n="homeBudgetLab">预算</span><b>'+moneyC(total,cur)+' / '+moneyC(bm,cur)+' ('+pct+'%)</b></div>'+
+      '<div class="btrack"><div class="bfill'+(over?' over':'')+'" style="width:'+pct+'%"></div></div>'+
+      (over?'<div class="bwarn">'+t("budOverMonth")+' '+moneyC(total-bm,cur)+'</div>':
+        '<div class="bline" style="margin-top:8px"><span>'+t("homeRemain")+'</span><b>'+moneyC(bm-total,cur)+'</b></div>');
+  }else{
+    bb.innerHTML='<div class="bline"><span data-i18n="homeNoBudget">未设预算</span><b>'+n+' '+t("count")+'</b></div>';
+  }
+  const sub=[n+" "+t("count"), t("monthExp")].join(" · ");
+  $("#homeOvSub").textContent=sub+(inc>0?" · "+t("income")+" "+moneyC(inc,cur):"");
+  // 近期记录（跨账本，按日期倒序，最多 5 条）
+  const recent=allExpenses.slice().sort((a,b)=>b.date.localeCompare(a.date)||(b.created||0)-(a.created||0)).slice(0,5);
+  const box=$("#homeList");
+  if(!recent.length){
+    box.innerHTML='<div class="home-empty"><span class="eico"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><p data-i18n="homeEmpty">还没有记录，点「记一笔」开始</p></div>';
+  }else{
+    box.innerHTML=recent.map(e=>{
+      const inc=e.type==="income";
+      return '<div class="hrow" data-id="'+e.id+'">'+catChip(e.category)+
+        '<div class="hm"><b>'+esc(e.category)+(inc?' <span class="tag-inc">'+t("income")+'</span>':"")+'</b><small>'+esc(e.note||e.date.slice(5))+'</small></div>'+
+        '<div class="ha'+(inc?' inc':' exp')+'">'+(inc?"+":"−")+moneyC(e.amount,e.cur||'EUR')+'</div></div>';
+    }).join("");
+  }
+  $$(".hrow",box).forEach(r=>r.addEventListener("click",()=>openDetail(r.dataset.id)));
+}
+
 /* ================= 明细视图 ================= */
 function renderLedger(){
   $("#periodLabel").textContent=fmtCnYm(state.ly,state.lm);
@@ -2172,7 +2360,23 @@ function bindEvents(){
     if(b){ state.ly=+b.dataset.y; state.lm=+b.dataset.m; state.sy=+b.dataset.y; $("#periodCal").style.display="none"; updatePeriodLabel(); if(state.tab==="stats")renderStats(); else renderLedger(); }
   });
   $("#statSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{state.statMode=b.dataset.k; state.monthCat=null; renderStats();}));
-  $("#fabBtn").addEventListener("click",()=>openModal(null));
+  // 全局「＋」→ 快捷弹层（手动记账 / AI 导入 / 日历 / 预算）
+  $("#fabBtn").addEventListener("click",()=>{ $("#quickSheet").classList.add("on"); });
+  $("#quickSheet").addEventListener("click",e=>{
+    if(e.target===e.currentTarget){ $("#quickSheet").classList.remove("on"); return; }
+    const q=id=>{ $("#quickSheet").classList.remove("on"); showTab(id); };
+    if(e.target.closest("#qsManual")){ $("#quickSheet").classList.remove("on"); openModal(null); }
+    else if(e.target.closest("#qsImport")){ q("import"); }
+    else if(e.target.closest("#qsDash")||e.target.closest("#qsBudget")){ q("settings"); }
+  });
+  // 首页按钮
+  if($("#homeAddBtn")) $("#homeAddBtn").addEventListener("click",()=>openModal(null));
+  if($("#homeImportBtn")) $("#homeImportBtn").addEventListener("click",()=>showTab("import"));
+  if($("#homeCalBtn")) $("#homeCalBtn").addEventListener("click",()=>showTab("settings"));
+  if($("#homeCalBtn2")) $("#homeCalBtn2").addEventListener("click",()=>showTab("settings"));
+  if($("#homeDashBtn")) $("#homeDashBtn").addEventListener("click",()=>showTab("settings"));
+  if($("#homeStatsBtn")) $("#homeStatsBtn").addEventListener("click",()=>showTab("stats"));
+  if($("#homeAllBtn")) $("#homeAllBtn").addEventListener("click",()=>showTab("ledger"));
   $("#fCancel").addEventListener("click",closeModal);
   $("#fSave").addEventListener("click",saveModal);
   $("#fDelete").addEventListener("click",deleteModal);
@@ -2357,7 +2561,7 @@ async function init(){
   applyLang();
   if($("#dashBreak")) $("#dashBreak").innerHTML='<div class="dash-break dash-empty"><span class="num">'+moneyC(0,state.statCur)+'</span><small>0</small></div>';
   $("#dAmt").textContent=money(0);
-  showTab("ledger");
+  showTab("home");
   // 每月定时：打开时补录已到期项；运行中每分钟再查一次
   checkRecurring();
   setInterval(()=>{ checkRecurring(); },60000);
