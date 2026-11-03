@@ -941,9 +941,9 @@ zh:[
  {h:"1. 这是什么", b:[
    {t:"p",v:"一款完全离线的个人记账工具：所有数据只存在你的手机本机（IndexedDB），不联网、不上传、不调 AI 接口。支持 AI 识别小票/账单、月/年账单、类别、可视化、入账、预算与导出备份。"}]},
  {h:"2. 快速开始", b:[
-   {t:"p",v:"底部四个页签：<b>明细</b>（流水列表）、<b>统计</b>（本月/年账单/趋势）、<b>导入</b>（AI 识别入库）、<b>设置</b>（类别、数据、看板、预算、语言、提醒）。点底部中间「＋」即可手动记一笔，可记<b>支出</b>或<b>入账</b>。"}]},
+   {t:"p",v:"底部四个页签：<b>明细</b>（流水列表）、<b>统计</b>（本月/年账单/趋势）、<b>导入</b>（AI 识别入库）、<b>设置</b>（类别、今日看板、预算、每月定时、语言、数据）。点底部中间「＋」即可手动记一笔，可记<b>支出</b>或<b>入账</b>。"}]},
  {h:"3. 记一笔支出 / 入账", b:[
-   {t:"p",v:"点「＋」→ 先选<b>支出 / 入账</b> → 填金额、选日期（点日期直接弹日历）、选类别（点开下拉）、填备注 → 保存。金额与日期必填，日期默认今天。"}]},
+   {t:"p",v:"点「＋」→ 先选<b>支出 / 入账</b> → 填金额、选日期（点日期直接弹日历）、选类别（点开下拉）、填备注 → 保存。金额与日期必填，日期默认今天。金额旁可<b>选货币</b>（每笔自带，不同货币=不同账本，不换算）。金额支持小数点，欧式键盘的逗号也会被当作小数点。"}]},
  {h:"4. AI 识别入库（最常用）", b:[
    {t:"p",v:"<b>流程：</b>打开「导入」→ 点「复制识别提示词」（或批量版）→ 把提示词连同你的小票/购物截图/银行记录图片一起发给 DeepSeek → DeepSeek 只返回一段 JSON → 回到本 app「导入」页粘贴 → 点「解析」→ 在预览里确认 →「确认入库」。英文界面下提示词也是英文。"},
    {t:"p",v:"支持：超市小票、购物截图、银行支出记录等。识别结果会带商品明细（原名 + 中文名 + 数量 + 单价），入库后可查看每一项。"},
@@ -953,13 +953,14 @@ zh:[
  {h:"6. 类别管理", b:[
    {t:"p",v:"「设置 → 类别」可改名、删除、点「改」换图标和颜色（颜色会同步到统计图的颜色）；可点「新增类别」用色板和图标新建。"}]},
  {h:"7. 统计与预算", b:[
-   {t:"p",v:"「统计」页：本月看<b>环形占比图</b>（点某个扇区看该类别明细，只有一个类别时占满整圈）；<b>年账单</b>看 12 个月柱状；<b>趋势</b>看 12 个月折线、月均线与<b>预算红线</b>。"},
-   {t:"p",v:"在「设置 → 月度预算」填金额后，趋势图会出现一条红色虚线作为预算上限，超出预算的月份会标红。顶部期标签可点开日历直接选月份。"}]},
+   {t:"p",v:"「统计」页顶部有<b>账本</b>栏（列出你用过的币种，按使用频次排序）：选哪种货币就看哪种货币的统计，互不混算。本月看<b>环形占比图</b>（点扇区看该类别明细）；<b>年账单</b>看 12 个月柱状 + 年度预算进度；<b>趋势</b>看 12 个月折线、月均线与<b>该账本</b>的月度预算红线。"},
+   {t:"p",v:"「设置 → 预算（按账本）」可给每个币种分别设<b>月度预算</b>与<b>年度预算</b>：月度用于趋势图红线与本月超支提示，年度用于年账单超支提示；输入即生效，无需点保存。"},
+   {t:"p",v:"「设置 → 今日看板」：点某天看该天<b>分币种的金额与笔数</b>；日历里每天标注各币种<b>金额</b>（多币种分行）；点顶部日期可跳转到任意一天。"}]},
  {h:"8. 搜索与排序", b:[
    {t:"p",v:"「明细」页顶部可搜索备注/类别/商品名（跨所有月份）；右侧下拉可按日期或金额升/降序排列。"}]},
- {h:"9. 记账提醒", b:[
-   {t:"p",v:"「设置 → 记账提醒」可开启：每天 / 每周（选星期几）/ 每 N 天，并设提醒时间。打开 App 时会检查，若到点且这段时间还没记过账就提醒你。"},
-   {t:"p",v:"注意：iOS「添加到主屏幕」的网页无法在后台推送通知，所以提醒是在你打开 App 时触发的。"}]},
+ {h:"9. 每月定时记账", b:[
+   {t:"p",v:"「设置 → 每月定时记账 → 新增定时」可加多条，如每月 1 日 08:00 房租、15 日订阅费。设定「每月第几天 + 几点几分」+ 金额/币种/类别/备注，可选支出或入账。"},
+   {t:"p",v:"选<b>本月开始</b>：若今天已过该日（如今天 2 日、选 1 日），打开 App 会补记本月这一次；选<b>下月开始</b>则从下月该日开始。到设定时刻自动记一笔；若当天没打开 App，下次打开会自动补记漏掉的月份。"}]},
  {h:"10. 数据与备份（重要）", b:[
    {t:"p",v:"数据存在本机 IndexedDB（库名 expense-db），iOS 可在「设置 → Safari → 高级 → 网站数据」查看/清除。建议定期在「设置 → 导出」导出 JSON 备份；换手机或清缓存后用「恢复」导入回来。"}]},
  {h:"11. 安装到主屏幕（各品牌）", b:[
@@ -982,9 +983,9 @@ en:[
  {h:"1. What is this", b:[
    {t:"p",v:"A fully offline personal bookkeeping app: all data lives only on your device (IndexedDB) — no network, no upload, no AI API. Supports AI receipt recognition, monthly/yearly bills, categories, charts, income, budget and export backup."}]},
  {h:"2. Quick start", b:[
-   {t:"p",v:"Four tabs at the bottom: <b>Records</b> (ledger), <b>Stats</b> (month / year / trend), <b>Import</b> (AI recognition), <b>Settings</b> (categories, data, dashboard, budget, language, reminder). Tap the “＋” button to add an <b>expense</b> or <b>income</b>."}]},
+   {t:"p",v:"Four tabs at the bottom: <b>Records</b> (ledger), <b>Stats</b> (month / year / trend), <b>Import</b> (AI recognition), <b>Settings</b> (categories, dashboard, budget, schedules, language, data). Tap the “＋” button to add an <b>expense</b> or <b>income</b>."}]},
  {h:"3. Add an expense / income", b:[
-   {t:"p",v:"Tap “＋” → pick <b>Expense / Income</b> → enter amount, date (tap to open calendar), category (tap to open dropdown), note → save. Amount and date are required; date defaults to today."}]},
+   {t:"p",v:"Tap “＋” → pick <b>Expense / Income</b> → enter amount, date (tap to open calendar), category (tap to open dropdown), note → save. Amount and date are required; date defaults to today. Pick a <b>currency</b> next to the amount (per-record; different currency = different ledger, no conversion). Decimal points are supported — a European comma is treated as the decimal point."}]},
  {h:"4. AI recognition (most used)", b:[
    {t:"p",v:"<b>Flow:</b> open “Import” → tap “Copy recognition prompt” (or batch) → send the prompt together with your receipt / shopping screenshot / bank record to DeepSeek → DeepSeek returns only one JSON → paste it back into the app's “Import” page → tap “Parse” → review → “Import”. The prompt is in English when the app is in English."},
    {t:"p",v:"Supports: supermarket receipts, shopping/order screenshots, bank spending records, etc. Results include item details (original name + Chinese name + qty + unit price) that you can view per entry."},
@@ -994,13 +995,14 @@ en:[
  {h:"6. Categories", b:[
    {t:"p",v:"“Settings → Categories” lets you rename, delete, and tap “Edit” to change icon & color (colors sync to the stats chart); tap “Add category” to create with the palette and icons."}]},
  {h:"7. Stats & budget", b:[
-   {t:"p",v:"“Stats”: this month shows a <b>donut chart</b> (tap a segment for that category's details; a single category fills the ring); <b>Year</b> shows 12-month bars; <b>Trend</b> shows the 12-month line, monthly-average line and the <b>budget line</b>."},
-   {t:"p",v:"After setting a “Monthly budget” in Settings, the trend chart shows a red dashed ceiling; months over budget are marked red. Tap the period label to open a calendar and pick a month."}]},
+   {t:"p",v:"The <b>Ledger</b> bar at the top of “Stats” lists the currencies you've used (sorted by how often you use them): pick one to see that currency's stats only — ledgers never mix. This month shows a <b>donut chart</b> (tap a segment for that category's details); <b>Year</b> shows 12-month bars + yearly-budget progress; <b>Trend</b> shows the 12-month line, monthly-average line and that ledger's <b>monthly budget line</b>."},
+   {t:"p",v:"“Settings → Budget (per ledger)” lets you set <b>monthly</b> and <b>yearly</b> budgets for each currency: monthly drives the trend red line and this-month over-budget notice, yearly drives the year-bill over-budget notice. Takes effect as you type."},
+   {t:"p",v:"“Settings → Today's dashboard”: tap a day to see that day's <b>amount + count per currency</b>; the calendar labels each day with each currency's <b>amount</b> (multi-currency on separate lines); tap the date to jump to any day."}]},
  {h:"8. Search & sort", b:[
    {t:"p",v:"Search note/category/item across all months from the top of “Records”; the dropdown sorts by date or amount, ascending or descending."}]},
- {h:"9. Reminder", b:[
-   {t:"p",v:"“Settings → Reminder” can enable: Daily / Weekly (pick weekdays) / Every N days, plus a reminder time. When you open the app it checks and reminds you if the time has passed and you haven't logged recently."},
-   {t:"p",v:"Note: home-screen web apps on iOS can't push background notifications, so the reminder triggers when you open the app."}]},
+ {h:"9. Monthly schedule", b:[
+   {t:"p",v:"“Settings → Monthly schedule → Add” lets you add rules such as rent on the 1st at 08:00 or a subscription on the 15th. Set “day of month + time (HH:MM)” + amount / currency / category / note, as expense or income."},
+   {t:"p",v:"Pick <b>This month</b>: if today already passed that day (e.g. today is the 2nd, day=1), opening the app backfills this month's occurrence; pick <b>Next month</b> to start from next month's day. It auto-records at the set moment; if the app wasn't open that day, it catches up the missed months next time."}]},
  {h:"10. Data & backup (important)", b:[
    {t:"p",v:"Data is stored in local IndexedDB (db “expense-db”); on iOS check/clear via Settings → Safari → Advanced → Website Data. Export a JSON backup regularly under “Settings → Export”; restore it on a new device or after clearing cache."}]},
  {h:"11. Add to home screen (per brand)", b:[
@@ -2123,11 +2125,17 @@ function renderDash(){
     const dayRecs=byDay[ds]||{};
     const dcs=Object.keys(dayRecs);
     const cls="dc"+(ds===todayStr()?" today":"")+(ds===sel?" sel":"")+(dcs.length?" has":"");
-    // 单币种显示金额（随数据变化），多币种显示笔数
-    const tag=dcs.length===1
-      ? curSym(dcs[0])+Math.round(dayRecs[dcs[0]].amt)
-      : dcs.slice(0,2).map(c=>curSym(c)+dayRecs[c].n).join("·")+(dcs.length>2?"·+"+(dcs.length-2):"");
-    html+='<span class="'+cls+'" data-d="'+ds+'"><b>'+d+'</b>'+(tag?'<i class="tags">'+esc(tag)+'</i>':"")+'</span>';
+    // 日历格：每个币种一行，显示金额（多币种分行）；币种过多时仅显示前两个+个数
+    const lineFor=c=>curSym(c)+Math.round(dayRecs[c].amt);
+    let lines;
+    if(!dcs.length) lines=[];
+    else if(dcs.length===1) lines=[lineFor(dcs[0])];
+    else{
+      lines=dcs.slice(0,2).map(lineFor);
+      if(dcs.length>2) lines.push("+"+(dcs.length-2));
+    }
+    html+='<span class="'+cls+'" data-d="'+ds+'"><b>'+d+'</b>'+
+      (lines.length?lines.map(l=>'<i class="tags">'+esc(l)+'</i>').join(""):"")+'</span>';
   }
   html+='</div><div class="dash-foot"><button class="btn btn-ghost sm" id="dashTodayBtn">回到今天</button></div>';
   $("#dashCal").innerHTML=html;
