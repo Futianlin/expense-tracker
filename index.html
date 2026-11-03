@@ -416,6 +416,86 @@ main{padding:8px 20px 26px}
 #view-settings .set-group{border-radius:18px;overflow:hidden}#view-stats .card{padding:20px}
 .import-tip{border-radius:18px}#view-import .import-tip{padding:20px}
 @media(min-width:600px){main{padding-left:24px;padding-right:24px}}
+
+/* DayTally V2.2 — reference-led, full product interaction overhaul */
+#view-settings .set-group.settings-detail{display:none}#view-settings .set-group.settings-detail.active-detail{display:block}#view-settings .set-group.settings-detail.active-detail{padding:14px;background:white;border-radius:16px;box-shadow:0 1px 6px #193e2910}.settings-directory button:active{background:#E7F2E9}.v2-highlight{animation:v2flash .8s ease}@keyframes v2flash{0%{outline:2px solid #61A886}100%{outline:2px solid transparent}}
+:root{--bg:#FAF9F5;--surface:#FFF;--border:#E9EDE7;--text:#153B2D;--muted:#75817A;--accent:#267B59;--accent-soft:#E0F0E5;--radius:17px}
+body{background:var(--bg);font-size:14px;letter-spacing:-.12px}
+.header{background:var(--bg);border-bottom:0;padding:10px 20px 8px;box-shadow:none}
+.header .brand{display:none}
+.header-row{justify-content:flex-end;min-height:2px}
+#periodWrap{width:100%;justify-content:space-between;gap:12px}
+.period-label{font-size:13px;min-width:0;padding:7px 4px}
+.period .nav button{border-radius:12px;border-color:#ECEFE8}
+main{padding:8px 20px 30px}
+#view-home .home-top{padding:16px 0 20px}
+.home-top h1{font-size:22px!important;letter-spacing:-.8px!important}
+.home-eyebrow{margin-top:0;font-size:11px;color:#6F8076}
+.icon-action{height:38px;width:38px;border:0;border-radius:10px;background:#EAF2EB;color:#287A59;font-size:20px}
+.home-hero{padding:18px 18px 17px;border-radius:18px;background:linear-gradient(145deg,#E7F2E9,#E1F0E5);margin-bottom:14px}
+.hero-overline{margin-bottom:15px;font-weight:650}
+.hero-amount{font-size:37px;letter-spacing:-1.3px;margin:4px 0 7px}
+.hero-meta{gap:10px}.hero-progress{margin:11px 0 8px;height:7px}
+.home-actions{margin:14px 0 24px;gap:8px}.home-action{min-height:62px;border-radius:12px;border:1px solid #ECF0EB;background:#fff;box-shadow:0 1px 4px #173d3106;font-size:20px}
+.home-action span{font-size:11px}.home-section-head h2{font-size:16px}
+.home-recent{border-radius:14px;background:transparent}.recent-row{padding:12px 7px;background:transparent;border-color:#E7ECE7}.recent-row .cico{width:38px;height:38px;border-radius:12px}
+.screen-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 18px;min-height:38px}.screen-heading h1{font-size:23px;letter-spacing:-.5px;margin:0;font-weight:750}.screen-controls{display:flex;gap:8px}.screen-icon{border:0;background:#EEF3EF;border-radius:11px;color:#1B5B41;width:39px;height:39px;font-size:24px;line-height:1;display:grid;place-items:center;cursor:pointer}.screen-caption{font-size:10px;letter-spacing:1.1px;color:#9DAAA0}
+#view-ledger .summary{display:none}
+#view-ledger .ledger-tool{display:flex;gap:8px;align-items:center;margin-bottom:18px}
+#view-ledger .lt-search{flex:1;min-width:0;background:white;border:1px solid #E8EEE8;border-radius:12px}
+#view-ledger #sortSel{max-width:125px;background:#fff;border:1px solid #E8EEE8;border-radius:12px;font-size:12px}
+#view-ledger .day{margin:0 0 20px}
+#view-ledger .day-head{padding:9px 0;color:#5C7064;border-bottom:0;font-size:12px}
+#view-ledger .row{padding:13px 2px;border-color:#EDF0EC}
+#view-ledger .row-title{font-size:14px}
+#view-ledger .row-sub{font-size:11px}
+#view-ledger .row-amt{font-size:14px}
+#view-stats .card{border:0;padding:8px 0 18px;background:transparent}
+#statSegWrap{margin:0 0 12px!important}
+#statSeg{width:100%;border-radius:50px;padding:3px;background:#F0F1EC;border:0;display:flex}
+#statSeg button{flex:1;border-radius:50px;padding:8px 5px;font-size:12px}
+#statSeg button.on{box-shadow:0 2px 5px #214f3420}
+#view-stats .donut-holder{max-width:205px}
+#view-stats .cat-item{padding:13px 0}
+#view-stats .bar-row{margin-bottom:10px}
+#view-stats .bar-track{height:19px;border-radius:7px}
+#view-stats .bar-fill{border-radius:7px}
+#view-import .import-tip{background:#EFF7F0;padding:18px;border:0;border-radius:17px;color:#225C42;font-size:13px;line-height:1.75}
+#view-import .import-tip b{font-size:16px}
+#view-import .card{border:1px solid #E9EEE8;border-radius:16px;padding:16px}
+#view-import textarea{min-height:165px;border-radius:12px}
+.import-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:4px 0 22px}
+.import-step{display:flex;flex-direction:column;align-items:center;gap:5px;color:#A3ACA6;position:relative;text-align:center;font-size:10px}
+.import-step:before{content:'';position:absolute;top:12px;left:-44%;width:86%;height:1px;background:#E2E7E1}
+.import-step:first-child:before{display:none}
+.import-step b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#E9EEEA;color:#88978E;font-size:12px;z-index:1}
+.import-step.current{color:#247B57;font-weight:700}.import-step.current b{background:#267B59;color:#fff}
+.import-step.done b{background:#DCEEE3;color:#267B59}.import-step.done b:after{content:'✓';position:absolute;background:#DCEEE3}.import-step.done{color:#398565}
+#view-settings .set-group{background:transparent;border:0;overflow:visible;margin-bottom:17px;border-radius:0}
+#view-settings .set-title{background:transparent!important;border:0!important;padding:6px 4px 10px!important;color:#6A7D71;font-size:12px!important}
+#view-settings .set-item{background:white;border-radius:12px;padding:14px!important;margin-bottom:2px;border:0!important}
+#view-settings .set-group:has(#dashCal){display:none}
+.settings-directory{margin-bottom:22px}.directory-label{font-size:11px;color:#75827A;margin:16px 4px 9px;font-weight:700}.settings-directory button{width:100%;display:flex;align-items:center;gap:13px;border:0;border-bottom:1px solid #F1F3EF;background:#fff;padding:13px 16px;text-align:left;color:#287857;font-size:17px;min-height:49px}.settings-directory button:first-of-type,.directory-label+button{border-radius:13px 13px 0 0}.settings-directory button span{font-size:14px;color:#1B3C2E;flex:1}.settings-directory button i{font-style:normal;color:#A1ABA4;font-size:22px}
+#view-calendar .set-group{border:0;background:transparent}.calendar-special .set-title{display:none}.calendar-special .dash-card{background:transparent!important;border:0!important;padding:0!important}.calendar-special #dashCal{margin-top:18px}
+.fab{width:52px;height:52px;bottom:calc(37px + env(safe-area-inset-bottom));right:50%;transform:translateX(50%);border-radius:50%;z-index:45;border:4px solid var(--bg);font-size:25px;box-shadow:0 3px 12px #1A513B3A}
+.fab:active{transform:translateX(50%) scale(.95)}
+.quick-menu{right:calc(50% - 88px);bottom:calc(94px + env(safe-area-inset-bottom));z-index:46}
+.tabbar{background:#fff;padding:7px 8px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -3px 15px #1C37290C;min-height:65px}
+.tabbar .tab:nth-child(2){margin-right:33px}.tabbar .tab:nth-child(3){margin-left:33px}.tab{font-size:10px;min-height:45px}
+.modal-mask .sheet{border-radius:26px 26px 0 0;padding-top:20px;box-shadow:0 -14px 45px #1F38241A}
+#modalTitle{text-align:center;font-size:19px}.sheet .sub{text-align:center}
+#modal #fAmount{font-size:32px!important;min-height:62px;text-align:center;font-weight:700;border:0!important;background:transparent!important;box-shadow:none}
+#modal .type-toggle{border-radius:40px;overflow:hidden}
+#modal .field{margin-bottom:13px}
+#modal .btn-primary{border-radius:13px}
+@media(max-width:355px){main{padding-left:13px;padding-right:13px}.home-action span{font-size:10px}.tabbar .tab:nth-child(2){margin-right:23px}.tabbar .tab:nth-child(3){margin-left:23px}}
+
+/* V2 strict reference: three genuinely separate import screens */
+#view-import .screen-heading{margin-top:0;margin-bottom:24px}#view-import .screen-heading h1{font-size:19px}
+#view-import{padding:0 2px}#view-import .import-steps{margin:0 5px 38px;gap:2px}.import-step{font-size:11px;gap:7px}.import-step b{width:24px;height:24px}.import-step:before{top:11px}
+.wizard-panel[hidden]{display:none!important}.wizard-panel{padding:0 4px;min-height:62vh}.wizard-panel h2{font-size:18px;margin:0 0 10px;font-weight:750;color:#183E30;letter-spacing:-.3px}.wizard-description{font-size:13px;line-height:1.85;color:#6F7B72;margin:0 0 23px}.wizard-illustration{height:135px;display:flex;gap:22px;align-items:center;justify-content:center;color:#23805D;margin:8px 0 28px;font-size:25px}.wizard-document{width:80px;height:94px;background:#F2F4F1;border:1px solid #D6DED7;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#8A9A8E;font-size:34px;box-shadow:0 4px 12px #1F382408}.wizard-document.target{background:#DCEDE1;color:#267A59;border-color:#D1E8D7}.wizard-document small{font-size:10px;font-weight:600;margin-top:3px}
+.wizard-outline{display:block;width:100%;height:47px;background:#fff;border:1px solid #DDE6DE;border-radius:12px;color:#205A42;font-weight:650;margin:10px 0;font-size:13px}.wizard-text{background:none;border:0;display:block;margin:14px auto;padding:10px;color:#287B59;font-weight:600;font-size:12px}.wizard-next{margin-top:25px!important;min-height:47px;border-radius:12px}.wizard-input{height:245px!important;min-height:245px!important;resize:vertical;background:#fff!important;font-size:13px!important;border-color:#E0E7E1!important}.wizard-actions{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:9px;margin-top:16px}.wizard-actions .btn{border-radius:12px;min-height:44px;font-size:13px}.wizard-format{margin-top:12px;font-size:11px}.wizard-preview{padding:0}.wizard-preview .prev-row{display:flex;align-items:center;gap:8px;border-bottom:1px solid #E7EBE7;padding:13px 4px}.wizard-preview .prev-row .prev-main{flex:1;min-width:0}.wizard-preview .prev-row .prev-num{order:2;max-width:92px}.wizard-preview .prev-row .prev-num input{width:88px!important;font-size:15px!important;font-weight:750;color:#153F2D;text-align:right}.wizard-preview .prev-row .prev-del{order:3}.wizard-check{order:-1;display:flex;align-items:center}.wizard-check input{width:17px;height:17px;accent-color:#25845C}.wizard-preview .prev-main select{border:0!important;background:transparent!important;font-size:15px;font-weight:700;padding-left:0}.wizard-preview .pdate,.wizard-preview .pnote{font-size:11px;color:#7B857D}.wizard-commit-bar{position:sticky;bottom:calc(72px + env(safe-area-inset-bottom));background:#F8F8F5;padding:17px 0;display:flex;align-items:center;justify-content:space-between;gap:9px}.wizard-commit-bar>label{font-size:12px;white-space:nowrap;display:flex;gap:4px;align-items:center}.wizard-commit-bar input{accent-color:#24805C}.wizard-commit-bar .btn{min-height:43px;font-size:12px;border-radius:11px}.wizard-preview .prev-del{visibility:hidden}.wizard-preview .wizard-editing .prev-num,.wizard-preview .wizard-editing .prev-main select,.wizard-preview .wizard-editing .prev-del{visibility:visible}.wizard-preview .prev-num{visibility:visible}.wizard-restore{display:none!important}.wizard-row-toggle{order:3;border:0;background:none;color:#718278;padding:7px;cursor:pointer}.wizard-row-details{order:5;flex-basis:100%;width:100%;padding:8px 8px 10px 26px;background:#F2F6F2;border-radius:9px}.wizard-row-details[hidden]{display:none}.wizard-preview .prev-row{flex-wrap:wrap}.wizard-item-line{display:flex;justify-content:space-between;gap:8px;padding:5px 0;font-size:12px;color:#4E6B5A}.wizard-detail-meta{font-size:11px;color:#708175;padding-bottom:5px}
+
 </style>
 </head>
 <body>
@@ -444,12 +524,13 @@ main{padding:8px 20px 26px}
   <!-- ===== 视图：明细 ===== -->
   <main id="main">
     <section id="view-home" class="view on">
-      <div class="home-top"><div><div class="home-eyebrow" id="homeGreeting">本地 · 离线</div><h1 id="homeTitle">天天记账</h1></div><button id="homeCalBtn" class="icon-action" title="日历" aria-label="日历">▦</button></div>
+      <div class="home-top"><div><h1 id="homeTitle">天天记账</h1><div class="home-eyebrow" id="homeGreeting">DayTally · 本地离线</div></div><button id="homeCalBtn" class="icon-action" title="日历" aria-label="日历">▦</button></div>
       <div class="home-hero" id="homeHero"></div>
       <div class="home-actions"><button id="homeAdd" class="home-action primary">＋ <span data-home="add">记一笔</span></button><button id="homeImport" class="home-action">⇩ <span data-home="import">识别导入</span></button><button id="homeCalendar" class="home-action">▦ <span data-home="calendar">日历</span></button><button id="homeBudget" class="home-action">◉ <span data-home="budget">预算</span></button></div>
       <div class="home-section-head"><h2 id="homeRecentLabel">近期记录</h2><button id="homeAll" class="text-link">查看全部 ›</button></div><div class="home-recent" id="homeRecent"></div>
     </section>
     <section id="view-ledger" class="view">
+      <div class="screen-heading"><h1 data-v2="transactions">交易记录</h1><div class="screen-controls"><button id="ledgerSearchToggle" class="screen-icon" aria-label="搜索">⌕</button><button id="ledgerFilterToggle" class="screen-icon" aria-label="筛选及排序">☷</button></div></div>
       <div class="card summary" id="summaryCard"></div>
       <div class="ledger-tool">
         <div class="lt-search"><svg viewBox="0 0 24 24"><path d="M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM16 16l4 4"/></svg><input id="searchInput" type="search" data-i18n-ph="searchPh" placeholder="搜索备注 / 类别 / 商品名"></div>
@@ -465,46 +546,57 @@ main{padding:8px 20px 26px}
 
     <!-- ===== 视图：统计 ===== -->
     <section id="view-stats" class="view">
+      <div class="screen-heading"><h1 data-v2="analysis">消费分析</h1><span class="screen-caption">DAYTALLY / INSIGHTS</span></div>
       <div class="card" id="statCard"></div>
     </section>
 
     <!-- ===== 视图：导入 ===== -->
     <section id="view-import" class="view">
-      <div class="import-tip">
-        <b data-i18n="importTitle">AI 识别支出凭证 → 粘贴入库</b><br>
-        <span data-i18n="importTip">在 DeepSeek 里识别前，先点下面「复制识别提示词」把提示词带上；再把 DeepSeek 返回的 JSON 粘贴到输入框，点「解析」核对后入库。支持小票、购物/订单截图、银行消费记录；一次可识别多张（用「批量识别提示词」，返回的数组会按各自的日期分别入库）。金额以「实付总价」为准。</span>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-          <button class="btn btn-primary sm" id="copyPromptBtn" data-i18n="copyPrompt">复制识别提示词</button>
-          <button class="btn btn-ghost sm" id="batchCopyBtn" data-i18n="batchPrompt">批量识别提示词</button>
-          <button class="btn btn-ghost sm" id="viewPromptBtn" data-i18n="viewPrompt">查看提示词</button>
-        </div>
+      <div class="screen-heading"><button id="importBack" class="screen-icon" aria-label="返回首页">‹</button><h1 data-v2="import">识别结果导入</h1><span></span></div>
+      <div class="import-steps"><div class="import-step current" data-step="1"><b>1</b><span>获取提示词</span></div><div class="import-step" data-step="2"><b>2</b><span>粘贴结果</span></div><div class="import-step" data-step="3"><b>3</b><span>核对导入</span></div></div>
+      <div id="wizardOne" class="wizard-panel">
+        <div class="wizard-illustration" aria-hidden="true"><div class="wizard-document">☷<small>Receipt</small></div><span>→</span><div class="wizard-document target">☑<small>DayTally</small></div></div>
+        <h2 data-wz="step1">第 1 步：获取识别提示词</h2>
+        <p class="wizard-description" data-wz="help1">复制下方提示词，前往 DeepSeek 或你使用的 AI 工具，上传小票、订单或银行消费截图进行识别。识别结束后返回这里粘贴结果。</p>
+        <button class="wizard-outline" id="copyPromptBtn" data-i18n="copyPrompt">复制识别提示词（单张）</button>
+        <button class="wizard-outline" id="batchCopyBtn" data-i18n="batchPrompt">复制批量识别提示词</button>
+        <button class="wizard-text" id="viewPromptBtn" data-i18n="viewPrompt">查看完整提示词 ›</button>
+        <div class="card" id="promptBox" style="display:none"><h3 data-i18n="promptBoxTitle">识别提示词</h3><div class="prompt-scroll" id="promptText"></div><button class="btn btn-primary block" id="copyPrompt2Btn" data-i18n="copyPrompt">复制识别提示词</button></div>
+        <button class="btn btn-primary block wizard-next" id="wizardToTwo" data-wz="next">我已获取识别结果 · 下一步 →</button>
       </div>
-      <div class="card" id="promptBox" style="display:none">
-        <h3 data-i18n="promptBoxTitle">识别提示词（整段发给 DeepSeek）</h3>
-        <div class="prompt-scroll" id="promptText"></div>
-        <button class="btn btn-primary block" id="copyPrompt2Btn" data-i18n="copyPrompt">复制识别提示词</button>
+      <div id="wizardTwo" class="wizard-panel" hidden>
+        <h2 data-wz="step2">第 2 步：粘贴识别结果</h2>
+        <p class="wizard-description" data-wz="help2">将 DeepSeek 返回的 JSON 或文本粘贴到下方，然后点击解析。</p>
+        <textarea class="in wizard-input" id="importText" data-i18n-ph="importPh" placeholder="粘贴识别结果（JSON 或文本）…"></textarea>
+        <div class="wizard-actions"><button class="btn btn-plain" id="wizardPaste" data-wz="paste">粘贴</button><button class="btn btn-plain" id="wizardClear" data-wz="clear">清空</button><button class="btn btn-primary" id="parseBtn" data-i18n="parse">解析</button></div>
+        <div class="hint wizard-format" id="importHint" data-i18n="importHint">支持 JSON、批量数组及原有文本格式，全部在本地解析。</div>
+        <button class="wizard-text" id="wizardToOne" data-wz="back1">‹ 返回获取提示词</button>
       </div>
-      <div class="card">
-        <textarea class="in" id="importText" data-i18n-ph="importPh" placeholder="粘贴 DeepSeek 返回的 JSON 或文本…"></textarea>
-        <div class="hint" id="importHint" data-i18n="importHint">支持：小票 / 订单 / 银行消费 JSON（含 expense 字段或数组）、简单 JSON、以及「日期 金额 类别 备注」格式的行。批量识别返回的数组会自动按各自日期拆开入库。</div>
-        <button class="btn btn-primary block mt" id="parseBtn" data-i18n="parse">解析</button>
+      <div id="wizardThree" class="wizard-panel" hidden>
+        <h2 data-wz="step3">第 3 步：核对并导入</h2>
+        <p id="wizardSummary" class="wizard-description">检查识别到的消费记录，编辑后确认导入。</p>
+        <div id="previewCard" class="wizard-preview" style="display:none"><span id="previewCount" hidden></span><div id="previewList"></div><div class="wizard-commit-bar"><label><input type="checkbox" id="wizardSelectAll" checked> <span data-wz="all">全选</span></label><button class="btn btn-plain" id="wizardEdit" data-wz="edit">编辑</button><button class="btn btn-primary" id="commitBtn" data-i18n="commit">确认导入</button></div><button class="wizard-text" id="clearPreviewBtn" data-i18n="clear">清空</button></div>
+        <button class="wizard-text" id="wizardToTwoBack" data-wz="back2">‹ 返回粘贴结果</button>
       </div>
-      <div class="card" id="previewCard" style="display:none">
-        <h3><span data-i18n="previewTitle">待入库</span> <span id="previewCount"></span> 笔</h3>
-        <div id="previewList"></div>
-        <button class="btn btn-primary block mt" id="commitBtn" data-i18n="commit">确认入库</button>
-        <button class="btn btn-plain block mt" id="clearPreviewBtn" data-i18n="clear">清空</button>
-      </div>
-      <div class="card">
-        <h3 data-i18n="restoreTitle">从文件恢复</h3>
-        <label class="btn btn-plain block" for="restoreFile" style="margin-bottom:8px" data-i18n="restoreBtn">选择 JSON / CSV 文件</label>
-        <input type="file" id="restoreFile" accept=".json,.csv,.txt" style="display:none">
-        <div class="hint" data-i18n="restoreHint">用于恢复之前导出的备份（JSON 完整备份 / CSV 明细）。</div>
-      </div>
+      <div class="wizard-restore" hidden><h3 data-i18n="restoreTitle">从文件恢复</h3><label for="restoreFile" data-i18n="restoreBtn">选择 JSON / CSV 文件</label></div>
+      <input type="file" id="restoreFile" accept=".json,.csv,.txt" style="display:none">
     </section>
 
     <!-- ===== 视图：设置 ===== -->
+    <section id="view-calendar" class="view"><div class="screen-heading"><button id="calendarBack" class="screen-icon" aria-label="返回首页">‹</button><h1 data-v2="calendar">日历</h1><span></span></div><div id="calendarMount"></div></section>
     <section id="view-settings" class="view">
+      <div class="screen-heading"><h1 data-v2="settings">设置</h1></div>
+      <div class="settings-directory" id="settingsDirectory">
+        <div class="directory-label">记账管理</div>
+        <button data-target="setCats">◈ <span>支出类别</span><i>›</i></button>
+        <button data-target="recTitle">▦ <span>每月定时记账</span><i>›</i></button>
+        <button data-target="setBudget">◎ <span>预算管理</span><i>›</i></button>
+        <div class="directory-label">数据与隐私</div>
+        <button data-target="setData">⇩ <span>数据备份与恢复</span><i>›</i></button>
+        <div class="directory-label">偏好与帮助</div>
+        <button data-target="setLang">◉ <span>语言 / Language</span><i>›</i></button>
+        <button data-target="setManual">ⓘ <span>用户手册</span><i>›</i></button>
+      </div>
       <div class="set-group">
         <div class="set-title" data-i18n="setDash">今日看板</div>
         <div class="dash-card">
@@ -1286,7 +1378,7 @@ function renderHome(){
   const pct=budget>0?amount/budget*100:0;
   document.querySelector(".home-tab-label").textContent=zh?"首页":"Home";
   document.getElementById("homeTitle").textContent=zh?"天天记账":"DayTally";
-  document.getElementById("homeGreeting").textContent=zh?"本地 · 离线":"Local · Offline";
+  document.getElementById("homeGreeting").textContent=zh?"DayTally · 本地离线":"Local · Offline";
   document.getElementById("homeRecentLabel").textContent=zh?"近期记录":"Recent transactions";
   document.getElementById("homeAll").textContent=zh?"查看全部 ›":"View all ›";
   document.querySelector('[data-home="add"]').textContent=zh?"记一笔":"Add";
@@ -1944,22 +2036,28 @@ function renderPreview(){
     const sel='<select data-i="'+i+'">'+state.cats.map(c=>
       '<option value="'+esc(c.name)+'"'+(r.category===c.name?" selected":"")+'>'+esc(c.name)+'</option>').join("")+'</select>';
     div.innerHTML=
-      '<div class="prev-num"><input type="number" step="0.01" min="0" value="'+r.amount+'" data-i="'+i+'" class="num"></div>'+
+      '<label class="wizard-check"><input type="checkbox" class="wizard-row-check" data-i="'+i+'" '+(r.wizardSelected===false?'':'checked')+'></label><div class="prev-num"><input type="number" step="0.01" min="0" value="'+r.amount+'" data-i="'+i+'" class="num"></div>'+
       '<div class="prev-main">'+sel+
       '<div class="pdate">'+esc(r.date)+' · '+(r.source==="ai"?"AI":t("srcManual"))+'</div>'+
       (r.note?'<div class="pnote">'+esc(r.note)+'</div>':'')+
       (r.items&&r.items.length?'<div class="pnote" style="color:var(--accent-ink)">'+t("hasItems")+' '+r.items.length+'</div>':'')+'</div>'+
-      '<button class="prev-del" data-i="'+i+'" aria-label="'+t("mDelete")+'">✕</button>';
+      '<button type="button" class="wizard-row-toggle" data-i="'+i+'" aria-label="Expand record">⌄</button>'+
+      '<button class="prev-del" data-i="'+i+'" aria-label="'+t("mDelete")+'">✕</button>'+
+      '<div class="wizard-row-details" hidden>'+('<div class="wizard-detail-meta">'+esc(r.date)+' · '+esc(r.cur||'EUR')+' · '+esc(r.note||'')+'</div>')+
+      ((r.items||[]).map(it=>'<div class="wizard-item-line"><span>'+esc(it.nameZh||it.name||'Item')+'</span><span>'+esc(String(it.qty||1))+' × '+esc(String(it.unitPrice||0))+' · '+esc(String(it.amount||0))+'</span></div>').join('')||'<div class="wizard-detail-meta">'+(state.lang==='en'?'No itemized products':'没有商品明细')+'</div>')+'</div>';
     wrap.appendChild(div);
   });
   $$("input",wrap).forEach(inp=>inp.addEventListener("input",e=>{previewRows[+e.target.dataset.i].amount=parseFloat(e.target.value)||0;}));
   $$("select",wrap).forEach(sel=>sel.addEventListener("change",e=>{previewRows[+e.target.dataset.i].category=e.target.value;}));
+  $$(".wizard-row-check",wrap).forEach(el=>el.addEventListener("change",e=>{previewRows[+e.target.dataset.i].wizardSelected=e.target.checked;updateWizardSummary();}));
+  $$(".wizard-row-toggle",wrap).forEach(b=>b.addEventListener("click",()=>{const details=b.parentNode.querySelector(".wizard-row-details");details.hidden=!details.hidden;b.textContent=details.hidden?"⌄":"⌃";}));
+  updateWizardSummary();
   $$(".prev-del",wrap).forEach(b=>b.addEventListener("click",e=>{
     previewRows.splice(+e.target.dataset.i,1); renderPreview();
   }));
 }
 function commitPreview(){
-  const good=previewRows.filter(r=>r.amount>0&&/^\d{4}-\d{2}-\d{2}$/.test(r.date));
+  const good=previewRows.filter(r=>r.wizardSelected!==false&&r.amount>0&&/^\d{4}-\d{2}-\d{2}$/.test(r.date));
   if(!good.length){ toast(t("tNoValidCommit")); return; }
   const nowTs=Date.now();
   good.forEach(r=>saveExpense({id:uid(),amount:r.amount,date:r.date,category:r.category,
@@ -2315,8 +2413,8 @@ function bindEvents(){
     else $("#viewPromptBtn").textContent=t("tViewPrompt");
   });
   $("#parseBtn").addEventListener("click",()=>{
-    const t=$("#importText").value.trim(); if(!t){toast(t("tPasteFirst"));return;}
-    const res=parseImport(t);
+    const rawText=$("#importText").value.trim(); if(!rawText){toast(t("tPasteFirst"));return;}
+    const res=parseImport(rawText);
     if(res.error){toast(t("tParseFail")+res.error); previewRows=[]; renderPreview(); return;}
     previewRows=res.rows; renderPreview();
     if(!res.rows.length) toast(t("tNoValid"));
@@ -2435,6 +2533,79 @@ async function init(){
 }
 init();
 /*@@END@@*/
+</script>
+
+<script>
+/* V2.2 UI orchestration. Existing data model, parser and business handlers remain untouched. */
+(function(){
+  function $(s){return document.querySelector(s)}
+  function updateImportSteps(n){document.querySelectorAll('.import-step').forEach(el=>{const i=+el.dataset.step;el.classList.toggle('current',i===n);el.classList.toggle('done',i<n)});}
+  const oldShowTab=showTab;
+  showTab=function(tab){
+    oldShowTab(tab);
+    if(tab==='calendar'){
+      $('#periodWrap').style.display='none';$('#statSegWrap').style.display='none';$('#fabBtn').style.display='none';
+      renderDash();
+    }
+    if(tab==='import') updateImportSteps(window.__wizardStep||1);
+    window.scrollTo({top:0,behavior:'instant'});
+  };
+  openHomeCalendar=function(){showTab('calendar')};
+  const calendarSection=$('#view-settings .set-group:has(#dashCal)');
+  if(calendarSection){calendarSection.classList.add('calendar-special');$('#calendarMount').appendChild(calendarSection);}
+  $('#calendarBack').addEventListener('click',()=>showTab('home'));
+  $('#importBack').addEventListener('click',()=>showTab('home'));
+  $('#ledgerSearchToggle').addEventListener('click',()=>$('#searchInput').focus());
+  $('#ledgerFilterToggle').addEventListener('click',()=>$('#sortSel').focus());
+  $('#view-settings').querySelectorAll('.set-group').forEach(g=>g.classList.add('settings-detail'));
+  $('#settingsDirectory').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const el=document.querySelector('[data-i18n="'+b.dataset.target+'"]') || document.getElementById(b.dataset.target);
+    if(!el)return;
+    const group=el.closest('.set-group')||el;
+    $('#view-settings').querySelectorAll('.settings-detail').forEach(g=>g.classList.toggle('active-detail',g===group));
+    if(b.dataset.target==='setCats' && typeof renderSettings==='function'){const manage=$('#catManage');if(manage && getComputedStyle(manage).display==='none')el.click();}
+    group.scrollIntoView({behavior:'smooth',block:'start'});
+    group.classList.remove('v2-highlight');void group.offsetWidth;group.classList.add('v2-highlight');
+  }));
+  $('#importText').addEventListener('input',()=>updateImportSteps($('#importText').value.trim()?2:1));
+  $('#parseBtn').addEventListener('click',()=>setTimeout(()=>updateImportSteps($('#previewCard').style.display==='block'?3:2),0));
+  $('#clearPreviewBtn').addEventListener('click',()=>setTimeout(()=>updateImportSteps(2),0));
+  $('#commitBtn').addEventListener('click',()=>setTimeout(()=>updateImportSteps(1),150));
+  let wizardStep=1;
+  function wizardGo(n){
+    wizardStep=n;window.__wizardStep=n;
+    ['wizardOne','wizardTwo','wizardThree'].forEach((id,i)=>{$('#'+id).hidden=i+1!==n});
+    updateImportSteps(n);
+    if(n===3)updateWizardSummary();
+    const app=$('#view-import'); if(app.classList.contains('on'))window.scrollTo({top:0,behavior:'instant'});
+  }
+  window.updateWizardSummary=function(){
+    const rows=typeof previewRows!=='undefined'?previewRows:[];
+    const chosen=rows.filter(r=>r.wizardSelected!==false);
+    const group={};chosen.forEach(r=>group[r.cur||'EUR']=(group[r.cur||'EUR']||0)+Number(r.amount||0));
+    const amounts=Object.entries(group).map(([cur,v])=>moneyC(v,cur)).join(' · ');
+    $('#wizardSummary').textContent=(state.lang==='en'?`Selected ${chosen.length} of ${rows.length} records`:`已选 ${chosen.length} / ${rows.length} 笔记录`)+(amounts?' · '+amounts:'');
+    $('#wizardSelectAll').checked=rows.length>0 && chosen.length===rows.length;
+  };
+  $('#wizardToTwo').addEventListener('click',()=>wizardGo(2));
+  $('#wizardToOne').addEventListener('click',()=>wizardGo(1));
+  $('#wizardToTwoBack').addEventListener('click',()=>wizardGo(2));
+  $('#wizardPaste').addEventListener('click',async()=>{try{const text=await navigator.clipboard.readText();$('#importText').value=text;$('#importText').dispatchEvent(new Event('input'));}catch(e){$('#importText').focus();toast(state.lang==='en'?'Paste manually from clipboard':'请长按输入框粘贴');}});
+  $('#wizardClear').addEventListener('click',()=>{$('#importText').value='';$('#importText').focus();});
+  $('#wizardSelectAll').addEventListener('change',e=>{previewRows.forEach(r=>r.wizardSelected=e.target.checked);document.querySelectorAll('.wizard-row-check').forEach(c=>c.checked=e.target.checked);updateWizardSummary();});
+  $('#wizardEdit').addEventListener('click',()=>{$('#previewList').classList.toggle('wizard-editing');});
+  $('#parseBtn').addEventListener('click',()=>setTimeout(()=>{if(previewRows.length)wizardGo(3);else wizardGo(2)},0));
+  $('#commitBtn').addEventListener('click',()=>setTimeout(()=>{if(!previewRows.length)wizardGo(1);},0));
+  const _showTabWizard=showTab;
+  showTab=function(tab){_showTabWizard(tab);if(tab==='import')wizardGo(wizardStep);};
+  const wizardTranslations={zh:{step1:'第 1 步：获取识别提示词',step2:'第 2 步：粘贴识别结果',step3:'第 3 步：核对并导入',help1:'复制下方提示词，前往 DeepSeek 或你使用的 AI 工具，上传小票、订单或银行消费截图进行识别。识别结束后返回这里粘贴结果。',help2:'将 DeepSeek 返回的 JSON 或文本粘贴到下方，然后点击解析。',next:'我已获取识别结果 · 下一步 →',paste:'粘贴',clear:'清空',back1:'‹ 返回获取提示词',back2:'‹ 返回粘贴结果',all:'全选',edit:'编辑'},en:{step1:'Step 1: Get recognition prompt',step2:'Step 2: Paste recognized result',step3:'Step 3: Review and import',help1:'Copy a prompt, open DeepSeek or another AI tool, upload your receipt or transaction screenshot, and return with the result.',help2:'Paste the JSON or text returned by your AI tool, then press Parse.',next:'I have the results · Continue →',paste:'Paste',clear:'Clear',back1:'‹ Back to prompt',back2:'‹ Back to paste',all:'Select all',edit:'Edit'}};
+  function translateWizard(){const map=wizardTranslations[state.lang==='en'?'en':'zh'];document.querySelectorAll('[data-wz]').forEach(el=>{const key=el.dataset.wz;if(map[key])el.textContent=map[key]});}
+  const syncLanguage=()=>{const en=state.lang==='en';const strings={transactions:['交易记录','Transactions'],analysis:['消费分析','Spending analysis'],import:['识别结果导入','Import results'],calendar:['日历','Calendar'],settings:['设置','Settings']};Object.entries(strings).forEach(([k,v])=>{const el=document.querySelector('[data-v2="'+k+'"]');if(el)el.textContent=v[en?1:0]});};
+  const priorApply=applyLang;
+  applyLang=function(){priorApply();syncLanguage();translateWizard();};
+  syncLanguage();translateWizard();
+  /* Ensure all original links remain possible even when navigational structures change. */
+})();
 </script>
 </body>
 </html>
