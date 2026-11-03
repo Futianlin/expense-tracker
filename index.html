@@ -1898,18 +1898,19 @@ function expsCount(y){ return allExpenses.filter(e=>isExp(e)&&inLedger(e)&&+e.da
 function lineSVG(months,max,avg,budget){
   const W=320,H=150,padL=6,padR=8,padT=12,padB=22;
   const iw=W-padL-padR, ih=H-padT-padB;
-  const emax=Math.max(max,budget||0,1);
+  // 主比例尺只随支出走（含月均），预算不把曲线压扁；预算线独立呈现并夹在可见范围
+  const emax=Math.max(max,avg||0,1)*1.12;
   const yScale=v=>padT+ih-(v/emax)*ih;
   const pts=months.map((v,i)=>({x:padL+i*(iw/11), y:yScale(v)}));
   const line=pts.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
   const area=line+" L"+pts[11].x.toFixed(1)+" "+(padT+ih)+" L"+pts[0].x.toFixed(1)+" "+(padT+ih)+" Z";
   const avgY=yScale(avg);
-  const budgetY=budget>0?yScale(budget):null;
+  const budgetY=budget>0?Math.max(yScale(budget),padT):null;
   const grid=[25,50,75].map(g=>{const gy=padT+ih*(g/100); return '<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="#EEF1F4" stroke-width="1"/>';}).join("");
-  const dots=pts.map((p,i)=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.6" fill="'+(budget>0&&months[i]>budget?"#D9534F":"#2E7D5B")+'"/>').join("");
+  const dots=pts.map((p,i)=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.6" fill="'+(budget>0&&months[i]>budget?"#D9534F":"#287C5A")+'"/>').join("");
   const labels=months.map((v,i)=> '<text x="'+(padL+i*(iw/11)).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="#9AA3AB">'+(i+1)+'</text>').join("");
   return '<svg viewBox="0 0 320 150" width="100%">'+
-    '<defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E7D5B" stop-opacity=".26"/><stop offset="1" stop-color="#2E7D5B" stop-opacity="0"/></linearGradient></defs>'+
+    '<defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#287C5A" stop-opacity=".26"/><stop offset="1" stop-color="#287C5A" stop-opacity="0"/></linearGradient></defs>'+
     grid+
     '<path d="'+area+'" fill="url(#lg)"/>'+
     (budgetY!=null?'<line x1="'+padL+'" y1="'+budgetY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+budgetY.toFixed(1)+'" stroke="#D9534F" stroke-width="1.5" stroke-dasharray="5 4"/>':"")+
